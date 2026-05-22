@@ -3,6 +3,7 @@ import { review } from "@/agents/editor";
 import { evaluate } from "@/agents/evaluator";
 import { check } from "@/agents/fact-checker";
 import { draft as takeDraft } from "@/agents/take";
+import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import { generations, posts, viralPosts } from "@/db/schema";
 import { authorizeCronRequest, unauthorized } from "@/lib/cron-auth";
@@ -42,20 +43,57 @@ export async function GET(request: Request) {
     .where(gt(generations.createdAt, sub7d));
   const takenIds = new Set(takenRows.map((t) => t.vid).filter(Boolean));
 
-  const candidate = recent.find((v) => !takenIds.has(v.id));
+  // Pick the highest-engagement candidate that (a) hasn't been processed in
+  // the last 7d and (b) passes the topic safety gate. Walk down the top list
+  // until one passes — political/tragic/conspiracy tweets get filtered here
+  // and don't waste downstream tokens or risk the queue.
+  let candidate: (typeof recent)[number] | null = null;
+  const blockedCategories: Array<{ author: string; category: string }> = [];
+  for (const v of recent) {
+    if (takenIds.has(v.id)) continue;
+    const guard = await guardCheck({ text: v.text, author: v.author });
+    await writeTrace({
+      generationId: null,
+      agent: "topic-guard",
+      eventType: guard.safe ? "safe" : "blocked",
+      payload: {
+        viralPostId: v.id,
+        viralAuthor: v.author,
+        category: guard.category,
+        reason: guard.reason,
+        mode: "cron-generate",
+      },
+      model: guard.model,
+      tokensIn: guard.tokensIn,
+      tokensOut: guard.tokensOut,
+      costUsd: guard.costUsd.toString(),
+    });
+    if (guard.safe) {
+      candidate = v;
+      break;
+    }
+    blockedCategories.push({
+      author: v.author ?? "?",
+      category: guard.category,
+    });
+  }
+
   if (!candidate) {
     await writeTrace({
       generationId: null,
       agent: "cron-generate",
       eventType: "skip",
       payload: {
-        reason: "all 20 top viral posts already taken in last 7d",
-        topCount: recent.length,
+        reason: "no safe candidates after topic-guard filter",
+        considered: recent.length,
+        blocked: blockedCategories,
       },
     });
     return Response.json({
       ok: true,
-      skipped: "all recent viral posts already processed",
+      skipped: "no brand-safe viral candidates",
+      consideredCount: recent.length,
+      blocked: blockedCategories,
     });
   }
 

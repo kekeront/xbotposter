@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { review } from "@/agents/editor";
 import { draft as takeDraft } from "@/agents/take";
+import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import {
   type ContentType,
@@ -76,6 +77,38 @@ export async function POST(request: Request) {
   }
 
   const author = viral.author ?? "unknown";
+
+  // Topic safety gate — block politically/sensitively charged sources before
+  // spending any tokens on the writer.
+  const guard = await guardCheck({ text: viral.text, author });
+  await writeTrace({
+    generationId: null,
+    agent: "topic-guard",
+    eventType: guard.safe ? "safe" : "blocked",
+    payload: {
+      viralPostId: viral.id,
+      viralAuthor: author,
+      category: guard.category,
+      reason: guard.reason,
+      mode: "take",
+    },
+    model: guard.model,
+    tokensIn: guard.tokensIn,
+    tokensOut: guard.tokensOut,
+    costUsd: guard.costUsd.toString(),
+  });
+
+  if (!guard.safe) {
+    return Response.json(
+      {
+        blocked: true,
+        category: guard.category,
+        reason: guard.reason,
+        viralAuthor: author,
+      },
+      { status: 200 },
+    );
+  }
 
   const [generation] = await db
     .insert(generations)

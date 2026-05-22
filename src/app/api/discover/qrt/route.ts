@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { review } from "@/agents/editor";
 import { draft as qrtDraft } from "@/agents/qrt";
+import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import { generations, posts, viralPosts, type Post } from "@/db/schema";
 import { writeTrace } from "@/lib/trace";
@@ -46,6 +47,37 @@ export async function POST(request: Request) {
   }
 
   const author = viral.author ?? "unknown";
+
+  // Topic safety gate — fail-closed on politics / tragedy / conspiracy / etc.
+  const guard = await guardCheck({ text: viral.text, author });
+  await writeTrace({
+    generationId: null,
+    agent: "topic-guard",
+    eventType: guard.safe ? "safe" : "blocked",
+    payload: {
+      viralPostId: viral.id,
+      viralAuthor: author,
+      category: guard.category,
+      reason: guard.reason,
+      mode: "qrt",
+    },
+    model: guard.model,
+    tokensIn: guard.tokensIn,
+    tokensOut: guard.tokensOut,
+    costUsd: guard.costUsd.toString(),
+  });
+
+  if (!guard.safe) {
+    return Response.json(
+      {
+        blocked: true,
+        category: guard.category,
+        reason: guard.reason,
+        viralAuthor: author,
+      },
+      { status: 200 },
+    );
+  }
 
   const [generation] = await db
     .insert(generations)
