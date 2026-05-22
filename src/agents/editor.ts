@@ -6,6 +6,7 @@ export type EditorInput = {
   drafts: string[];
   contentType: "single" | "thread";
   referenceTweets?: string[];
+  fingerprintBlock?: string;
 };
 
 export type EditorOutput = {
@@ -49,6 +50,10 @@ function buildMessages(input: EditorInput): CompletionMessage[] {
   const messages: CompletionMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
   ];
+
+  if (input.fingerprintBlock) {
+    messages.push({ role: "system", content: input.fingerprintBlock });
+  }
 
   const refs = (input.referenceTweets ?? []).slice(0, 10);
   if (refs.length > 0) {

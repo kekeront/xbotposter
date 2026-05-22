@@ -5,33 +5,19 @@ import { draft as takeDraft } from "@/agents/take";
 import { db } from "@/db/client";
 import {
   type ContentType,
-  fingerprints,
   generations,
   posts,
   viralPosts,
   type Post,
 } from "@/db/schema";
 import { writeTrace } from "@/lib/trace";
+import { loadDefaultVoice } from "@/lib/voice-load";
 
 const TakeRequest = z.object({
   viralPostId: z.string().uuid(),
   userAngle: z.string().max(500).optional(),
   contentType: z.enum(["single", "thread"]).default("single"),
 });
-
-type FingerprintProfile = { referenceTweets?: string[] };
-
-async function loadDefaultReferenceTweets(): Promise<string[]> {
-  const rows = await db
-    .select()
-    .from(fingerprints)
-    .where(eq(fingerprints.name, "default"))
-    .limit(1);
-  const row = rows[0];
-  if (!row) return [];
-  const profile = row.profile as FingerprintProfile;
-  return profile.referenceTweets ?? [];
-}
 
 async function insertPostChain(
   generationId: string,
@@ -123,14 +109,15 @@ export async function POST(request: Request) {
   });
 
   try {
-    const refs = await loadDefaultReferenceTweets();
+    const voice = await loadDefaultVoice();
 
     const writerResult = await takeDraft({
       viralText: viral.text,
       viralAuthor: author,
       userAngle: userAngle ?? null,
       contentType,
-      referenceTweets: refs,
+      referenceTweets: voice.referenceTweets,
+      fingerprintBlock: voice.fingerprintBlock,
     });
 
     await writeTrace({
@@ -150,7 +137,8 @@ export async function POST(request: Request) {
         : `Reacting to @${author}: ${viral.text}`,
       drafts: writerResult.texts,
       contentType,
-      referenceTweets: refs,
+      referenceTweets: voice.referenceTweets,
+      fingerprintBlock: voice.fingerprintBlock,
     });
 
     await writeTrace({

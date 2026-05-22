@@ -5,34 +5,18 @@ import { draft } from "@/agents/writer";
 import { db } from "@/db/client";
 import {
   type ContentType,
-  fingerprints,
   generations,
   posts,
   type Post,
 } from "@/db/schema";
 import { writeTrace } from "@/lib/trace";
+import { loadDefaultVoice } from "@/lib/voice-load";
 
 const ComposeRequest = z.object({
   topic: z.string().min(1).max(2000),
   contentType: z.enum(["single", "thread"]).default("single"),
   mode: z.enum(["ai", "manual"]).default("ai"),
 });
-
-type FingerprintProfile = {
-  referenceTweets?: string[];
-};
-
-async function loadDefaultReferenceTweets(): Promise<string[]> {
-  const rows = await db
-    .select()
-    .from(fingerprints)
-    .where(eq(fingerprints.name, "default"))
-    .limit(1);
-  const row = rows[0];
-  if (!row) return [];
-  const profile = row.profile as FingerprintProfile;
-  return profile.referenceTweets ?? [];
-}
 
 async function insertPostChain(
   generationId: string,
@@ -155,16 +139,24 @@ export async function POST(request: Request) {
     }
 
     // mode === "ai" — two-stage pipeline: writer → editor
-    const referenceTweets = await loadDefaultReferenceTweets();
+    const voice = await loadDefaultVoice();
 
     await writeTrace({
       generationId: generation.id,
       agent: "writer",
       eventType: "start",
-      payload: { referenceTweetCount: referenceTweets.length },
+      payload: {
+        referenceTweetCount: voice.referenceTweets.length,
+        hasFingerprint: !!voice.fingerprint,
+      },
     });
 
-    const writerResult = await draft({ topic, contentType, referenceTweets });
+    const writerResult = await draft({
+      topic,
+      contentType,
+      referenceTweets: voice.referenceTweets,
+      fingerprintBlock: voice.fingerprintBlock,
+    });
 
     await writeTrace({
       generationId: generation.id,
@@ -188,7 +180,8 @@ export async function POST(request: Request) {
       topic,
       drafts: writerResult.texts,
       contentType,
-      referenceTweets,
+      referenceTweets: voice.referenceTweets,
+      fingerprintBlock: voice.fingerprintBlock,
     });
 
     await writeTrace({

@@ -3,27 +3,14 @@ import { z } from "zod";
 import { review } from "@/agents/editor";
 import { draft as qrtDraft } from "@/agents/qrt";
 import { db } from "@/db/client";
-import { fingerprints, generations, posts, viralPosts, type Post } from "@/db/schema";
+import { generations, posts, viralPosts, type Post } from "@/db/schema";
 import { writeTrace } from "@/lib/trace";
+import { loadDefaultVoice } from "@/lib/voice-load";
 
 const QrtRequest = z.object({
   viralPostId: z.string().uuid(),
   userAngle: z.string().max(500).optional(),
 });
-
-type FingerprintProfile = { referenceTweets?: string[] };
-
-async function loadDefaultReferenceTweets(): Promise<string[]> {
-  const rows = await db
-    .select()
-    .from(fingerprints)
-    .where(eq(fingerprints.name, "default"))
-    .limit(1);
-  const row = rows[0];
-  if (!row) return [];
-  const profile = row.profile as FingerprintProfile;
-  return profile.referenceTweets ?? [];
-}
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -92,13 +79,14 @@ export async function POST(request: Request) {
   });
 
   try {
-    const refs = await loadDefaultReferenceTweets();
+    const voice = await loadDefaultVoice();
 
     const writerResult = await qrtDraft({
       viralText: viral.text,
       viralAuthor: author,
       userAngle: userAngle ?? null,
-      referenceTweets: refs,
+      referenceTweets: voice.referenceTweets,
+      fingerprintBlock: voice.fingerprintBlock,
     });
 
     await writeTrace({
@@ -118,7 +106,8 @@ export async function POST(request: Request) {
         : `Quote retweeting @${author}: ${viral.text}`,
       drafts: [writerResult.text],
       contentType: "single",
-      referenceTweets: refs,
+      referenceTweets: voice.referenceTweets,
+      fingerprintBlock: voice.fingerprintBlock,
     });
 
     await writeTrace({

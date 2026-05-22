@@ -2,17 +2,17 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { fingerprints } from "@/db/schema";
+import { extractFingerprint, type Fingerprint } from "@/lib/fingerprint";
 
 const DEFAULT_NAME = "default";
 
 const SaveRequest = z.object({
-  referenceTweets: z
-    .array(z.string().min(1).max(2000))
-    .max(200),
+  referenceTweets: z.array(z.string().min(1).max(2000)).max(200),
 });
 
 type FingerprintProfile = {
   referenceTweets?: string[];
+  fingerprint?: Fingerprint;
 };
 
 export async function GET() {
@@ -23,11 +23,16 @@ export async function GET() {
     .limit(1);
   const row = rows[0];
   if (!row) {
-    return Response.json({ referenceTweets: [], updatedAt: null });
+    return Response.json({
+      referenceTweets: [],
+      fingerprint: null,
+      updatedAt: null,
+    });
   }
   const profile = row.profile as FingerprintProfile;
   return Response.json({
     referenceTweets: profile.referenceTweets ?? [],
+    fingerprint: profile.fingerprint ?? null,
     updatedAt: row.updatedAt,
   });
 }
@@ -52,7 +57,9 @@ export async function POST(request: Request) {
     .map((t) => t.trim())
     .filter(Boolean);
 
-  const profile: FingerprintProfile = { referenceTweets };
+  const fingerprint = extractFingerprint(referenceTweets);
+  const profile: FingerprintProfile = { referenceTweets, fingerprint };
+
   const existing = await db
     .select()
     .from(fingerprints)
@@ -69,7 +76,7 @@ export async function POST(request: Request) {
       })
       .where(eq(fingerprints.id, existing[0].id))
       .returning();
-    return Response.json(updated);
+    return Response.json({ ...updated, fingerprint });
   }
 
   const [created] = await db
@@ -80,5 +87,5 @@ export async function POST(request: Request) {
       sampleCount: referenceTweets.length,
     })
     .returning();
-  return Response.json(created, { status: 201 });
+  return Response.json({ ...created, fingerprint }, { status: 201 });
 }

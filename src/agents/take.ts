@@ -7,6 +7,7 @@ export type TakeInput = {
   userAngle?: string | null;
   contentType?: "single" | "thread";
   referenceTweets?: string[];
+  fingerprintBlock?: string;
 };
 
 export type TakeOutput = {
@@ -43,6 +44,10 @@ function buildMessages(input: TakeInput): CompletionMessage[] {
   const messages: CompletionMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
   ];
+
+  if (input.fingerprintBlock) {
+    messages.push({ role: "system", content: input.fingerprintBlock });
+  }
 
   const refs = (input.referenceTweets ?? [])
     .map((t) => t.trim())

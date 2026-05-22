@@ -6,6 +6,7 @@ export type QrtInput = {
   viralAuthor: string;
   userAngle?: string | null;
   referenceTweets?: string[];
+  fingerprintBlock?: string;
 };
 
 export type QrtOutput = {
@@ -37,6 +38,10 @@ function buildMessages(input: QrtInput): CompletionMessage[] {
   const messages: CompletionMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
   ];
+
+  if (input.fingerprintBlock) {
+    messages.push({ role: "system", content: input.fingerprintBlock });
+  }
 
   const refs = (input.referenceTweets ?? [])
     .map((t) => t.trim())
