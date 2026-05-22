@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { review } from "@/agents/editor";
+import { evaluate, type EvalOutput } from "@/agents/evaluator";
 import { draft } from "@/agents/writer";
 import { db } from "@/db/client";
 import {
@@ -10,13 +11,132 @@ import {
   type Post,
 } from "@/db/schema";
 import { writeTrace } from "@/lib/trace";
-import { loadDefaultVoice } from "@/lib/voice-load";
+import { loadDefaultVoice, type LoadedVoice } from "@/lib/voice-load";
 
 const ComposeRequest = z.object({
   topic: z.string().min(1).max(2000),
   contentType: z.enum(["single", "thread"]).default("single"),
   mode: z.enum(["ai", "manual"]).default("ai"),
+  variants: z.number().int().min(1).max(3).default(1),
 });
+
+type VariantResult = {
+  index: number;
+  texts: string[];
+  writerCost: number;
+  editorCost: number;
+  evalCost: number;
+  totalCost: number;
+  tokensIn: number;
+  tokensOut: number;
+  editorIssues: string[];
+  editorChanged: boolean;
+  evalScores: EvalOutput["scores"];
+  evalOverall: number;
+  evalCritique: string;
+  writerModel: string;
+  editorModel: string;
+  evalModel: string;
+};
+
+async function runVariant(
+  index: number,
+  topic: string,
+  contentType: "single" | "thread",
+  voice: LoadedVoice,
+  generationId: string,
+): Promise<VariantResult> {
+  await writeTrace({
+    generationId,
+    agent: "writer",
+    eventType: "start",
+    payload: { variantIndex: index },
+  });
+  const writerResult = await draft({
+    topic,
+    contentType,
+    referenceTweets: voice.referenceTweets,
+    fingerprintBlock: voice.fingerprintBlock,
+  });
+  await writeTrace({
+    generationId,
+    agent: "writer",
+    eventType: "complete",
+    payload: { variantIndex: index, posts: writerResult.texts.length },
+    model: writerResult.model,
+    tokensIn: writerResult.tokensIn,
+    tokensOut: writerResult.tokensOut,
+    costUsd: writerResult.costUsd.toString(),
+  });
+
+  const editorResult = await review({
+    topic,
+    drafts: writerResult.texts,
+    contentType,
+    referenceTweets: voice.referenceTweets,
+    fingerprintBlock: voice.fingerprintBlock,
+  });
+  await writeTrace({
+    generationId,
+    agent: "editor",
+    eventType: editorResult.changed
+      ? "complete_with_changes"
+      : "complete_no_changes",
+    payload: {
+      variantIndex: index,
+      issues: editorResult.issuesFound,
+      changed: editorResult.changed,
+    },
+    model: editorResult.model,
+    tokensIn: editorResult.tokensIn,
+    tokensOut: editorResult.tokensOut,
+    costUsd: editorResult.costUsd.toString(),
+  });
+
+  const evalResult = await evaluate({
+    seed: topic,
+    draft: editorResult.texts,
+    contentType,
+    referenceTweets: voice.referenceTweets,
+    fingerprintBlock: voice.fingerprintBlock,
+  });
+  await writeTrace({
+    generationId,
+    agent: "evaluator",
+    eventType: "complete",
+    payload: {
+      variantIndex: index,
+      overall: evalResult.overall,
+      scores: evalResult.scores,
+      critique: evalResult.critique,
+    },
+    model: evalResult.model,
+    tokensIn: evalResult.tokensIn,
+    tokensOut: evalResult.tokensOut,
+    costUsd: evalResult.costUsd.toString(),
+  });
+
+  return {
+    index,
+    texts: editorResult.texts,
+    writerCost: writerResult.costUsd,
+    editorCost: editorResult.costUsd,
+    evalCost: evalResult.costUsd,
+    totalCost: writerResult.costUsd + editorResult.costUsd + evalResult.costUsd,
+    tokensIn:
+      writerResult.tokensIn + editorResult.tokensIn + evalResult.tokensIn,
+    tokensOut:
+      writerResult.tokensOut + editorResult.tokensOut + evalResult.tokensOut,
+    editorIssues: editorResult.issuesFound,
+    editorChanged: editorResult.changed,
+    evalScores: evalResult.scores,
+    evalOverall: evalResult.overall,
+    evalCritique: evalResult.critique,
+    writerModel: writerResult.model,
+    editorModel: editorResult.model,
+    evalModel: evalResult.model,
+  };
+}
 
 async function insertPostChain(
   generationId: string,
@@ -62,13 +182,13 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  const { topic, contentType, mode } = parsed.data;
+  const { topic, contentType, mode, variants } = parsed.data;
 
   const [generation] = await db
     .insert(generations)
     .values({
       topic,
-      inputMeta: { contentType, mode },
+      inputMeta: { contentType, mode, variants },
       status: "running",
     })
     .returning();
@@ -84,7 +204,7 @@ export async function POST(request: Request) {
     generationId: generation.id,
     agent: "compose",
     eventType: "start",
-    payload: { contentType, mode, length: topic.length },
+    payload: { contentType, mode, variants, length: topic.length },
   });
 
   try {
@@ -138,75 +258,45 @@ export async function POST(request: Request) {
       );
     }
 
-    // mode === "ai" — two-stage pipeline: writer → editor
+    // mode === "ai" — writer → editor → evaluator pipeline, optionally N variants
     const voice = await loadDefaultVoice();
 
-    await writeTrace({
-      generationId: generation.id,
-      agent: "writer",
-      eventType: "start",
-      payload: {
-        referenceTweetCount: voice.referenceTweets.length,
-        hasFingerprint: !!voice.fingerprint,
-      },
-    });
+    const variantResults = await Promise.all(
+      Array.from({ length: variants }, (_, i) =>
+        runVariant(i, topic, contentType, voice, generation.id),
+      ),
+    );
 
-    const writerResult = await draft({
-      topic,
-      contentType,
-      referenceTweets: voice.referenceTweets,
-      fingerprintBlock: voice.fingerprintBlock,
-    });
+    // Sort by overall eval score desc; winner becomes the actual queue draft.
+    variantResults.sort((a, b) => b.evalOverall - a.evalOverall);
+    const winner = variantResults[0]!;
 
-    await writeTrace({
-      generationId: generation.id,
-      agent: "writer",
-      eventType: "complete",
-      payload: { variants: writerResult.texts.length },
-      model: writerResult.model,
-      tokensIn: writerResult.tokensIn,
-      tokensOut: writerResult.tokensOut,
-      costUsd: writerResult.costUsd.toString(),
-    });
-
-    await writeTrace({
-      generationId: generation.id,
-      agent: "editor",
-      eventType: "start",
-      payload: { draftCount: writerResult.texts.length },
-    });
-
-    const editorResult = await review({
-      topic,
-      drafts: writerResult.texts,
-      contentType,
-      referenceTweets: voice.referenceTweets,
-      fingerprintBlock: voice.fingerprintBlock,
-    });
-
-    await writeTrace({
-      generationId: generation.id,
-      agent: "editor",
-      eventType: editorResult.changed ? "complete_with_changes" : "complete_no_changes",
-      payload: {
-        issues: editorResult.issuesFound,
-        changed: editorResult.changed,
-      },
-      model: editorResult.model,
-      tokensIn: editorResult.tokensIn,
-      tokensOut: editorResult.tokensOut,
-      costUsd: editorResult.costUsd.toString(),
-    });
-
-    const totalTokensIn = writerResult.tokensIn + editorResult.tokensIn;
-    const totalTokensOut = writerResult.tokensOut + editorResult.tokensOut;
-    const totalCost = writerResult.costUsd + editorResult.costUsd;
+    const totalCost = variantResults.reduce((s, v) => s + v.totalCost, 0);
+    const totalTokensIn = variantResults.reduce((s, v) => s + v.tokensIn, 0);
+    const totalTokensOut = variantResults.reduce((s, v) => s + v.tokensOut, 0);
 
     await db
       .update(generations)
       .set({
         status: "succeeded",
-        model: `${writerResult.model} + ${editorResult.model}`,
+        model: `${winner.writerModel} + ${winner.editorModel} + ${winner.evalModel}`,
+        inputMeta: {
+          contentType,
+          mode,
+          variants,
+          winnerEval: {
+            scores: winner.evalScores,
+            overall: winner.evalOverall,
+            critique: winner.evalCritique,
+          },
+          allVariants: variantResults.map((v) => ({
+            index: v.index,
+            overall: v.evalOverall,
+            scores: v.evalScores,
+            critique: v.evalCritique,
+            firstChars: v.texts[0]?.slice(0, 60) ?? "",
+          })),
+        },
         tokensIn: totalTokensIn,
         tokensOut: totalTokensOut,
         costUsd: totalCost.toString(),
@@ -214,11 +304,10 @@ export async function POST(request: Request) {
       })
       .where(eq(generations.id, generation.id));
 
-    const finalTexts = editorResult.texts;
     const createdPosts = await insertPostChain(
       generation.id,
       contentType,
-      finalTexts,
+      winner.texts,
     );
 
     await writeTrace({
@@ -226,10 +315,10 @@ export async function POST(request: Request) {
       agent: "compose",
       eventType: "complete",
       payload: {
-        postCount: createdPosts.length,
-        mode: "ai",
-        editorChanged: editorResult.changed,
-        editorIssues: editorResult.issuesFound,
+        variants,
+        winnerIndex: winner.index,
+        winnerOverall: winner.evalOverall,
+        rankedScores: variantResults.map((v) => v.evalOverall),
       },
     });
 
@@ -238,15 +327,28 @@ export async function POST(request: Request) {
         generation: {
           id: generation.id,
           status: "succeeded" as const,
-          model: `${writerResult.model} + ${editorResult.model}`,
+          model: `${winner.writerModel} + ${winner.editorModel} + ${winner.evalModel}`,
           tokensIn: totalTokensIn,
           tokensOut: totalTokensOut,
           costUsd: totalCost,
         },
         editor: {
-          changed: editorResult.changed,
-          issuesFound: editorResult.issuesFound,
+          changed: winner.editorChanged,
+          issuesFound: winner.editorIssues,
         },
+        eval: {
+          scores: winner.evalScores,
+          overall: winner.evalOverall,
+          critique: winner.evalCritique,
+        },
+        variants: variantResults.map((v) => ({
+          index: v.index,
+          texts: v.texts,
+          overall: v.evalOverall,
+          scores: v.evalScores,
+          critique: v.evalCritique,
+          isWinner: v.index === winner.index,
+        })),
         posts: createdPosts,
       },
       { status: 201 },

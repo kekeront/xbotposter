@@ -10,6 +10,24 @@ import { Textarea } from "@/components/ui/textarea";
 type ContentType = "single" | "thread";
 type Mode = "ai" | "manual";
 
+type EvalScores = {
+  insightDensity: number;
+  voiceMatch: number;
+  antiSlop: number;
+  charFit: number;
+  language: number;
+  faithfulness: number;
+};
+
+type VariantSummary = {
+  index: number;
+  texts: string[];
+  overall: number;
+  scores: EvalScores;
+  critique: string;
+  isWinner: boolean;
+};
+
 type ComposeResult = {
   generation: {
     id: string;
@@ -19,6 +37,12 @@ type ComposeResult = {
     tokensOut: number;
     costUsd: number;
   };
+  eval?: {
+    scores: EvalScores;
+    overall: number;
+    critique: string;
+  };
+  variants?: VariantSummary[];
   posts: Array<{
     id: string;
     text: string;
@@ -64,9 +88,14 @@ export function ComposeForm() {
   const [topic, setTopic] = useState("");
   const [contentType, setContentType] = useState<ContentType>("single");
   const [mode, setMode] = useState<Mode>("ai");
+  const [variants, setVariants] = useState<1 | 2 | 3>(1);
+  const [status, setStatus] = useState<
+    "idle" | "generating" | "done" | "error"
+  >("idle");
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<ComposeResult | null>(null);
 
   useEffect(() => {
-    // Hydrate from localStorage after mount (avoids SSR mismatch).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMode(readStoredMode());
   }, []);
@@ -75,16 +104,12 @@ export function ComposeForm() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(MODE_STORAGE_KEY, mode);
   }, [mode]);
-  const [status, setStatus] = useState<"idle" | "generating" | "done" | "error">(
-    "idle",
-  );
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ComposeResult | null>(null);
 
   const isManual = mode === "manual";
   const trimmed = topic.trim();
   const charCount = trimmed.length;
-  const overSoftLimit = isManual && contentType === "single" && charCount > X_SOFT_LIMIT;
+  const overSoftLimit =
+    isManual && contentType === "single" && charCount > X_SOFT_LIMIT;
 
   async function submit() {
     if (!trimmed) return;
@@ -95,7 +120,12 @@ export function ComposeForm() {
       const res = await fetch("/api/compose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, contentType, mode }),
+        body: JSON.stringify({
+          topic,
+          contentType,
+          mode,
+          variants: isManual ? 1 : variants,
+        }),
       });
       const data: ComposeResult | { error: string; message?: string } =
         await res.json();
@@ -114,25 +144,18 @@ export function ComposeForm() {
   const label = isManual ? "Tweet text" : "Idea / topic";
   const placeholder = isManual
     ? contentType === "thread"
-      ? `Type the exact tweets, separated by --- on its own line.
-
-Example:
-
-first tweet here
----
-second tweet
----
-third tweet`
-      : `Type the exact tweet you want to ship.
-
-Example: just shipped a thing. small win, but a win.`
-    : `Paste a thought, a link, a rough idea. Anything.
-
-Example: small models are getting weirdly close to frontier on narrow tasks. write a take.`;
+      ? `Type the exact tweets, separated by --- on its own line.\n\nExample:\n\nfirst tweet here\n---\nsecond tweet\n---\nthird tweet`
+      : `Type the exact tweet you want to ship.\n\nExample: just shipped a thing. small win, but a win.`
+    : `Paste a thought, a link, a rough idea. Anything.\n\nExample: small models are getting weirdly close to frontier on narrow tasks. write a take.`;
 
   const buttonLabel = (() => {
-    if (status === "generating") return isManual ? "queueing…" : "drafting…";
-    return isManual ? "queue" : "draft";
+    if (status === "generating")
+      return isManual
+        ? "queueing…"
+        : variants > 1
+          ? `drafting ${variants}×…`
+          : "drafting…";
+    return isManual ? "queue" : variants > 1 ? `draft ${variants}` : "draft";
   })();
 
   return (
@@ -146,7 +169,7 @@ Example: small models are getting weirdly close to frontier on narrow tasks. wri
             >
               {label}
             </label>
-            <div className="ml-auto flex items-center gap-2 font-mono text-xs">
+            <div className="ml-auto flex flex-wrap items-center gap-2 font-mono text-xs">
               <ToggleButton
                 active={mode === "ai"}
                 onClick={() => setMode("ai")}
@@ -172,6 +195,21 @@ Example: small models are getting weirdly close to frontier on narrow tasks. wri
               >
                 thread
               </ToggleButton>
+              {!isManual ? (
+                <>
+                  <span className="text-muted-foreground/40">·</span>
+                  <span className="text-muted-foreground">variants:</span>
+                  {([1, 2, 3] as const).map((n) => (
+                    <ToggleButton
+                      key={n}
+                      active={variants === n}
+                      onClick={() => setVariants(n)}
+                    >
+                      {n}
+                    </ToggleButton>
+                  ))}
+                </>
+              ) : null}
             </div>
           </div>
         </CardHeader>
@@ -193,11 +231,14 @@ Example: small models are getting weirdly close to frontier on narrow tasks. wri
                 </span>
               ) : (
                 <span>
-                  Uses your reference tweets from{" "}
+                  Writer → editor → evaluator. {variants > 1
+                    ? `${variants} variants, top score wins.`
+                    : "1 variant."}{" "}
+                  Voice from{" "}
                   <Link href="/voice" className="underline">
                     Voice
-                  </Link>{" "}
-                  as few-shots.
+                  </Link>
+                  .
                 </span>
               )}
             </p>
@@ -236,6 +277,12 @@ Example: small models are getting weirdly close to frontier on narrow tasks. wri
   );
 }
 
+function scoreColor(n: number): string {
+  if (n >= 80) return "text-emerald-700 dark:text-emerald-400";
+  if (n >= 60) return "text-amber-700 dark:text-amber-400";
+  return "text-destructive";
+}
+
 function ResultCard({ result }: { result: ComposeResult }) {
   const isManual = result.generation.model === "manual";
   return (
@@ -253,6 +300,14 @@ function ResultCard({ result }: { result: ComposeResult }) {
               {result.generation.tokensIn + result.generation.tokensOut} tokens
               {" · "}${result.generation.costUsd.toFixed(5)}
             </span>
+          ) : null}
+          {result.eval ? (
+            <Badge
+              variant="outline"
+              className={`font-mono text-xs ${scoreColor(result.eval.overall)}`}
+            >
+              eval {result.eval.overall}
+            </Badge>
           ) : null}
           <Link
             href="/queue"
@@ -281,7 +336,96 @@ function ResultCard({ result }: { result: ComposeResult }) {
             </div>
           </div>
         ))}
+
+        {result.eval ? <EvalBreakdown evaluation={result.eval} /> : null}
+
+        {result.variants && result.variants.length > 1 ? (
+          <VariantsList variants={result.variants} />
+        ) : null}
       </CardContent>
     </Card>
+  );
+}
+
+function EvalBreakdown({
+  evaluation,
+}: {
+  evaluation: { scores: EvalScores; overall: number; critique: string };
+}) {
+  return (
+    <div className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3">
+      <div className="flex flex-wrap items-baseline gap-3 text-xs font-mono">
+        <span className="font-semibold">eval breakdown</span>
+        <ScorePill label="insight" v={evaluation.scores.insightDensity} />
+        <ScorePill label="voice" v={evaluation.scores.voiceMatch} />
+        <ScorePill label="anti-slop" v={evaluation.scores.antiSlop} />
+        <ScorePill label="length" v={evaluation.scores.charFit} />
+        <ScorePill label="lang" v={evaluation.scores.language} />
+        <ScorePill label="faithful" v={evaluation.scores.faithfulness} />
+      </div>
+      {evaluation.critique ? (
+        <p className="text-xs text-muted-foreground italic">
+          {evaluation.critique}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function ScorePill({ label, v }: { label: string; v: number }) {
+  return (
+    <span>
+      <span className="text-muted-foreground">{label}:</span>{" "}
+      <span className={`font-semibold ${scoreColor(v)}`}>{v}</span>
+    </span>
+  );
+}
+
+function VariantsList({ variants }: { variants: VariantSummary[] }) {
+  return (
+    <details className="rounded-lg border">
+      <summary className="cursor-pointer list-none px-3 py-2 font-mono text-xs text-muted-foreground [&::-webkit-details-marker]:hidden">
+        ▸ all {variants.length} variants ranked
+      </summary>
+      <div className="flex flex-col gap-2 border-t p-3">
+        {variants.map((v) => (
+          <div
+            key={v.index}
+            className={`flex flex-col gap-1 rounded-md border p-2 ${
+              v.isWinner ? "border-emerald-500/40 bg-emerald-500/5" : ""
+            }`}
+          >
+            <div className="flex flex-wrap items-baseline gap-2 font-mono text-xs">
+              <span className="font-semibold">#{v.index + 1}</span>
+              <Badge
+                variant="outline"
+                className={`font-mono ${scoreColor(v.overall)}`}
+              >
+                {v.overall}
+              </Badge>
+              {v.isWinner ? (
+                <span className="text-emerald-600 dark:text-emerald-500">
+                  ← winner
+                </span>
+              ) : null}
+            </div>
+            {v.texts.map((t, i) => (
+              <p
+                key={i}
+                className="whitespace-pre-wrap text-xs text-muted-foreground"
+              >
+                {v.texts.length > 1 ? `${i + 1}/${v.texts.length} · ` : ""}
+                {t}
+              </p>
+            ))}
+            {v.critique ? (
+              <p className="text-xs italic text-muted-foreground/80">
+                {v.critique}
+              </p>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </details>
   );
 }
