@@ -1,0 +1,4807 @@
+[
+  {
+    "id": "eefdc6fc-75e3-4055-9a32-92e72601575e",
+    "generation_id": "d44a5879-716a-49c2-9f3e-5978c6931709",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Эм‑дэш использован для стилистики — заменить на запятую или убрать"
+      ],
+      "changed": true
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1207,
+    "tokens_out": 502,
+    "cost_usd": "0.001306",
+    "ts": "2026-05-22T15:22:03.223Z",
+    "gen_topic": "qrt on @gdb: the model alone is no longer the product",
+    "gen_input_meta": {
+      "mode": "qrt",
+      "userAngle": null,
+      "viralXUrl": "https://x.com/gdb/status/2057670776803996110",
+      "contentType": "single",
+      "viralAuthor": "gdb",
+      "viralPostId": "c3d642ac-51c2-4b11-859c-3ce73acfdf63",
+      "viralXTweetId": "2057670776803996110"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.001948"
+  },
+  {
+    "id": "8f0a5527-a6b8-4ee5-a6f2-8526a50117f9",
+    "generation_id": "d44a5879-716a-49c2-9f3e-5978c6931709",
+    "agent": "qrt",
+    "event_type": "complete",
+    "payload": {
+      "length": 47
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 760,
+    "tokens_out": 16,
+    "cost_usd": "0.000642",
+    "ts": "2026-05-22T15:21:56.154Z",
+    "gen_topic": "qrt on @gdb: the model alone is no longer the product",
+    "gen_input_meta": {
+      "mode": "qrt",
+      "userAngle": null,
+      "viralXUrl": "https://x.com/gdb/status/2057670776803996110",
+      "contentType": "single",
+      "viralAuthor": "gdb",
+      "viralPostId": "c3d642ac-51c2-4b11-859c-3ce73acfdf63",
+      "viralXTweetId": "2057670776803996110"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.001948"
+  },
+  {
+    "id": "93fff2b7-115e-4642-bdca-fc16f8c6bc7b",
+    "generation_id": "d44a5879-716a-49c2-9f3e-5978c6931709",
+    "agent": "qrt",
+    "event_type": "start",
+    "payload": {
+      "hasAngle": false,
+      "viralAuthor": "gdb"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:21:53.686Z",
+    "gen_topic": "qrt on @gdb: the model alone is no longer the product",
+    "gen_input_meta": {
+      "mode": "qrt",
+      "userAngle": null,
+      "viralXUrl": "https://x.com/gdb/status/2057670776803996110",
+      "contentType": "single",
+      "viralAuthor": "gdb",
+      "viralPostId": "c3d642ac-51c2-4b11-859c-3ce73acfdf63",
+      "viralXTweetId": "2057670776803996110"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.001948"
+  },
+  {
+    "id": "9f25d230-f366-46f0-88a4-a62d1f9f1b2c",
+    "generation_id": "ea8b1578-6a18-43b1-8013-15ad61d2bbca",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1251,
+    "tokens_out": 506,
+    "cost_usd": "0.001325",
+    "ts": "2026-05-22T15:20:39.760Z",
+    "gen_topic": "take on @paulg: The fact that Trump made so sure to silence Marjorie Taylor Greene and Thomas Massie makes me more c",
+    "gen_input_meta": {
+      "mode": "take",
+      "userAngle": null,
+      "viralXUrl": "https://x.com/paulg/status/2057532394802950520",
+      "contentType": "single",
+      "viralAuthor": "paulg",
+      "viralPostId": "1612334c-d8df-40aa-9581-d6efba46a106",
+      "viralXTweetId": "2057532394802950520"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002122"
+  },
+  {
+    "id": "315cd4b2-10f8-4cf0-9c07-b88c35ba4b22",
+    "generation_id": "ea8b1578-6a18-43b1-8013-15ad61d2bbca",
+    "agent": "take",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 859,
+    "tokens_out": 34,
+    "cost_usd": "0.000797",
+    "ts": "2026-05-22T15:20:31.676Z",
+    "gen_topic": "take on @paulg: The fact that Trump made so sure to silence Marjorie Taylor Greene and Thomas Massie makes me more c",
+    "gen_input_meta": {
+      "mode": "take",
+      "userAngle": null,
+      "viralXUrl": "https://x.com/paulg/status/2057532394802950520",
+      "contentType": "single",
+      "viralAuthor": "paulg",
+      "viralPostId": "1612334c-d8df-40aa-9581-d6efba46a106",
+      "viralXTweetId": "2057532394802950520"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002122"
+  },
+  {
+    "id": "efcb88a4-6b8a-4567-87f7-a082e26f23b9",
+    "generation_id": "ea8b1578-6a18-43b1-8013-15ad61d2bbca",
+    "agent": "take",
+    "event_type": "start",
+    "payload": {
+      "hasAngle": false,
+      "contentType": "single",
+      "viralAuthor": "paulg"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:20:29.320Z",
+    "gen_topic": "take on @paulg: The fact that Trump made so sure to silence Marjorie Taylor Greene and Thomas Massie makes me more c",
+    "gen_input_meta": {
+      "mode": "take",
+      "userAngle": null,
+      "viralXUrl": "https://x.com/paulg/status/2057532394802950520",
+      "contentType": "single",
+      "viralAuthor": "paulg",
+      "viralPostId": "1612334c-d8df-40aa-9581-d6efba46a106",
+      "viralXTweetId": "2057532394802950520"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002122"
+  },
+  {
+    "id": "84626e4b-0246-419e-b035-a068cf5488dc",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "complete_with_errors",
+    "payload": {
+      "errors": [
+        "@karpathy: userByUsername(@karpathy) timed out after 8000ms"
+      ],
+      "source": "manual",
+      "elapsedMs": 34244,
+      "tweetsFetched": 72,
+      "apiCallsApprox": 18,
+      "tweetsCaptured": 54,
+      "influencersTracked": 10,
+      "influencersResolved": 9
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:19:04.524Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "e11e5fe0-ba94-49cb-8bb3-bfb62d03d751",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "start",
+    "payload": {
+      "source": "manual",
+      "influencers": 10
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:18:30.280Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "ddf4008b-d7aa-497d-ad1e-70dfe4179502",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1,
+      "winnerIndex": 0,
+      "rankedScores": [
+        95
+      ],
+      "winnerOverall": 95,
+      "winnerInventedClaims": 4
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:17:11.888Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "18560182-c4ef-4dd9-b813-82ad45108aa1",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "fact-checker",
+    "event_type": "complete_with_invented",
+    "payload": {
+      "invented": 4,
+      "uncertain": 0,
+      "claimsCount": 4,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 406,
+    "tokens_out": 1319,
+    "cost_usd": "0.002740",
+    "ts": "2026-05-22T15:17:09.740Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "7742da5a-25ad-457d-8965-7bc331d08502",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 100,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 95,
+        "faithfulness": 100,
+        "insightDensity": 75
+      },
+      "overall": 95,
+      "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна.",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 954,
+    "tokens_out": 807,
+    "cost_usd": "0.001853",
+    "ts": "2026-05-22T15:17:09.546Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "aa163771-f61a-4583-bb38-edf86a258899",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1295,
+    "tokens_out": 1465,
+    "cost_usd": "0.003254",
+    "ts": "2026-05-22T15:16:51.122Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "b0efdd63-f756-4cb3-8601-de2bf0b852eb",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 5,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1847,
+    "tokens_out": 93,
+    "cost_usd": "0.001804",
+    "ts": "2026-05-22T15:16:29.714Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "f95e96c7-d9c4-4da7-9588-4025857a553b",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 5,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:16:27.958Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "a33c7058-2a1f-46b9-81c7-f7a4a263b8ec",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "outliner",
+    "event_type": "complete",
+    "payload": {
+      "beats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 609,
+    "tokens_out": 1842,
+    "cost_usd": "0.003836",
+    "ts": "2026-05-22T15:16:27.555Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "7af513be-c51d-4a06-a083-d714e28e86e4",
+    "generation_id": "b84392e3-eec0-44a8-8903-1125b8b3575b",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 58,
+      "variants": 1,
+      "contentType": "thread"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:15:59.673Z",
+    "gen_topic": "почему многие AI стартапы умирают на этапе перехода в прод",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 75
+        },
+        "overall": 95,
+        "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Большинство AI-стартапов гибнут на переходе в прод 😭",
+            "Исследовательский прототип плохо живёт в стабильной архитектуре",
+            "Недооценивают данные, инфраструктуру и постоянный фич-пайплайн",
+            "Исследователи редко умеют SRE, мониторинг и CI",
+            "Владелец продакшна должен быть инженером, и бюджет на MLOps тоже"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 75
+          },
+          "overall": 95,
+          "critique": "Чётко и по делу; можно добавить один конкретный пример или короткий совет для продакшна."
+        }
+      ],
+      "contentType": "thread",
+      "outlineBeats": [
+        "Большинство AI-стартапов гибнут при переходе в прод 😭",
+        "Исследовательский прототип плохо переносится в стабильную архитектуру",
+        "Недооценены данные инфраструктура и постоянный пайплайн для фич",
+        "Команда исследователей редко умеет строить SRE мониторинг и CI",
+        "Сделайте владельцем продакшна инженера и выделите бюджет на MLOps"
+      ]
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.013486"
+  },
+  {
+    "id": "94c0992d-85d6-4499-9164-3ce13b4c5a74",
+    "generation_id": "dbb9b567-07b4-44f1-ae50-fa2fe1b5440f",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1,
+      "winnerIndex": 0,
+      "rankedScores": [
+        83
+      ],
+      "winnerOverall": 83,
+      "winnerInventedClaims": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:13:52.821Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 80,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 85,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 83,
+        "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "AI агентов уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 80,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 85,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 83,
+          "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005257"
+  },
+  {
+    "id": "3273f158-70c4-46e7-ad4d-02717e6160bf",
+    "generation_id": "dbb9b567-07b4-44f1-ae50-fa2fe1b5440f",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 2,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 309,
+    "tokens_out": 289,
+    "cost_usd": "0.000655",
+    "ts": "2026-05-22T15:13:51.894Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 80,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 85,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 83,
+        "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "AI агентов уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 80,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 85,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 83,
+          "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005257"
+  },
+  {
+    "id": "44c58ec8-8c2b-4d84-9494-8290b60c14de",
+    "generation_id": "dbb9b567-07b4-44f1-ae50-fa2fe1b5440f",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 80,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 85,
+        "faithfulness": 100,
+        "insightDensity": 30
+      },
+      "overall": 83,
+      "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение.",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 857,
+    "tokens_out": 744,
+    "cost_usd": "0.001702",
+    "ts": "2026-05-22T15:13:51.470Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 80,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 85,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 83,
+        "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "AI агентов уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 80,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 85,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 83,
+          "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005257"
+  },
+  {
+    "id": "b282cd72-6372-450b-98b1-adbcb2e7cd6d",
+    "generation_id": "dbb9b567-07b4-44f1-ae50-fa2fe1b5440f",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1202,
+    "tokens_out": 613,
+    "cost_usd": "0.001527",
+    "ts": "2026-05-22T15:13:40.844Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 80,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 85,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 83,
+        "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "AI агентов уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 80,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 85,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 83,
+          "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005257"
+  },
+  {
+    "id": "5990d7f3-c4c9-4643-b8dc-c0f946d5b7d1",
+    "generation_id": "dbb9b567-07b4-44f1-ae50-fa2fe1b5440f",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1729,
+    "tokens_out": 17,
+    "cost_usd": "0.001373",
+    "ts": "2026-05-22T15:13:31.115Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 80,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 85,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 83,
+        "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "AI агентов уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 80,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 85,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 83,
+          "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005257"
+  },
+  {
+    "id": "eccc81bc-81b0-4673-96bd-45d55b1ffe44",
+    "generation_id": "dbb9b567-07b4-44f1-ae50-fa2fe1b5440f",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 0,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:13:23.723Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 80,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 85,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 83,
+        "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "AI агентов уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 80,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 85,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 83,
+          "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005257"
+  },
+  {
+    "id": "8e3bfbd7-df59-469d-9f68-a6a19a90ae5f",
+    "generation_id": "dbb9b567-07b4-44f1-ae50-fa2fe1b5440f",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 61,
+      "variants": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:13:23.284Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 80,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 85,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 83,
+        "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "AI агентов уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 80,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 85,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 83,
+          "critique": "Коротко и точнo, но это почти дословный перевод — можно добавить более конкретную наблюдение."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005257"
+  },
+  {
+    "id": "0b3dc6c7-df3d-452a-9a80-cbd1a02c6773",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "variants": 3,
+      "winnerIndex": 0,
+      "rankedScores": [
+        0,
+        0,
+        0
+      ],
+      "winnerOverall": 0,
+      "winnerInventedClaims": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:11:06.794Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "048cf2c9-06f5-4737-8750-1acbdf08d823",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 2,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 311,
+    "tokens_out": 413,
+    "cost_usd": "0.000904",
+    "ts": "2026-05-22T15:11:05.906Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "bb0ae208-89e6-4a5f-9af9-dc3bf38dfd7a",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 0,
+        "antiSlop": 0,
+        "language": 0,
+        "voiceMatch": 0,
+        "faithfulness": 0,
+        "insightDensity": 0
+      },
+      "overall": 0,
+      "critique": "evaluator returned non-JSON output",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 859,
+    "tokens_out": 800,
+    "cost_usd": "0.001815",
+    "ts": "2026-05-22T15:11:05.601Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "16327d8d-8d77-430c-9ac5-66e567e24a37",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 2,
+      "variantIndex": 1
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 307,
+    "tokens_out": 347,
+    "cost_usd": "0.000771",
+    "ts": "2026-05-22T15:10:56.296Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "3c827f84-9279-4a1d-9588-c44636eb5310",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 0,
+        "antiSlop": 0,
+        "language": 0,
+        "voiceMatch": 0,
+        "faithfulness": 0,
+        "insightDensity": 0
+      },
+      "overall": 0,
+      "critique": "evaluator returned non-JSON output",
+      "variantIndex": 1
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 855,
+    "tokens_out": 800,
+    "cost_usd": "0.001814",
+    "ts": "2026-05-22T15:10:55.978Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "e8ac8fe2-7181-4433-93e8-95777de4a34e",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Смешение языка: 'AI agents' лучше заменить на русскоязычное 'Агенты ИИ' (light EN для tech-терминов вроде 'production-ready' допустимо)",
+        "Небольшая стилистическая правка: 'повсюду' звучит более разговорно, ближе к голосу примера"
+      ],
+      "changed": true,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1200,
+    "tokens_out": 1272,
+    "cost_usd": "0.002844",
+    "ts": "2026-05-22T15:10:54.541Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "1d38f605-0da8-4a3e-a04d-3460c7a3f9ce",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 2,
+      "variantIndex": 2
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 309,
+    "tokens_out": 413,
+    "cost_usd": "0.000903",
+    "ts": "2026-05-22T15:10:53.720Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "4abae78d-108f-46c6-8c1b-d182fcf442bc",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 0,
+        "antiSlop": 0,
+        "language": 0,
+        "voiceMatch": 0,
+        "faithfulness": 0,
+        "insightDensity": 0
+      },
+      "overall": 0,
+      "critique": "evaluator returned non-JSON output",
+      "variantIndex": 2
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 857,
+    "tokens_out": 800,
+    "cost_usd": "0.001814",
+    "ts": "2026-05-22T15:10:53.517Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "de5a4c0f-8b3a-4f13-afe5-42c75b091df8",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Использован эм-даш — заменён на запятую в соответствии со стилем якоря"
+      ],
+      "changed": true,
+      "variantIndex": 1
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1201,
+    "tokens_out": 954,
+    "cost_usd": "0.002208",
+    "ts": "2026-05-22T15:10:44.210Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "b7a346b1-460d-4b88-aa1a-f1f27f060d75",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Использован эм‑тире для стилистического эффекта — заменить на запятую или другое оформление"
+      ],
+      "changed": true,
+      "variantIndex": 2
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1199,
+    "tokens_out": 892,
+    "cost_usd": "0.002084",
+    "ts": "2026-05-22T15:10:42.255Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "faaa0375-f3b5-46aa-80de-b10d210a5a82",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1729,
+    "tokens_out": 15,
+    "cost_usd": "0.001364",
+    "ts": "2026-05-22T15:10:37.135Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "549b6474-6484-476a-b042-ba44bc2156c4",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1729,
+    "tokens_out": 16,
+    "cost_usd": "0.001369",
+    "ts": "2026-05-22T15:10:30.453Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "5a423b4c-7fff-4ba0-8aef-0b566dd9bbbc",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 2
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1729,
+    "tokens_out": 14,
+    "cost_usd": "0.001360",
+    "ts": "2026-05-22T15:10:30.375Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "188afb6d-6146-4fec-aae2-88d0cb1bbe6e",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 0,
+      "variantIndex": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:10:23.980Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "fd089c74-8ca5-459b-bc95-6dd775a8292a",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 0,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:10:23.980Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "f66cd21d-72de-48d3-b1dc-c78496f3ef54",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 0,
+      "variantIndex": 2
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:10:23.978Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "1c612cc8-2166-4cc5-b3e9-72078fe69b7f",
+    "generation_id": "abe5edb5-5378-4fd2-ac35-74cfa5f37c06",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 61,
+      "variants": 3,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T15:10:23.577Z",
+    "gen_topic": "AI agents everywhere but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ повсюду, но production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI agents везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI-агенты везде, а production-ready всё ещё редки"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.019249"
+  },
+  {
+    "id": "35c12364-1c7d-4201-b95f-4fb69c2008ad",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "compose",
+    "event_type": "error",
+    "payload": {
+      "message": "Failed query: insert into \"posts\" (\"id\", \"generation_id\", \"parent_post_id\", \"thread_position\", \"content_type\", \"text\", \"status\", \"scheduled_for\", \"posted_at\", \"x_tweet_id\", \"quote_tweet_id\", \"embedding\", \"created_at\", \"updated_at\") values (default, $1, $2, $3, $4, $5, $6, default, default, default, default, default, default, default) returning \"id\", \"generation_id\", \"parent_post_id\", \"thread_position\", \"content_type\", \"text\", \"status\", \"scheduled_for\", \"posted_at\", \"x_tweet_id\", \"quote_tweet_id\", \"embedding\", \"created_at\", \"updated_at\"\nparams: 2c55950b-f7d0-41db-9e69-94ff96293a79,,,single,Агенты ИИ уже везде, production-ready всё ещё редкость,draft"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T14:59:50.253Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "c9053662-b0ef-4cdc-9564-732eb9fc0096",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 2,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 311,
+    "tokens_out": 224,
+    "cost_usd": "0.000526",
+    "ts": "2026-05-22T14:59:49.239Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "f39842cc-9c66-4809-80a7-8617cdcf9a50",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 0,
+        "antiSlop": 0,
+        "language": 0,
+        "voiceMatch": 0,
+        "faithfulness": 0,
+        "insightDensity": 0
+      },
+      "overall": 0,
+      "critique": "evaluator returned non-JSON output",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 859,
+    "tokens_out": 800,
+    "cost_usd": "0.001815",
+    "ts": "2026-05-22T14:59:48.966Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "617132ce-4359-4f9f-8cac-0cf5bb0b3267",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 2,
+      "variantIndex": 2
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 309,
+    "tokens_out": 418,
+    "cost_usd": "0.000913",
+    "ts": "2026-05-22T14:59:44.556Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "0c9886b3-1c6a-4db8-8a0f-76341f33b3d4",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 2,
+      "variantIndex": 1
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 310,
+    "tokens_out": 481,
+    "cost_usd": "0.001040",
+    "ts": "2026-05-22T14:59:44.537Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "8328b81a-bfb0-429e-9275-8bdd0cb49ff3",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 0,
+        "antiSlop": 0,
+        "language": 0,
+        "voiceMatch": 0,
+        "faithfulness": 0,
+        "insightDensity": 0
+      },
+      "overall": 0,
+      "critique": "evaluator returned non-JSON output",
+      "variantIndex": 2
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 857,
+    "tokens_out": 800,
+    "cost_usd": "0.001814",
+    "ts": "2026-05-22T14:59:44.356Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "47d28da3-357f-4a46-b070-df404ff2f8b1",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 0,
+        "antiSlop": 0,
+        "language": 0,
+        "voiceMatch": 0,
+        "faithfulness": 0,
+        "insightDensity": 0
+      },
+      "overall": 0,
+      "critique": "evaluator returned non-JSON output",
+      "variantIndex": 1
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 858,
+    "tokens_out": 800,
+    "cost_usd": "0.001815",
+    "ts": "2026-05-22T14:59:44.331Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "0794e8a5-0a90-43d5-ab7c-ce76e439d268",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Смешение английского и русского в «AI agents» — предпочитается русский термин 'агенты ИИ' при допустимом англоязычном тех-термине 'production-ready'"
+      ],
+      "changed": true,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1201,
+    "tokens_out": 850,
+    "cost_usd": "0.002000",
+    "ts": "2026-05-22T14:59:33.689Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "392bc5a7-c44f-40f5-a2e6-ec6cfcbacaf9",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 2
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1202,
+    "tokens_out": 549,
+    "cost_usd": "0.001399",
+    "ts": "2026-05-22T14:59:30.012Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "e9968e18-2d75-4e29-af88-b75971306573",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 1
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1203,
+    "tokens_out": 608,
+    "cost_usd": "0.001517",
+    "ts": "2026-05-22T14:59:29.626Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "be79a4ba-649c-4733-a96d-9a623487672f",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1730,
+    "tokens_out": 15,
+    "cost_usd": "0.001365",
+    "ts": "2026-05-22T14:59:21.316Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "bb5f8611-07f7-46a9-8d6b-8df5f118201d",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1730,
+    "tokens_out": 17,
+    "cost_usd": "0.001374",
+    "ts": "2026-05-22T14:59:21.179Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "c7ab99a5-a04f-4879-9f8b-2ecc99a259da",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 2
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1730,
+    "tokens_out": 16,
+    "cost_usd": "0.001370",
+    "ts": "2026-05-22T14:59:21.103Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "ce48f07f-b6cc-437a-8946-a93b2b50c31e",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 0,
+      "variantIndex": 2
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T14:59:18.843Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "4211a18f-0205-4f7f-a4da-e4aab8b77004",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 0,
+      "variantIndex": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T14:59:18.628Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "2096f6a5-46af-4138-8c07-92d7f39839ad",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "outlineBeats": 0,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T14:59:18.628Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "5ed98f2d-d5ad-411d-97a2-9a646ee8946d",
+    "generation_id": "2c55950b-f7d0-41db-9e69-94ff96293a79",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 65,
+      "variants": 3,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T14:59:18.106Z",
+    "gen_topic": "AI agents everywhere now but production-ready ones are still rare",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 3,
+      "winnerEval": {
+        "scores": {
+          "charFit": 0,
+          "antiSlop": 0,
+          "language": 0,
+          "voiceMatch": 0,
+          "faithfulness": 0,
+          "insightDensity": 0
+        },
+        "overall": 0,
+        "critique": "evaluator returned non-JSON output"
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Агенты ИИ уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 1,
+          "texts": [
+            "AI-агенты уже везде, production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        },
+        {
+          "index": 2,
+          "texts": [
+            "AI agents уже везде, а production-ready всё ещё редкость"
+          ],
+          "scores": {
+            "charFit": 0,
+            "antiSlop": 0,
+            "language": 0,
+            "voiceMatch": 0,
+            "faithfulness": 0,
+            "insightDensity": 0
+          },
+          "overall": 0,
+          "critique": "evaluator returned non-JSON output"
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.016946"
+  },
+  {
+    "id": "2182d98f-9b27-4a25-afff-f12739e2e5a2",
+    "generation_id": "90a79c1d-6ea1-4aab-af33-7e59a992e2bc",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "mode": "ai",
+      "postCount": 1,
+      "editorIssues": [],
+      "editorChanged": false
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T13:57:43.067Z",
+    "gen_topic": "OpenAI dropped a new tiny model, it's surprisingly good",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002827"
+  },
+  {
+    "id": "16415ab1-8abd-4155-b282-3bb9bce7584e",
+    "generation_id": "90a79c1d-6ea1-4aab-af33-7e59a992e2bc",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 984,
+    "tokens_out": 680,
+    "cost_usd": "0.001606",
+    "ts": "2026-05-22T13:57:42.308Z",
+    "gen_topic": "OpenAI dropped a new tiny model, it's surprisingly good",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002827"
+  },
+  {
+    "id": "98dd8214-2555-4449-99a6-a4bbd3c444d4",
+    "generation_id": "90a79c1d-6ea1-4aab-af33-7e59a992e2bc",
+    "agent": "editor",
+    "event_type": "start",
+    "payload": {
+      "draftCount": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T13:57:33.432Z",
+    "gen_topic": "OpenAI dropped a new tiny model, it's surprisingly good",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002827"
+  },
+  {
+    "id": "d141b954-6dcb-4f44-a584-839261bea054",
+    "generation_id": "90a79c1d-6ea1-4aab-af33-7e59a992e2bc",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1508,
+    "tokens_out": 20,
+    "cost_usd": "0.001221",
+    "ts": "2026-05-22T13:57:33.139Z",
+    "gen_topic": "OpenAI dropped a new tiny model, it's surprisingly good",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002827"
+  },
+  {
+    "id": "a15b036b-35d6-4517-b407-502a1a49eef3",
+    "generation_id": "90a79c1d-6ea1-4aab-af33-7e59a992e2bc",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "referenceTweetCount": 13
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T13:57:30.119Z",
+    "gen_topic": "OpenAI dropped a new tiny model, it's surprisingly good",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002827"
+  },
+  {
+    "id": "d25fead6-e5d9-4589-958e-bb85105e03c2",
+    "generation_id": "90a79c1d-6ea1-4aab-af33-7e59a992e2bc",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 55,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T13:57:29.695Z",
+    "gen_topic": "OpenAI dropped a new tiny model, it's surprisingly good",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002827"
+  },
+  {
+    "id": "4428244c-2923-4502-be5c-af7834ba75cb",
+    "generation_id": "5e7a6d74-cc8c-4da7-b67c-db102d06bdd9",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "mode": "ai",
+      "postCount": 1,
+      "editorIssues": [],
+      "editorChanged": false
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:33:39.383Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002084"
+  },
+  {
+    "id": "d500f008-0e87-4eb9-94e0-993c3b62653b",
+    "generation_id": "5e7a6d74-cc8c-4da7-b67c-db102d06bdd9",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1051,
+    "tokens_out": 427,
+    "cost_usd": "0.001117",
+    "ts": "2026-05-22T12:33:38.567Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002084"
+  },
+  {
+    "id": "8c1e3ae4-8060-463d-836b-bd7af63a50f0",
+    "generation_id": "5e7a6d74-cc8c-4da7-b67c-db102d06bdd9",
+    "agent": "editor",
+    "event_type": "start",
+    "payload": {
+      "draftCount": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:33:31.299Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002084"
+  },
+  {
+    "id": "b4afec58-9602-4a6c-8463-aa68988769aa",
+    "generation_id": "5e7a6d74-cc8c-4da7-b67c-db102d06bdd9",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1151,
+    "tokens_out": 23,
+    "cost_usd": "0.000967",
+    "ts": "2026-05-22T12:33:31.091Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002084"
+  },
+  {
+    "id": "8559b4df-ab30-412a-b13f-f7ecb365711d",
+    "generation_id": "5e7a6d74-cc8c-4da7-b67c-db102d06bdd9",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "referenceTweetCount": 8
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:33:28.431Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002084"
+  },
+  {
+    "id": "f2f74788-3268-44c8-b23b-999a970b394b",
+    "generation_id": "5e7a6d74-cc8c-4da7-b67c-db102d06bdd9",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 75,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:33:27.842Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "ai",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.002084"
+  },
+  {
+    "id": "2679a31f-905b-4fe4-9a95-cd717b6f566c",
+    "generation_id": "278b80a0-1865-4288-8444-f1062e7d632e",
+    "agent": "poster",
+    "event_type": "complete",
+    "payload": {
+      "count": 1,
+      "postId": "72d53a1b-7820-4757-8f34-cab09cc22844",
+      "xTweetIds": [
+        "2057800078736388362"
+      ]
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:25:47.322Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "1f17a43d-9e2a-4a8b-a735-6bd6b0a94937",
+    "generation_id": "278b80a0-1865-4288-8444-f1062e7d632e",
+    "agent": "poster",
+    "event_type": "start",
+    "payload": {
+      "postId": "72d53a1b-7820-4757-8f34-cab09cc22844",
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:25:43.527Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "6057815f-3c8e-431f-acdd-de30b7238770",
+    "generation_id": "278b80a0-1865-4288-8444-f1062e7d632e",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "mode": "manual",
+      "postCount": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:25:24.007Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "16c31e6b-e61d-41ee-95ee-2491a5e6601c",
+    "generation_id": "278b80a0-1865-4288-8444-f1062e7d632e",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "manual",
+      "length": 75,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:25:23.368Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "c88772bc-f43a-41be-9dbf-94a6818f6129",
+    "generation_id": "858ad7e9-d519-414b-9fae-e45f55d44b53",
+    "agent": "poster",
+    "event_type": "error",
+    "payload": {
+      "postId": "df2a2ce0-4553-40ce-a477-756873950158",
+      "message": "Request failed with code 402"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:14:49.025Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "5375d5d0-4146-4795-82de-aff18a88f266",
+    "generation_id": "858ad7e9-d519-414b-9fae-e45f55d44b53",
+    "agent": "poster",
+    "event_type": "start",
+    "payload": {
+      "postId": "df2a2ce0-4553-40ce-a477-756873950158",
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:14:48.211Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "0c60f1bc-96a0-4bde-95aa-d48a47866598",
+    "generation_id": "858ad7e9-d519-414b-9fae-e45f55d44b53",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "mode": "manual",
+      "postCount": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:13:42.522Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "d8a17514-e509-4c0a-9ef1-5ec10038669c",
+    "generation_id": "858ad7e9-d519-414b-9fae-e45f55d44b53",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "manual",
+      "length": 75,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:13:41.778Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "mode": "manual",
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "0ffa96da-6fbf-46f9-9ada-788b2e51e9c0",
+    "generation_id": "71c31338-d216-40bd-b5db-3663d04c21ba",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "postCount": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:04:33.976Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.001766"
+  },
+  {
+    "id": "f0b8c5f5-953a-4a8b-a78e-2fcec0c1c85d",
+    "generation_id": "71c31338-d216-40bd-b5db-3663d04c21ba",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 398,
+    "tokens_out": 833,
+    "cost_usd": "0.001766",
+    "ts": "2026-05-22T12:04:32.945Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.001766"
+  },
+  {
+    "id": "0a74745a-7a8a-4303-8962-a3c97cedecf6",
+    "generation_id": "71c31338-d216-40bd-b5db-3663d04c21ba",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "referenceTweetCount": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:04:18.709Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.001766"
+  },
+  {
+    "id": "aa7722b5-daa3-4041-90aa-6eb656c7356a",
+    "generation_id": "71c31338-d216-40bd-b5db-3663d04c21ba",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:04:17.911Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.001766"
+  },
+  {
+    "id": "4b05cd94-e83c-4ffd-810b-8757e5197e4e",
+    "generation_id": "fc1001d4-750b-464a-a08f-5e5796fb4d5a",
+    "agent": "compose",
+    "event_type": "error",
+    "payload": {
+      "message": "400 Unsupported value: 'temperature' does not support 0.8 with this model. Only the default (1) value is supported."
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:03:40.272Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "a8ce528c-034f-4958-984d-2de835d9ffc9",
+    "generation_id": "fc1001d4-750b-464a-a08f-5e5796fb4d5a",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "referenceTweetCount": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:03:37.636Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "ef677a24-2209-4009-abfa-c7f15343ae0d",
+    "generation_id": "fc1001d4-750b-464a-a08f-5e5796fb4d5a",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T12:03:36.860Z",
+    "gen_topic": "Testing my new AI bot to make my social media life easier. Hope it works :)",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "3d4bcded-0c24-4328-8751-cd4d14845604",
+    "generation_id": "b470e6f9-cf99-4f17-b4ac-ac253a165fcd",
+    "agent": "compose",
+    "event_type": "error",
+    "payload": {
+      "message": "400 Unsupported value: 'temperature' does not support 0.8 with this model. Only the default (1) value is supported."
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T11:59:14.658Z",
+    "gen_topic": "Testing my new system to automate my social media life, hope it works",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "6dc542c9-cc38-47a2-8bf4-2ec471f7cd2e",
+    "generation_id": "b470e6f9-cf99-4f17-b4ac-ac253a165fcd",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "referenceTweetCount": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T11:59:12.321Z",
+    "gen_topic": "Testing my new system to automate my social media life, hope it works",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.000000"
+  },
+  {
+    "id": "f368e0a4-627c-4622-9cac-3c478011c567",
+    "generation_id": "b470e6f9-cf99-4f17-b4ac-ac253a165fcd",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "topic": "Testing my new system to automate my social media life, hope it works",
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-22T11:59:11.627Z",
+    "gen_topic": "Testing my new system to automate my social media life, hope it works",
+    "gen_input_meta": {
+      "contentType": "single"
+    },
+    "gen_status": "failed",
+    "gen_total_cost": "0.000000"
+  }
+]
