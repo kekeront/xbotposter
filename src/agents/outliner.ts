@@ -57,7 +57,7 @@ export async function outline(input: OutlineInput): Promise<OutlineOutput> {
   const result = await complete({
     tier: "mid",
     messages: buildMessages(input),
-    maxTokens: 800,
+    maxTokens: 2000,
     responseFormat: "json_object",
   });
 

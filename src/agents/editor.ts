@@ -92,7 +92,7 @@ export async function review(input: EditorInput): Promise<EditorOutput> {
   const result = await complete({
     tier: "mid",
     messages: buildMessages(input),
-    maxTokens: 2000,
+    maxTokens: 3000,
     responseFormat: "json_object",
   });
 

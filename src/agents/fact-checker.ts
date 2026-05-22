@@ -65,7 +65,7 @@ export async function check(input: FactCheckInput): Promise<FactCheckOutput> {
   const result = await complete({
     tier: "mid",
     messages: buildMessages(input),
-    maxTokens: 1200,
+    maxTokens: 3000,
     responseFormat: "json_object",
   });
 

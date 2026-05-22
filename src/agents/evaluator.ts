@@ -101,7 +101,9 @@ export async function evaluate(input: EvalInput): Promise<EvalOutput> {
   const result = await complete({
     tier: "mid",
     messages: buildMessages(input),
-    maxTokens: 800,
+    // gpt-5 family uses reasoning tokens that eat into max_completion_tokens
+    // before the JSON is produced. Be generous so the final JSON isn't cut off.
+    maxTokens: 3000,
     responseFormat: "json_object",
   });
 
