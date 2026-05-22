@@ -42,6 +42,33 @@ async function loadViral(): Promise<Loaded> {
   }
 }
 
+async function loadLastFetch(): Promise<Date | null> {
+  try {
+    const rows = await db
+      .select({ capturedAt: viralPosts.capturedAt })
+      .from(viralPosts)
+      .orderBy(desc(viralPosts.capturedAt))
+      .limit(1);
+    return rows[0]?.capturedAt ?? null;
+  } catch {
+    return null;
+  }
+}
+
+const CRON_INTERVAL_HOURS = 12;
+
+function nextCronAt(intervalHours: number, now = new Date()): Date {
+  // vercel.json: "0 */12 * * *" → fires at 00:00 and 12:00 UTC
+  const next = new Date(now);
+  next.setUTCMinutes(0, 0, 0);
+  // Step forward by 1 hour until we land on a multiple of intervalHours
+  // and the time is strictly in the future.
+  while (next <= now || next.getUTCHours() % intervalHours !== 0) {
+    next.setUTCHours(next.getUTCHours() + 1);
+  }
+  return next;
+}
+
 function fmtCount(n: number | undefined): string {
   if (!n || n < 0) return "0";
   if (n < 1000) return String(n);
@@ -61,7 +88,8 @@ function relativeAge(d: Date | string): string {
 }
 
 export default async function DiscoverPage() {
-  const result = await loadViral();
+  const [result, lastFetch] = await Promise.all([loadViral(), loadLastFetch()]);
+  const nextFetch = nextCronAt(CRON_INTERVAL_HOURS);
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -78,16 +106,40 @@ export default async function DiscoverPage() {
         </Badge>
       </header>
 
-      <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4">
-        <div className="flex flex-col gap-1">
-          <p className="text-sm font-medium">
-            Tracking {INFLUENCERS.length} accounts
-          </p>
-          <p className="font-mono text-xs text-muted-foreground">
-            {INFLUENCERS.map((i) => `@${i.username}`).join(" · ")}
-          </p>
+      <section className="flex flex-col gap-3 rounded-lg border bg-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-medium">
+              Tracking {INFLUENCERS.length} accounts
+            </p>
+            <p className="font-mono text-xs text-muted-foreground">
+              {INFLUENCERS.map((i) => `@${i.username}`).join(" · ")}
+            </p>
+          </div>
+          <FetchButton trackedCount={INFLUENCERS.length} />
         </div>
-        <FetchButton trackedCount={INFLUENCERS.length} />
+
+        <div className="flex flex-wrap items-center gap-3 border-t pt-3 font-mono text-xs text-muted-foreground">
+          <span>
+            last fetch:{" "}
+            {lastFetch ? (
+              <span className="font-semibold">{relativeAge(lastFetch)} ago</span>
+            ) : (
+              <span className="font-semibold">never</span>
+            )}
+          </span>
+          <span className="text-muted-foreground/40">·</span>
+          <span>
+            auto-fetch every {CRON_INTERVAL_HOURS}h (Vercel Cron) · next at{" "}
+            <span className="font-semibold">
+              {nextFetch.toISOString().slice(11, 16)} UTC
+            </span>
+          </span>
+          <span className="text-muted-foreground/40">·</span>
+          <span className="text-muted-foreground/60">
+            cron only runs on Vercel; local dev = manual button or curl
+          </span>
+        </div>
       </section>
 
       {!result.ok ? (
