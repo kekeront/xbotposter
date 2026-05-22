@@ -6,6 +6,7 @@ export type WriterInput = {
   contentType?: "single" | "thread";
   referenceTweets?: string[];
   fingerprintBlock?: string;
+  outlineBeats?: string[];
 };
 
 export type WriterOutput = {
@@ -132,12 +133,17 @@ ${block}`,
   const contentType = input.contentType ?? "single";
   const formatLine =
     contentType === "thread"
-      ? "Write a thread of 3-7 posts."
+      ? "Write a thread."
       : "Write a single tweet.";
+
+  const outlineBlock =
+    contentType === "thread" && input.outlineBeats && input.outlineBeats.length > 0
+      ? `\n\nFollow this outline — one tweet per beat, in order:\n${input.outlineBeats.map((b, i) => `${i + 1}. ${b}`).join("\n")}\n\nProduce exactly ${input.outlineBeats.length} posts.`
+      : "";
 
   messages.push({
     role: "user",
-    content: `User's idea (do not invent anything beyond this):\n${input.topic.trim()}\n\n${formatLine}`,
+    content: `User's idea (do not invent anything beyond this):\n${input.topic.trim()}${outlineBlock}\n\n${formatLine}`,
   });
 
   return messages;

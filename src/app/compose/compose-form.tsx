@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -272,7 +273,9 @@ export function ComposeForm() {
         </CardContent>
       </Card>
 
-      {result ? <ResultCard result={result} /> : null}
+      {result ? (
+        <ResultCard result={result} onUpdate={(r) => setResult(r)} />
+      ) : null}
     </div>
   );
 }
@@ -283,7 +286,13 @@ function scoreColor(n: number): string {
   return "text-destructive";
 }
 
-function ResultCard({ result }: { result: ComposeResult }) {
+function ResultCard({
+  result,
+  onUpdate,
+}: {
+  result: ComposeResult;
+  onUpdate: (r: ComposeResult) => void;
+}) {
   const isManual = result.generation.model === "manual";
   return (
     <Card>
@@ -340,7 +349,32 @@ function ResultCard({ result }: { result: ComposeResult }) {
         {result.eval ? <EvalBreakdown evaluation={result.eval} /> : null}
 
         {result.variants && result.variants.length > 1 ? (
-          <VariantsList variants={result.variants} />
+          <VariantsList
+            variants={result.variants}
+            generationId={result.generation.id}
+            onSwitched={(newWinnerIndex, newPosts) => {
+              if (!result.variants) return;
+              const updatedVariants = result.variants.map((v) => ({
+                ...v,
+                isWinner: v.index === newWinnerIndex,
+              }));
+              const newWinner = updatedVariants.find(
+                (v) => v.index === newWinnerIndex,
+              );
+              onUpdate({
+                ...result,
+                variants: updatedVariants,
+                posts: newPosts,
+                eval: newWinner
+                  ? {
+                      scores: newWinner.scores,
+                      overall: newWinner.overall,
+                      critique: newWinner.critique,
+                    }
+                  : result.eval,
+              });
+            }}
+          />
         ) : null}
       </CardContent>
     </Card>
@@ -381,13 +415,62 @@ function ScorePill({ label, v }: { label: string; v: number }) {
   );
 }
 
-function VariantsList({ variants }: { variants: VariantSummary[] }) {
+function VariantsList({
+  variants,
+  generationId,
+  onSwitched,
+}: {
+  variants: VariantSummary[];
+  generationId: string;
+  onSwitched: (
+    newWinnerIndex: number,
+    newPosts: Array<{ id: string; text: string; threadPosition: number | null }>,
+  ) => void;
+}) {
+  const router = useRouter();
+  const [switchingIndex, setSwitchingIndex] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function pickVariant(index: number) {
+    setSwitchingIndex(index);
+    setError(null);
+    try {
+      const res = await fetch("/api/compose/use-variant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ generationId, variantIndex: index }),
+      });
+      const data: {
+        ok?: boolean;
+        posts?: Array<{
+          id: string;
+          text: string;
+          threadPosition: number | null;
+        }>;
+        error?: string;
+        message?: string;
+      } = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message ?? data.error ?? `HTTP ${res.status}`);
+      }
+      onSwitched(index, data.posts ?? []);
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "unknown");
+    } finally {
+      setSwitchingIndex(null);
+    }
+  }
+
   return (
     <details className="rounded-lg border">
       <summary className="cursor-pointer list-none px-3 py-2 font-mono text-xs text-muted-foreground [&::-webkit-details-marker]:hidden">
         ▸ all {variants.length} variants ranked
       </summary>
       <div className="flex flex-col gap-2 border-t p-3">
+        {error ? (
+          <p className="font-mono text-xs text-destructive">{error}</p>
+        ) : null}
         {variants.map((v) => (
           <div
             key={v.index}
@@ -407,7 +490,17 @@ function VariantsList({ variants }: { variants: VariantSummary[] }) {
                 <span className="text-emerald-600 dark:text-emerald-500">
                   ← winner
                 </span>
-              ) : null}
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto font-mono"
+                  onClick={() => pickVariant(v.index)}
+                  disabled={switchingIndex !== null}
+                >
+                  {switchingIndex === v.index ? "switching…" : "use this"}
+                </Button>
+              )}
             </div>
             {v.texts.map((t, i) => (
               <p
