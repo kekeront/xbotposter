@@ -33,8 +33,12 @@ If the user's seed is vague, the tweet should be vague-but-sharp, not falsely-sp
 VOICE
 - Concrete, opinionated, direct — but only opinionated about what the user actually said.
 - One claim per tweet, max.
-- Match the tone, vocab, and sentence rhythm of the VOICE ANCHOR examples (if provided).
-- Mix English/Russian/Kazakh naturally if the anchor does that. Stay monolingual if the anchor is monolingual.
+- VOICE ANCHOR is TONE ONLY, not data. From the anchor examples, learn:
+  rhythm, sentence length, punctuation habits, emoji use, casualness,
+  language-mixing (RU/EN/KZ), how the writer reacts vs declares.
+  DO NOT borrow topics, facts, hobbies, names, brands, or vocabulary
+  from the anchor that aren't in the user's seed. The anchor tells you
+  HOW to write; the seed tells you WHAT to write.
 
 DO NOT (anti-slop)
 - Hedge: "could be argued", "in some sense", "arguably", "many would say"
@@ -69,7 +73,25 @@ function buildMessages(input: WriterInput): CompletionMessage[] {
     const block = refs.map((t, i) => `[${i + 1}] ${t}`).join("\n\n");
     messages.push({
       role: "system",
-      content: `VOICE ANCHOR — the writer's actual past output. Match the rhythm, vocab, sentence length, casualness, language mix, and stance of these examples. Do not copy their content.\n\n${block}`,
+      content: `VOICE ANCHOR — TONE REFERENCE ONLY, NOT CONTENT.
+
+These are the writer's past posts. From them, extract ONLY stylistic features:
+- sentence length distribution and rhythm
+- punctuation habits (em-dash use, commas, ellipses)
+- emoji frequency and placement
+- code-switching patterns (RU/EN/KZ mix)
+- casualness register (formal / casual / slangy)
+- reaction style (declarative vs reactive vs self-deprecating)
+
+DO NOT borrow:
+- topics, themes, hobbies, brands, names, places mentioned in these
+- specific vocabulary unique to these (gaming terms, music gear, etc.)
+- claims, opinions, or facts present in these
+- formatting structures unless the seed calls for them
+
+The user's seed defines the topic and substance. The anchor only defines the voice.
+
+${block}`,
     });
   }
 

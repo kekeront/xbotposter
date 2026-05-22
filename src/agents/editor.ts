@@ -25,12 +25,13 @@ Review the draft against the user's seed and the voice anchor (if provided). If 
 CHECK FOR
 1. INVENTED SPECIFICS — numbers, percentages, dollars, time savings, performance gains, product names, features, brands, people, places, events that aren't in the user's seed. Strip them or replace with vague-but-sharp wording.
 2. FALSE STORIES — "I just shipped X", "I cut my time by Y", "my last 6 posts" when the seed doesn't say so.
-3. SLOP PHRASES — "delve", "it's worth noting", "the truth is", "the dirty secret", "the secret", "let me explain", "here's the thing", "imagine if", "consider this", hedges like "could be argued", "many would say"
-4. EM-DASH FLOURISHES — em-dashes used for stylistic effect rather than connecting clauses with new info. Replace with period or comma.
-5. THREADBAIT OPENERS — "Ever wondered…", "Here's the truth about X", "I just learned…"
-6. CLOSING TRICOLONS — "X, Y, and Z" used as a finishing kicker
-7. CHARACTER LENGTH — single tweets over 270 chars, threads where any post is over 270 chars
-8. VOICE MISMATCH — wildly different rhythm/vocab/tone from the voice anchor
+3. CONTENT BLEED FROM VOICE ANCHOR — the anchor is tone reference only. If the draft mentions specific topics, hobbies, names, brands, or vocabulary that came from the anchor but isn't in the user's seed (e.g., gaming references, music gear, named people, specific platforms) — strip them.
+4. SLOP PHRASES — "delve", "it's worth noting", "the truth is", "the dirty secret", "the secret", "let me explain", "here's the thing", "imagine if", "consider this", hedges like "could be argued", "many would say"
+5. EM-DASH FLOURISHES — em-dashes used for stylistic effect rather than connecting clauses with new info. Replace with period or comma.
+6. THREADBAIT OPENERS — "Ever wondered…", "Here's the truth about X", "I just learned…"
+7. CLOSING TRICOLONS — "X, Y, and Z" used as a finishing kicker
+8. CHARACTER LENGTH — single tweets over 270 chars, threads where any post is over 270 chars
+9. VOICE TONE MISMATCH — wildly different rhythm, register, or language-mix from the voice anchor (the TONE should match; the CONTENT should not)
 
 OUTPUT FORMAT
 Respond as JSON exactly:
@@ -52,7 +53,7 @@ function buildMessages(input: EditorInput): CompletionMessage[] {
   if (refs.length > 0) {
     messages.push({
       role: "system",
-      content: `VOICE ANCHOR — past output for style reference:\n\n${refs.map((t, i) => `[${i + 1}] ${t}`).join("\n\n")}`,
+      content: `VOICE ANCHOR — TONE REFERENCE ONLY. The anchor defines HOW the writer sounds (rhythm, casualness, language mix, emoji use). It does NOT define WHAT they're writing about — that comes from the user's seed. Flag if the draft borrows topics/names/brands/specific vocabulary from the anchor.\n\n${refs.map((t, i) => `[${i + 1}] ${t}`).join("\n\n")}`,
     });
   }
 
