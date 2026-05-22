@@ -1,0 +1,126 @@
+import "server-only";
+import { complete, type CompletionMessage } from "@/lib/llm";
+
+export type EditorInput = {
+  topic: string;
+  drafts: string[];
+  contentType: "single" | "thread";
+  referenceTweets?: string[];
+};
+
+export type EditorOutput = {
+  texts: string[];
+  issuesFound: string[];
+  changed: boolean;
+  model: string;
+  tokensIn: number;
+  tokensOut: number;
+  costUsd: number;
+};
+
+const SYSTEM_PROMPT = `You are an editor for X (Twitter) posts.
+
+Review the draft against the user's seed and the voice anchor (if provided). If issues exist, fix them. If the draft is clean, return it unchanged.
+
+CHECK FOR
+1. INVENTED SPECIFICS — numbers, percentages, dollars, time savings, performance gains, product names, features, brands, people, places, events that aren't in the user's seed. Strip them or replace with vague-but-sharp wording.
+2. FALSE STORIES — "I just shipped X", "I cut my time by Y", "my last 6 posts" when the seed doesn't say so.
+3. SLOP PHRASES — "delve", "it's worth noting", "the truth is", "the dirty secret", "the secret", "let me explain", "here's the thing", "imagine if", "consider this", hedges like "could be argued", "many would say"
+4. EM-DASH FLOURISHES — em-dashes used for stylistic effect rather than connecting clauses with new info. Replace with period or comma.
+5. THREADBAIT OPENERS — "Ever wondered…", "Here's the truth about X", "I just learned…"
+6. CLOSING TRICOLONS — "X, Y, and Z" used as a finishing kicker
+7. CHARACTER LENGTH — single tweets over 270 chars, threads where any post is over 270 chars
+8. VOICE MISMATCH — wildly different rhythm/vocab/tone from the voice anchor
+
+OUTPUT FORMAT
+Respond as JSON exactly:
+{
+  "issues": ["short description of issue 1", "issue 2", ...],
+  "revised": ["text of post 1", "text of post 2 (for threads)", ...]
+}
+- "issues" is an empty array if draft is clean.
+- "revised" MUST have the same number of items as the input draft (preserve thread structure).
+- If you make no changes, "revised" matches the input exactly.
+- Respond with ONLY the JSON. No preamble, no markdown, no explanation outside JSON.`;
+
+function buildMessages(input: EditorInput): CompletionMessage[] {
+  const messages: CompletionMessage[] = [
+    { role: "system", content: SYSTEM_PROMPT },
+  ];
+
+  const refs = (input.referenceTweets ?? []).slice(0, 10);
+  if (refs.length > 0) {
+    messages.push({
+      role: "system",
+      content: `VOICE ANCHOR — past output for style reference:\n\n${refs.map((t, i) => `[${i + 1}] ${t}`).join("\n\n")}`,
+    });
+  }
+
+  const draftsBlock =
+    input.contentType === "thread"
+      ? input.drafts.map((t, i) => `[${i + 1}] ${t}`).join("\n\n")
+      : input.drafts[0] ?? "";
+
+  messages.push({
+    role: "user",
+    content: `User's seed:\n${input.topic.trim()}\n\nDraft to review (${input.contentType}, ${input.drafts.length} post${input.drafts.length === 1 ? "" : "s"}):\n${draftsBlock}\n\nReturn JSON with issues + revised array.`,
+  });
+
+  return messages;
+}
+
+export async function review(input: EditorInput): Promise<EditorOutput> {
+  if (input.drafts.length === 0) {
+    return {
+      texts: [],
+      issuesFound: [],
+      changed: false,
+      model: "skip",
+      tokensIn: 0,
+      tokensOut: 0,
+      costUsd: 0,
+    };
+  }
+
+  const result = await complete({
+    tier: "mid",
+    messages: buildMessages(input),
+    maxTokens: 2000,
+    responseFormat: "json_object",
+  });
+
+  let parsed: { issues?: string[]; revised?: string[] };
+  try {
+    parsed = JSON.parse(result.text);
+  } catch {
+    return {
+      texts: input.drafts,
+      issuesFound: ["editor returned non-JSON output"],
+      changed: false,
+      model: result.model,
+      tokensIn: result.tokensIn,
+      tokensOut: result.tokensOut,
+      costUsd: result.costUsd,
+    };
+  }
+
+  const revised = parsed.revised;
+  const issues = parsed.issues ?? [];
+
+  const texts =
+    Array.isArray(revised) && revised.length === input.drafts.length
+      ? revised.map((t) => String(t).trim()).filter(Boolean)
+      : input.drafts;
+
+  const changed = texts.some((t, i) => t !== input.drafts[i]);
+
+  return {
+    texts: texts.length === input.drafts.length ? texts : input.drafts,
+    issuesFound: issues,
+    changed,
+    model: result.model,
+    tokensIn: result.tokensIn,
+    tokensOut: result.tokensOut,
+    costUsd: result.costUsd,
+  };
+}

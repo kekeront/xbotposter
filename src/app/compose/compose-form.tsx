@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
 type ContentType = "single" | "thread";
+type Mode = "ai" | "manual";
 
 type ComposeResult = {
   generation: {
@@ -25,17 +26,49 @@ type ComposeResult = {
   }>;
 };
 
+const X_SOFT_LIMIT = 280;
+
+function ToggleButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-md px-2 py-1 ${
+        active
+          ? "bg-foreground text-background"
+          : "bg-muted text-muted-foreground"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function ComposeForm() {
   const [topic, setTopic] = useState("");
   const [contentType, setContentType] = useState<ContentType>("single");
+  const [mode, setMode] = useState<Mode>("ai");
   const [status, setStatus] = useState<"idle" | "generating" | "done" | "error">(
     "idle",
   );
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ComposeResult | null>(null);
 
+  const isManual = mode === "manual";
+  const trimmed = topic.trim();
+  const charCount = trimmed.length;
+  const overSoftLimit = isManual && contentType === "single" && charCount > X_SOFT_LIMIT;
+
   async function submit() {
-    if (!topic.trim()) return;
+    if (!trimmed) return;
     setStatus("generating");
     setError(null);
     setResult(null);
@@ -43,7 +76,7 @@ export function ComposeForm() {
       const res = await fetch("/api/compose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, contentType }),
+        body: JSON.stringify({ topic, contentType, mode }),
       });
       const data: ComposeResult | { error: string; message?: string } =
         await res.json();
@@ -59,40 +92,67 @@ export function ComposeForm() {
     }
   }
 
+  const label = isManual ? "Tweet text" : "Idea / topic";
+  const placeholder = isManual
+    ? contentType === "thread"
+      ? `Type the exact tweets, separated by --- on its own line.
+
+Example:
+
+first tweet here
+---
+second tweet
+---
+third tweet`
+      : `Type the exact tweet you want to ship.
+
+Example: just shipped a thing. small win, but a win.`
+    : `Paste a thought, a link, a rough idea. Anything.
+
+Example: small models are getting weirdly close to frontier on narrow tasks. write a take.`;
+
+  const buttonLabel = (() => {
+    if (status === "generating") return isManual ? "queueing…" : "drafting…";
+    return isManual ? "queue" : "draft";
+  })();
+
   return (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <label
               htmlFor="topic"
               className="text-sm font-medium text-muted-foreground"
             >
-              Idea / topic
+              {label}
             </label>
             <div className="ml-auto flex items-center gap-2 font-mono text-xs">
-              <button
-                type="button"
+              <ToggleButton
+                active={mode === "ai"}
+                onClick={() => setMode("ai")}
+              >
+                ai draft
+              </ToggleButton>
+              <ToggleButton
+                active={mode === "manual"}
+                onClick={() => setMode("manual")}
+              >
+                manual
+              </ToggleButton>
+              <span className="text-muted-foreground/40">·</span>
+              <ToggleButton
+                active={contentType === "single"}
                 onClick={() => setContentType("single")}
-                className={`rounded-md px-2 py-1 ${
-                  contentType === "single"
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground"
-                }`}
               >
                 single
-              </button>
-              <button
-                type="button"
+              </ToggleButton>
+              <ToggleButton
+                active={contentType === "thread"}
                 onClick={() => setContentType("thread")}
-                className={`rounded-md px-2 py-1 ${
-                  contentType === "thread"
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground"
-                }`}
               >
                 thread
-              </button>
+              </ToggleButton>
             </div>
           </div>
         </CardHeader>
@@ -101,21 +161,40 @@ export function ComposeForm() {
             id="topic"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            rows={6}
-            placeholder={`Paste a thought, a link, a rough idea. Anything.
-
-Example: small models are getting weirdly close to frontier on narrow tasks. write a take.`}
+            rows={isManual ? 8 : 6}
+            placeholder={placeholder}
             disabled={status === "generating"}
           />
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              Uses your reference tweets from{" "}
-              <Link href="/voice" className="underline">
-                Voice
-              </Link>{" "}
-              as few-shots.
+              {isManual ? (
+                <span>
+                  Manual mode — text is queued as-is. No AI rewrite, no OpenAI
+                  call.
+                </span>
+              ) : (
+                <span>
+                  Uses your reference tweets from{" "}
+                  <Link href="/voice" className="underline">
+                    Voice
+                  </Link>{" "}
+                  as few-shots.
+                </span>
+              )}
             </p>
             <div className="flex items-center gap-3">
+              {isManual ? (
+                <span
+                  className={`font-mono text-xs ${
+                    overSoftLimit
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {charCount}
+                  {contentType === "single" ? `/${X_SOFT_LIMIT}` : ""}
+                </span>
+              ) : null}
               {status === "error" && error ? (
                 <span className="max-w-xs truncate font-mono text-xs text-destructive">
                   {error}
@@ -123,10 +202,10 @@ Example: small models are getting weirdly close to frontier on narrow tasks. wri
               ) : null}
               <Button
                 onClick={submit}
-                disabled={status === "generating" || !topic.trim()}
+                disabled={status === "generating" || !trimmed}
                 className="font-mono"
               >
-                {status === "generating" ? "drafting…" : "draft"}
+                {buttonLabel}
               </Button>
             </div>
           </div>
@@ -139,18 +218,23 @@ Example: small models are getting weirdly close to frontier on narrow tasks. wri
 }
 
 function ResultCard({ result }: { result: ComposeResult }) {
+  const isManual = result.generation.model === "manual";
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">Draft</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium">
+            {isManual ? "Queued" : "Draft"}
+          </span>
           <Badge variant="outline" className="font-mono text-xs">
             {result.generation.model}
           </Badge>
-          <span className="font-mono text-xs text-muted-foreground">
-            {result.generation.tokensIn + result.generation.tokensOut} tokens
-            {" · "}${result.generation.costUsd.toFixed(5)}
-          </span>
+          {!isManual ? (
+            <span className="font-mono text-xs text-muted-foreground">
+              {result.generation.tokensIn + result.generation.tokensOut} tokens
+              {" · "}${result.generation.costUsd.toFixed(5)}
+            </span>
+          ) : null}
           <Link
             href="/queue"
             className="ml-auto font-mono text-xs underline text-muted-foreground"

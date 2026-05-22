@@ -84,12 +84,13 @@ export async function complete(
   const response = await client.chat.completions.create({
     model,
     messages: opts.messages,
-    temperature: opts.temperature,
     max_completion_tokens: opts.maxTokens,
-    response_format:
-      opts.responseFormat === "json_object"
-        ? { type: "json_object" }
-        : undefined,
+    ...(typeof opts.temperature === "number"
+      ? { temperature: opts.temperature }
+      : {}),
+    ...(opts.responseFormat === "json_object"
+      ? { response_format: { type: "json_object" as const } }
+      : {}),
   });
 
   const choice = response.choices[0];

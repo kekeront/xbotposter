@@ -11,7 +11,7 @@ const schema = z.object({
   OPENAI_API_KEY: z.string().optional(),
   LLM_CHEAP_MODEL: z.string().default("gpt-5-nano"),
   LLM_MID_MODEL: z.string().default("gpt-5-mini"),
-  LLM_WRITER_MODEL: z.string().default("gpt-5-mini"),
+  LLM_WRITER_MODEL: z.string().default("gpt-5.4-mini"),
   EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
 
   X_CONSUMER_KEY: z.string().optional(),
