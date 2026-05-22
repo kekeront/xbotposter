@@ -1,11 +1,22 @@
-import { ComingSoon } from "@/components/shell/coming-soon";
+import { Badge } from "@/components/ui/badge";
+import { ComposeForm } from "./compose-form";
 
-export default function Page() {
+export default function ComposePage() {
   return (
-    <ComingSoon
-      title="Compose"
-      description="Manual generation: enter a topic, get a draft."
-      slice={1}
-    />
+    <div className="flex flex-col gap-6 p-8">
+      <header className="flex items-baseline justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Compose</h1>
+          <p className="text-sm text-muted-foreground">
+            Paste an idea, get a draft. Drafts land in the queue — nothing
+            posts to X until you approve.
+          </p>
+        </div>
+        <Badge variant="outline" className="font-mono">
+          slice 1
+        </Badge>
+      </header>
+      <ComposeForm />
+    </div>
   );
 }
