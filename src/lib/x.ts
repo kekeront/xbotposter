@@ -40,3 +40,83 @@ export async function postThread(texts: string[]): Promise<PostedTweet[]> {
   }
   return results;
 }
+
+export type XUserLite = {
+  id: string;
+  username: string;
+  name: string;
+};
+
+export async function userByUsername(username: string): Promise<XUserLite | null> {
+  const client = getXClient();
+  try {
+    const res = await client.v2.userByUsername(username);
+    if (!res.data) return null;
+    return {
+      id: res.data.id,
+      username: res.data.username,
+      name: res.data.name,
+    };
+  } catch (err) {
+    if (err instanceof Error && /not found|404/i.test(err.message)) return null;
+    throw err;
+  }
+}
+
+export type XTimelineTweet = {
+  id: string;
+  text: string;
+  createdAt: string | null;
+  metrics: {
+    likes: number;
+    retweets: number;
+    replies: number;
+    quotes: number;
+    bookmarks: number;
+    impressions: number;
+  };
+  isReply: boolean;
+  isRetweet: boolean;
+  isQuote: boolean;
+};
+
+export async function userTimeline(
+  userId: string,
+  opts?: { max?: number },
+): Promise<XTimelineTweet[]> {
+  const client = getXClient();
+  const max = opts?.max ?? 10;
+  const res = await client.v2.userTimeline(userId, {
+    max_results: Math.max(5, Math.min(100, max)),
+    "tweet.fields": [
+      "public_metrics",
+      "created_at",
+      "referenced_tweets",
+    ],
+    exclude: ["retweets", "replies"],
+  });
+
+  const out: XTimelineTweet[] = [];
+  for (const t of res.data.data ?? []) {
+    const refs = t.referenced_tweets ?? [];
+    const m = t.public_metrics;
+    out.push({
+      id: t.id,
+      text: t.text,
+      createdAt: t.created_at ?? null,
+      metrics: {
+        likes: m?.like_count ?? 0,
+        retweets: m?.retweet_count ?? 0,
+        replies: m?.reply_count ?? 0,
+        quotes: m?.quote_count ?? 0,
+        bookmarks: m?.bookmark_count ?? 0,
+        impressions: m?.impression_count ?? 0,
+      },
+      isReply: refs.some((r) => r.type === "replied_to"),
+      isRetweet: refs.some((r) => r.type === "retweeted"),
+      isQuote: refs.some((r) => r.type === "quoted"),
+    });
+  }
+
+  return out;
+}
