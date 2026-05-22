@@ -25,12 +25,37 @@ type Phase =
   | "idle"
   | "confirming"
   | "confirming_remove"
+  | "scheduling"
   | "posting"
   | "skipping"
   | "retrying"
   | "removing"
   | "done"
   | "error";
+
+function defaultScheduleLocal(): string {
+  const d = new Date(Date.now() + 60 * 60 * 1000); // +1h
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mn = String(d.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}T${hh}:${mn}`;
+}
+
+function fmtScheduled(d: Date | string): string {
+  const date = typeof d === "string" ? new Date(d) : d;
+  const ms = date.getTime() - Date.now();
+  if (ms < 0) {
+    const ago = Math.floor(-ms / 60000);
+    return `${ago}m ago (overdue)`;
+  }
+  const m = Math.floor(ms / 60000);
+  if (m < 60) return `in ${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `in ${h}h ${m % 60}m`;
+  return `in ${Math.floor(h / 24)}d ${h % 24}h`;
+}
 
 function statusVariant(s: PostStatus) {
   switch (s) {
@@ -68,6 +93,7 @@ export function PostRow({ post, threadCount, source }: Props) {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [scheduledFor, setScheduledFor] = useState(defaultScheduleLocal());
 
   const actionable = post.status === "draft" || post.status === "approved";
   const retryable = post.status === "failed";
@@ -148,6 +174,27 @@ export function PostRow({ post, threadCount, source }: Props) {
     }
   }
 
+  async function doSchedule() {
+    setError(null);
+    const iso = new Date(scheduledFor).toISOString();
+    try {
+      const res = await fetch(`/api/posts/${post.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "approved", scheduledFor: iso }),
+      });
+      if (!res.ok) {
+        const data: { error?: string } = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+      setPhase("idle");
+      router.refresh();
+    } catch (e) {
+      setPhase("error");
+      setError(e instanceof Error ? e.message : "unknown");
+    }
+  }
+
   return (
     <article className="flex flex-col gap-3 rounded-lg border bg-card p-4">
       <header className="flex flex-wrap items-center gap-2 text-xs">
@@ -175,6 +222,11 @@ export function PostRow({ post, threadCount, source }: Props) {
         <span className="font-mono text-muted-foreground">
           {relativeAge(post.createdAt)} ago
         </span>
+        {post.scheduledFor && post.status === "approved" ? (
+          <span className="font-mono text-muted-foreground">
+            · scheduled {fmtScheduled(post.scheduledFor)}
+          </span>
+        ) : null}
         {post.xTweetId ? (
           <a
             href={xUrl(post.xTweetId) ?? "#"}
@@ -245,11 +297,41 @@ export function PostRow({ post, threadCount, source }: Props) {
                 skip
               </Button>
               <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPhase("scheduling")}
+                className="font-mono"
+              >
+                schedule
+              </Button>
+              <Button
                 size="sm"
                 onClick={() => setPhase("confirming")}
                 className="font-mono"
               >
                 {isThread ? "post thread" : "post"}
+              </Button>
+            </>
+          ) : null}
+
+          {phase === "scheduling" ? (
+            <>
+              <input
+                type="datetime-local"
+                value={scheduledFor}
+                onChange={(e) => setScheduledFor(e.target.value)}
+                className="rounded-md border bg-background px-2 py-1 font-mono text-xs"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPhase("idle")}
+                className="font-mono"
+              >
+                cancel
+              </Button>
+              <Button size="sm" onClick={doSchedule} className="font-mono">
+                save schedule
               </Button>
             </>
           ) : null}

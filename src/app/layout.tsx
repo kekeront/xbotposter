@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { CadenceStrip } from "@/components/shell/cadence-strip";
 import { SidebarNav } from "@/components/shell/nav";
 import "./globals.css";
 
@@ -33,7 +34,10 @@ export default function RootLayout({
           <aside className="border-r bg-sidebar text-sidebar-foreground">
             <SidebarNav />
           </aside>
-          <main className="flex flex-col">{children}</main>
+          <main className="flex flex-col">
+            <CadenceStrip />
+            {children}
+          </main>
         </div>
       </body>
     </html>
