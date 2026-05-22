@@ -4,6 +4,18 @@ import { viralPosts } from "@/db/schema";
 import { writeTrace } from "@/lib/trace";
 import { userByUsername, userTimeline } from "@/lib/x";
 
+// Per-call hard limit so a hung X API request can't lock the whole endpoint.
+const X_CALL_TIMEOUT_MS = 8_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_resolve, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms),
+    ),
+  ]);
+}
+
 type FetchResult = {
   influencersTracked: number;
   influencersResolved: number;
@@ -35,7 +47,11 @@ export async function POST() {
 
   for (const inf of INFLUENCERS) {
     try {
-      const user = await userByUsername(inf.username);
+      const user = await withTimeout(
+        userByUsername(inf.username),
+        X_CALL_TIMEOUT_MS,
+        `userByUsername(@${inf.username})`,
+      );
       result.apiCallsApprox += 1;
       if (!user) {
         result.errors.push(`@${inf.username}: not found`);
@@ -43,7 +59,11 @@ export async function POST() {
       }
       result.influencersResolved += 1;
 
-      const tweets = await userTimeline(user.id, { max: 10 });
+      const tweets = await withTimeout(
+        userTimeline(user.id, { max: 10 }),
+        X_CALL_TIMEOUT_MS,
+        `userTimeline(@${inf.username})`,
+      );
       result.apiCallsApprox += 1;
       result.tweetsFetched += tweets.length;
 
