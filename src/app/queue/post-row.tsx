@@ -14,9 +14,11 @@ type Props = {
 type Phase =
   | "idle"
   | "confirming"
+  | "confirming_remove"
   | "posting"
   | "skipping"
   | "retrying"
+  | "removing"
   | "done"
   | "error";
 
@@ -84,6 +86,26 @@ export function PostRow({ post, threadCount }: Props) {
     setPhase("skipping");
     setError(null);
     try {
+      const res = await fetch(`/api/posts/${post.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "skipped" }),
+      });
+      if (!res.ok) {
+        const data: { error?: string } = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+      router.refresh();
+    } catch (e) {
+      setPhase("error");
+      setError(e instanceof Error ? e.message : "unknown");
+    }
+  }
+
+  async function doRemove() {
+    setPhase("removing");
+    setError(null);
+    try {
       const res = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
       if (!res.ok) {
         const data: { error?: string } = await res.json().catch(() => ({}));
@@ -146,89 +168,137 @@ export function PostRow({ post, threadCount }: Props) {
           {isThread && threadCount ? ` · ${threadCount} posts total` : ""}
         </span>
 
-        {(actionable || retryable) && (
-          <div className="flex items-center gap-2">
-            {phase === "error" && error ? (
-              <span className="max-w-xs truncate font-mono text-destructive">
-                {error}
+        <div className="flex items-center gap-2">
+          {phase === "error" && error ? (
+            <span className="max-w-xs truncate font-mono text-destructive">
+              {error}
+            </span>
+          ) : null}
+
+          {retryable && (phase === "idle" || phase === "error") ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPhase("confirming_remove")}
+                className="font-mono text-muted-foreground"
+              >
+                remove
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={doSkip}
+                className="font-mono"
+              >
+                skip
+              </Button>
+              <Button size="sm" onClick={doRetry} className="font-mono">
+                retry
+              </Button>
+            </>
+          ) : null}
+
+          {actionable && (phase === "idle" || phase === "error") ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPhase("confirming_remove")}
+                className="font-mono text-muted-foreground"
+              >
+                remove
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={doSkip}
+                className="font-mono"
+              >
+                skip
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setPhase("confirming")}
+                className="font-mono"
+              >
+                {isThread ? "post thread" : "post"}
+              </Button>
+            </>
+          ) : null}
+
+          {!actionable && !retryable && (phase === "idle" || phase === "error") ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPhase("confirming_remove")}
+              className="font-mono text-muted-foreground"
+            >
+              remove
+            </Button>
+          ) : null}
+
+          {phase === "confirming" ? (
+            <>
+              <span className="font-mono text-muted-foreground">
+                ship to @kekeront?
               </span>
-            ) : null}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPhase("idle")}
+                className="font-mono"
+              >
+                cancel
+              </Button>
+              <Button onClick={doPost} size="sm" className="font-mono">
+                yes, ship it
+              </Button>
+            </>
+          ) : null}
 
-            {retryable && (phase === "idle" || phase === "error") ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={doSkip}
-                  className="font-mono"
-                >
-                  skip
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={doRetry}
-                  className="font-mono"
-                >
-                  retry
-                </Button>
-              </>
-            ) : null}
-
-            {actionable && (phase === "idle" || phase === "error") ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={doSkip}
-                  className="font-mono"
-                >
-                  skip
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => setPhase("confirming")}
-                  className="font-mono"
-                >
-                  {isThread ? "post thread" : "post"}
-                </Button>
-              </>
-            ) : null}
-
-            {phase === "confirming" ? (
-              <>
-                <span className="font-mono text-muted-foreground">
-                  ship to @kekeront?
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPhase("idle")}
-                  className="font-mono"
-                >
-                  cancel
-                </Button>
-                <Button onClick={doPost} size="sm" className="font-mono">
-                  yes, ship it
-                </Button>
-              </>
-            ) : null}
-
-            {phase === "posting" ? (
-              <span className="font-mono text-muted-foreground">posting…</span>
-            ) : null}
-            {phase === "skipping" ? (
-              <span className="font-mono text-muted-foreground">skipping…</span>
-            ) : null}
-            {phase === "retrying" ? (
-              <span className="font-mono text-muted-foreground">retrying…</span>
-            ) : null}
-            {phase === "done" ? (
-              <span className="font-mono text-emerald-600 dark:text-emerald-500">
-                shipped
+          {phase === "confirming_remove" ? (
+            <>
+              <span className="font-mono text-muted-foreground">
+                delete permanently?
               </span>
-            ) : null}
-          </div>
-        )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPhase("idle")}
+                className="font-mono"
+              >
+                cancel
+              </Button>
+              <Button
+                onClick={doRemove}
+                variant="destructive"
+                size="sm"
+                className="font-mono"
+              >
+                yes, remove
+              </Button>
+            </>
+          ) : null}
+
+          {phase === "posting" ? (
+            <span className="font-mono text-muted-foreground">posting…</span>
+          ) : null}
+          {phase === "skipping" ? (
+            <span className="font-mono text-muted-foreground">skipping…</span>
+          ) : null}
+          {phase === "retrying" ? (
+            <span className="font-mono text-muted-foreground">retrying…</span>
+          ) : null}
+          {phase === "removing" ? (
+            <span className="font-mono text-muted-foreground">removing…</span>
+          ) : null}
+          {phase === "done" ? (
+            <span className="font-mono text-emerald-600 dark:text-emerald-500">
+              shipped
+            </span>
+          ) : null}
+        </div>
       </footer>
     </article>
   );

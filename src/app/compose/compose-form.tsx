@@ -66,6 +66,8 @@ export function ComposeForm() {
   const [mode, setMode] = useState<Mode>("ai");
 
   useEffect(() => {
+    // Hydrate from localStorage after mount (avoids SSR mismatch).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMode(readStoredMode());
   }, []);
 

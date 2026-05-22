@@ -56,12 +56,15 @@ export async function PATCH(request: Request, { params }: RouteContext) {
 
 export async function DELETE(_request: Request, { params }: RouteContext) {
   const { id } = await params;
-  const [deleted] = await db
-    .update(posts)
-    .set({ status: "skipped", updatedAt: new Date() })
+  // Hard delete. Cascades to thread children via parent_post_id FK.
+  // Use PATCH with { status: "skipped" } for soft archive.
+  const deleted = await db
+    .delete(posts)
     .where(eq(posts.id, id))
-    .returning();
+    .returning({ id: posts.id });
 
-  if (!deleted) return Response.json({ error: "not found" }, { status: 404 });
-  return Response.json(deleted);
+  if (deleted.length === 0) {
+    return Response.json({ error: "not found" }, { status: 404 });
+  }
+  return Response.json({ ok: true, id: deleted[0]?.id });
 }
