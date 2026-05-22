@@ -90,6 +90,7 @@ export const posts = pgTable(
     scheduledFor: timestamp("scheduled_for", { withTimezone: true }),
     postedAt: timestamp("posted_at", { withTimezone: true }),
     xTweetId: text("x_tweet_id"),
+    quoteTweetId: text("quote_tweet_id"),
     embedding: vector("embedding", { dimensions: 1536 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()

@@ -2,14 +2,44 @@ import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/client";
-import { POST_STATUS, posts, type Post, type PostStatus } from "@/db/schema";
-import { PostRow } from "./post-row";
+import {
+  generations,
+  POST_STATUS,
+  posts,
+  type Post,
+  type PostStatus,
+} from "@/db/schema";
+import { PostRow, type PostSource } from "./post-row";
 
 export const dynamic = "force-dynamic";
 
+type GenerationMeta = {
+  mode?: "ai" | "manual" | "take" | "qrt";
+  viralAuthor?: string;
+  viralXTweetId?: string;
+  viralXUrl?: string;
+  userAngle?: string | null;
+};
+
 type Loaded =
-  | { ok: true; rows: Array<Post & { threadCount: number }> }
+  | {
+      ok: true;
+      rows: Array<Post & { threadCount: number; source: PostSource | null }>;
+    }
   | { ok: false; error: string };
+
+function metaToSource(meta: GenerationMeta | null): PostSource | null {
+  if (!meta || !meta.mode) return null;
+  if (meta.mode === "take" || meta.mode === "qrt") {
+    return {
+      kind: meta.mode,
+      viralAuthor: meta.viralAuthor ?? null,
+      viralXTweetId: meta.viralXTweetId ?? null,
+      viralXUrl: meta.viralXUrl ?? null,
+    };
+  }
+  return { kind: meta.mode };
+}
 
 type Filter = "active" | "all" | PostStatus;
 
@@ -36,8 +66,12 @@ async function loadPosts(filter: Filter): Promise<Loaded> {
     }
 
     const rows = await db
-      .select()
+      .select({
+        post: posts,
+        generationMeta: generations.inputMeta,
+      })
       .from(posts)
+      .leftJoin(generations, eq(generations.id, posts.generationId))
       .where(whereClause)
       .orderBy(desc(posts.createdAt))
       .limit(50);
@@ -58,10 +92,13 @@ async function loadPosts(filter: Filter): Promise<Loaded> {
 
     return {
       ok: true,
-      rows: rows.map((r) => ({
-        ...r,
+      rows: rows.map(({ post, generationMeta }) => ({
+        ...post,
         threadCount:
-          r.contentType === "thread" ? (byParent.get(r.id) ?? 0) + 1 : 0,
+          post.contentType === "thread"
+            ? (byParent.get(post.id) ?? 0) + 1
+            : 0,
+        source: metaToSource(generationMeta as GenerationMeta | null),
       })),
     };
   } catch (e) {
@@ -171,6 +208,7 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
               key={row.id}
               post={row}
               threadCount={row.threadCount || undefined}
+              source={row.source}
             />
           ))}
         </div>

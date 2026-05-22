@@ -6,9 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Post, PostStatus } from "@/db/schema";
 
+export type PostSource =
+  | { kind: "ai" | "manual" }
+  | {
+      kind: "take" | "qrt";
+      viralAuthor: string | null;
+      viralXTweetId: string | null;
+      viralXUrl: string | null;
+    };
+
 type Props = {
   post: Post;
   threadCount?: number;
+  source?: PostSource | null;
 };
 
 type Phase =
@@ -54,7 +64,7 @@ function xUrl(tweetId: string | null): string | null {
   return `https://x.com/i/web/status/${tweetId}`;
 }
 
-export function PostRow({ post, threadCount }: Props) {
+export function PostRow({ post, threadCount, source }: Props) {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -145,6 +155,23 @@ export function PostRow({ post, threadCount }: Props) {
         <Badge variant="outline" className="font-mono">
           {isThread ? `thread${threadCount ? ` · ${threadCount}` : ""}` : "single"}
         </Badge>
+        {source && (source.kind === "take" || source.kind === "qrt") ? (
+          <span className="font-mono text-muted-foreground">
+            {source.kind === "take" ? "take on" : "QRT"}{" "}
+            {source.viralXUrl ? (
+              <a
+                href={source.viralXUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                @{source.viralAuthor ?? "?"}
+              </a>
+            ) : (
+              <span>@{source.viralAuthor ?? "?"}</span>
+            )}
+          </span>
+        ) : null}
         <span className="font-mono text-muted-foreground">
           {relativeAge(post.createdAt)} ago
         </span>

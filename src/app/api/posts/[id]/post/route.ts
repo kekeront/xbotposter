@@ -72,7 +72,9 @@ export async function POST(_request: Request, { params }: RouteContext) {
       }
       xIds = results.map((r) => r.id);
     } else {
-      const tweet = await postTweet(root.text);
+      const tweet = await postTweet(root.text, {
+        quoteTweetId: root.quoteTweetId ?? undefined,
+      });
       const [updated]: Post[] = await db
         .update(posts)
         .set({

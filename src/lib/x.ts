@@ -19,13 +19,14 @@ export type PostedTweet = { id: string; text: string };
 
 export async function postTweet(
   text: string,
-  opts?: { replyToTweetId?: string },
+  opts?: { replyToTweetId?: string; quoteTweetId?: string },
 ): Promise<PostedTweet> {
   const client = getXClient();
   const res = await client.v2.tweet(text, {
-    reply: opts?.replyToTweetId
-      ? { in_reply_to_tweet_id: opts.replyToTweetId }
-      : undefined,
+    ...(opts?.replyToTweetId
+      ? { reply: { in_reply_to_tweet_id: opts.replyToTweetId } }
+      : {}),
+    ...(opts?.quoteTweetId ? { quote_tweet_id: opts.quoteTweetId } : {}),
   });
   return { id: res.data.id, text: res.data.text };
 }

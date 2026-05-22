@@ -1,10 +1,10 @@
 import { desc, sql } from "drizzle-orm";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { INFLUENCERS } from "@/config/influencers";
 import { db } from "@/db/client";
 import { viralPosts, type ViralPost } from "@/db/schema";
 import { FetchButton } from "./fetch-button";
+import { ViralActions } from "./viral-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -192,26 +192,7 @@ function ViralRow({ post }: { post: ViralPost }) {
           {fmtCount(m.replies)} · 👁 {fmtCount(m.impressions)}
         </span>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="font-mono"
-            disabled
-            title="lands in slice 4b"
-          >
-            take
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="font-mono"
-            disabled
-            title="lands in slice 4c"
-          >
-            QRT
-          </Button>
-        </div>
+        <ViralActions viralPostId={post.id} qrtSupported={true} />
       </footer>
     </article>
   );
