@@ -11,7 +11,14 @@ type Props = {
   threadCount?: number;
 };
 
-type Phase = "idle" | "confirming" | "posting" | "skipping" | "done" | "error";
+type Phase =
+  | "idle"
+  | "confirming"
+  | "posting"
+  | "skipping"
+  | "retrying"
+  | "done"
+  | "error";
 
 function statusVariant(s: PostStatus) {
   switch (s) {
@@ -51,6 +58,7 @@ export function PostRow({ post, threadCount }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const actionable = post.status === "draft" || post.status === "approved";
+  const retryable = post.status === "failed";
   const isThread = post.contentType === "thread";
 
   async function doPost() {
@@ -77,6 +85,26 @@ export function PostRow({ post, threadCount }: Props) {
     setError(null);
     try {
       const res = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data: { error?: string } = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+      router.refresh();
+    } catch (e) {
+      setPhase("error");
+      setError(e instanceof Error ? e.message : "unknown");
+    }
+  }
+
+  async function doRetry() {
+    setPhase("retrying");
+    setError(null);
+    try {
+      const res = await fetch(`/api/posts/${post.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "draft" }),
+      });
       if (!res.ok) {
         const data: { error?: string } = await res.json().catch(() => ({}));
         throw new Error(data.error ?? `HTTP ${res.status}`);
@@ -118,7 +146,7 @@ export function PostRow({ post, threadCount }: Props) {
           {isThread && threadCount ? ` · ${threadCount} posts total` : ""}
         </span>
 
-        {actionable ? (
+        {(actionable || retryable) && (
           <div className="flex items-center gap-2">
             {phase === "error" && error ? (
               <span className="max-w-xs truncate font-mono text-destructive">
@@ -126,7 +154,27 @@ export function PostRow({ post, threadCount }: Props) {
               </span>
             ) : null}
 
-            {phase === "idle" || phase === "error" ? (
+            {retryable && (phase === "idle" || phase === "error") ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={doSkip}
+                  className="font-mono"
+                >
+                  skip
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={doRetry}
+                  className="font-mono"
+                >
+                  retry
+                </Button>
+              </>
+            ) : null}
+
+            {actionable && (phase === "idle" || phase === "error") ? (
               <>
                 <Button
                   variant="outline"
@@ -171,13 +219,16 @@ export function PostRow({ post, threadCount }: Props) {
             {phase === "skipping" ? (
               <span className="font-mono text-muted-foreground">skipping…</span>
             ) : null}
+            {phase === "retrying" ? (
+              <span className="font-mono text-muted-foreground">retrying…</span>
+            ) : null}
             {phase === "done" ? (
               <span className="font-mono text-emerald-600 dark:text-emerald-500">
                 shipped
               </span>
             ) : null}
           </div>
-        ) : null}
+        )}
       </footer>
     </article>
   );

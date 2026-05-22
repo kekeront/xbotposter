@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -52,10 +52,27 @@ function ToggleButton({
   );
 }
 
+const MODE_STORAGE_KEY = "nfactz.compose.mode";
+
+function readStoredMode(): Mode {
+  if (typeof window === "undefined") return "ai";
+  const v = window.localStorage.getItem(MODE_STORAGE_KEY);
+  return v === "manual" ? "manual" : "ai";
+}
+
 export function ComposeForm() {
   const [topic, setTopic] = useState("");
   const [contentType, setContentType] = useState<ContentType>("single");
   const [mode, setMode] = useState<Mode>("ai");
+
+  useEffect(() => {
+    setMode(readStoredMode());
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(MODE_STORAGE_KEY, mode);
+  }, [mode]);
   const [status, setStatus] = useState<"idle" | "generating" | "done" | "error">(
     "idle",
   );

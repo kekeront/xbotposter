@@ -1,7 +1,8 @@
-import { desc, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/client";
-import { posts, type Post } from "@/db/schema";
+import { POST_STATUS, posts, type Post, type PostStatus } from "@/db/schema";
 import { PostRow } from "./post-row";
 
 export const dynamic = "force-dynamic";
@@ -10,12 +11,34 @@ type Loaded =
   | { ok: true; rows: Array<Post & { threadCount: number }> }
   | { ok: false; error: string };
 
-async function loadPosts(): Promise<Loaded> {
+type Filter = "active" | "all" | PostStatus;
+
+const ACTIVE_STATUSES: PostStatus[] = ["draft", "approved", "scheduled", "failed"];
+
+function parseFilter(raw: string | undefined): Filter {
+  if (raw === "all") return "all";
+  if (raw && (POST_STATUS as readonly string[]).includes(raw)) {
+    return raw as PostStatus;
+  }
+  return "active";
+}
+
+async function loadPosts(filter: Filter): Promise<Loaded> {
   try {
+    const parentNull = isNull(posts.parentPostId);
+    let whereClause;
+    if (filter === "all") {
+      whereClause = parentNull;
+    } else if (filter === "active") {
+      whereClause = and(parentNull, inArray(posts.status, ACTIVE_STATUSES));
+    } else {
+      whereClause = and(parentNull, eq(posts.status, filter));
+    }
+
     const rows = await db
       .select()
       .from(posts)
-      .where(isNull(posts.parentPostId))
+      .where(whereClause)
       .orderBy(desc(posts.createdAt))
       .limit(50);
 
@@ -49,8 +72,55 @@ async function loadPosts(): Promise<Loaded> {
   }
 }
 
-export default async function QueuePage() {
-  const result = await loadPosts();
+async function loadCounts(): Promise<Record<Filter, number>> {
+  const counts: Record<Filter, number> = {
+    active: 0,
+    all: 0,
+    draft: 0,
+    approved: 0,
+    scheduled: 0,
+    posted: 0,
+    failed: 0,
+    skipped: 0,
+  };
+  try {
+    const rows = await db
+      .select({
+        status: posts.status,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(posts)
+      .where(isNull(posts.parentPostId))
+      .groupBy(posts.status);
+
+    for (const row of rows) {
+      counts[row.status] = row.count;
+      counts.all += row.count;
+      if (ACTIVE_STATUSES.includes(row.status)) counts.active += row.count;
+    }
+  } catch {
+    // ignore — counts not critical
+  }
+  return counts;
+}
+
+const FILTER_TABS: Array<{ value: Filter; label: string }> = [
+  { value: "active", label: "active" },
+  { value: "draft", label: "draft" },
+  { value: "posted", label: "posted" },
+  { value: "failed", label: "failed" },
+  { value: "skipped", label: "skipped" },
+  { value: "all", label: "all" },
+];
+
+type QueuePageProps = {
+  searchParams: Promise<{ filter?: string }>;
+};
+
+export default async function QueuePage({ searchParams }: QueuePageProps) {
+  const { filter: filterRaw } = await searchParams;
+  const filter = parseFilter(filterRaw);
+  const [result, counts] = await Promise.all([loadPosts(filter), loadCounts()]);
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -62,14 +132,38 @@ export default async function QueuePage() {
           </p>
         </div>
         <Badge variant="outline" className="font-mono">
-          slice 2a
+          slice 3a
         </Badge>
       </header>
+
+      <nav className="flex flex-wrap gap-1 font-mono text-xs">
+        {FILTER_TABS.map((tab) => {
+          const isActive = filter === tab.value;
+          const count = counts[tab.value];
+          const href = tab.value === "active" ? "/queue" : `/queue?filter=${tab.value}`;
+          return (
+            <Link
+              key={tab.value}
+              href={href}
+              className={`rounded-md px-2 py-1 transition-colors ${
+                isActive
+                  ? "bg-foreground text-background"
+                  : "bg-muted text-muted-foreground hover:bg-muted/70"
+              }`}
+            >
+              {tab.label}
+              <span className={isActive ? "ml-1 opacity-70" : "ml-1 opacity-50"}>
+                {count}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
 
       {!result.ok ? (
         <DbErrorState message={result.error} />
       ) : result.rows.length === 0 ? (
-        <EmptyState />
+        <EmptyState filter={filter} />
       ) : (
         <div className="flex flex-col gap-3">
           {result.rows.map((row) => (
@@ -85,13 +179,21 @@ export default async function QueuePage() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ filter }: { filter: Filter }) {
   return (
     <div className="flex flex-col items-start gap-3 rounded-lg border border-dashed p-8">
-      <p className="text-sm font-medium">No drafts yet.</p>
+      <p className="text-sm font-medium">
+        No posts in <span className="font-mono">{filter}</span>.
+      </p>
       <p className="text-sm text-muted-foreground">
-        Head to <a href="/compose" className="underline">Compose</a> and draft
-        something.
+        {filter === "active" ? (
+          <>
+            Head to <Link href="/compose" className="underline">Compose</Link>{" "}
+            and draft something.
+          </>
+        ) : (
+          <>Try a different filter above.</>
+        )}
       </p>
     </div>
   );
