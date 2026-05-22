@@ -14,8 +14,8 @@ const schema = z.object({
   LLM_WRITER_MODEL: z.string().default("gpt-5-mini"),
   EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
 
-  X_API_KEY: z.string().optional(),
-  X_API_SECRET: z.string().optional(),
+  X_CONSUMER_KEY: z.string().optional(),
+  X_CONSUMER_SECRET: z.string().optional(),
   X_ACCESS_TOKEN: z.string().optional(),
   X_ACCESS_TOKEN_SECRET: z.string().optional(),
 
@@ -24,15 +24,23 @@ const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
-const parsed = schema.safeParse(process.env);
+// Treat empty strings as undefined so blank lines in .env.local don't trip
+// `.min(...)` checks on otherwise optional fields.
+const normalized: Record<string, string | undefined> = {};
+for (const [k, v] of Object.entries(process.env)) {
+  normalized[k] = v === "" ? undefined : v;
+}
+
+const parsed = schema.safeParse(normalized);
 
 if (!parsed.success) {
-  console.error(
-    "Invalid environment variables:",
-    parsed.error.flatten().fieldErrors,
-  );
+  const fieldErrors = parsed.error.flatten().fieldErrors;
+  console.error("Invalid environment variables:", fieldErrors);
+  const summary = Object.entries(fieldErrors)
+    .map(([key, msgs]) => `${key}: ${(msgs ?? []).join(", ")}`)
+    .join(" | ");
   throw new Error(
-    "Invalid or missing environment variables. Check .env.local against .env.example.",
+    `Invalid or missing environment variables — ${summary}. Check .env.local against .env.example.`,
   );
 }
 

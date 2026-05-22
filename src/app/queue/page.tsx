@@ -1,33 +1,50 @@
-import { desc } from "drizzle-orm";
+import { desc, isNull, sql } from "drizzle-orm";
+import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/client";
 import { posts, type Post } from "@/db/schema";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { PostRow } from "./post-row";
 
 export const dynamic = "force-dynamic";
 
-async function loadPosts(): Promise<
-  | { ok: true; rows: Post[] }
-  | { ok: false; error: string }
-> {
+type Loaded =
+  | { ok: true; rows: Array<Post & { threadCount: number }> }
+  | { ok: false; error: string };
+
+async function loadPosts(): Promise<Loaded> {
   try {
     const rows = await db
       .select()
       .from(posts)
+      .where(isNull(posts.parentPostId))
       .orderBy(desc(posts.createdAt))
       .limit(50);
-    return { ok: true, rows };
-  } catch (err) {
+
+    const threadCounts = await db
+      .select({
+        parentId: posts.parentPostId,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(posts)
+      .where(sql`${posts.parentPostId} is not null`)
+      .groupBy(posts.parentPostId);
+
+    const byParent = new Map<string, number>();
+    for (const row of threadCounts) {
+      if (row.parentId) byParent.set(row.parentId, row.count);
+    }
+
+    return {
+      ok: true,
+      rows: rows.map((r) => ({
+        ...r,
+        threadCount:
+          r.contentType === "thread" ? (byParent.get(r.id) ?? 0) + 1 : 0,
+      })),
+    };
+  } catch (e) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "unknown DB error",
+      error: e instanceof Error ? e.message : "unknown DB error",
     };
   }
 }
@@ -41,12 +58,11 @@ export default async function QueuePage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Queue</h1>
           <p className="text-sm text-muted-foreground">
-            Drafts and scheduled posts. Slice 0 reads from the DB; generation
-            lands in slice 1.
+            Review, skip, or ship drafts. Threads post as chained replies.
           </p>
         </div>
         <Badge variant="outline" className="font-mono">
-          slice 0
+          slice 2a
         </Badge>
       </header>
 
@@ -55,7 +71,15 @@ export default async function QueuePage() {
       ) : result.rows.length === 0 ? (
         <EmptyState />
       ) : (
-        <PostsTable rows={result.rows} />
+        <div className="flex flex-col gap-3">
+          {result.rows.map((row) => (
+            <PostRow
+              key={row.id}
+              post={row}
+              threadCount={row.threadCount || undefined}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -64,15 +88,11 @@ export default async function QueuePage() {
 function EmptyState() {
   return (
     <div className="flex flex-col items-start gap-3 rounded-lg border border-dashed p-8">
-      <p className="text-sm font-medium">No posts yet.</p>
+      <p className="text-sm font-medium">No drafts yet.</p>
       <p className="text-sm text-muted-foreground">
-        Trigger a placeholder draft via:
+        Head to <a href="/compose" className="underline">Compose</a> and draft
+        something.
       </p>
-      <pre className="rounded-md bg-muted px-3 py-2 font-mono text-xs">
-        {`curl -X POST http://localhost:3000/api/compose \\
-  -H "Content-Type: application/json" \\
-  -d '{"topic":"hello world"}'`}
-      </pre>
     </div>
   );
 }
@@ -84,44 +104,12 @@ function DbErrorState({ message }: { message: string }) {
         Couldn&apos;t reach the database.
       </p>
       <p className="text-sm text-muted-foreground">
-        Check that <code className="font-mono">DATABASE_URL</code> is set in
-        <code className="font-mono"> .env.local</code> and the migration has
-        been applied. See README for setup steps.
+        Check that <code className="font-mono">DATABASE_URL</code> is set and
+        the migration has been applied.
       </p>
       <pre className="max-w-2xl overflow-x-auto rounded-md bg-muted px-3 py-2 font-mono text-xs">
         {message}
       </pre>
     </div>
-  );
-}
-
-function PostsTable({ rows }: { rows: Post[] }) {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Created</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Text</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((row) => (
-          <TableRow key={row.id}>
-            <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
-              {row.createdAt.toISOString().slice(0, 16).replace("T", " ")}
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline">{row.status}</Badge>
-            </TableCell>
-            <TableCell className="text-sm">{row.contentType}</TableCell>
-            <TableCell className="max-w-xl truncate text-sm">
-              {row.text}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
   );
 }

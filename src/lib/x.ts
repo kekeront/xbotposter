@@ -7,8 +7,8 @@ let _client: TwitterApi | undefined;
 export function getXClient(): TwitterApi {
   if (_client) return _client;
   _client = new TwitterApi({
-    appKey: requireEnv("X_API_KEY"),
-    appSecret: requireEnv("X_API_SECRET"),
+    appKey: requireEnv("X_CONSUMER_KEY"),
+    appSecret: requireEnv("X_CONSUMER_SECRET"),
     accessToken: requireEnv("X_ACCESS_TOKEN"),
     accessSecret: requireEnv("X_ACCESS_TOKEN_SECRET"),
   });
