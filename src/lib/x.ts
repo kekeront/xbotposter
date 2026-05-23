@@ -83,7 +83,7 @@ export type XTimelineTweet = {
 
 export async function userTimeline(
   userId: string,
-  opts?: { max?: number },
+  opts?: { max?: number; sinceId?: string },
 ): Promise<XTimelineTweet[]> {
   const client = getXClient();
   const max = opts?.max ?? 10;
@@ -95,6 +95,10 @@ export async function userTimeline(
       "referenced_tweets",
     ],
     exclude: ["retweets", "replies"],
+    // since_id only returns tweets newer than the most recent we've captured.
+    // X bills per resource returned — paying only for the increment is the
+    // single biggest steady-state cost optimization.
+    ...(opts?.sinceId ? { since_id: opts.sinceId } : {}),
   });
 
   const out: XTimelineTweet[] = [];

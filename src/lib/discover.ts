@@ -1,9 +1,28 @@
 import "server-only";
+import { and, isNotNull, sql } from "drizzle-orm";
 import { INFLUENCERS } from "@/config/influencers";
 import { db } from "@/db/client";
 import { viralPosts } from "@/db/schema";
 import { writeTrace } from "./trace";
 import { userByUsername, userTimeline } from "./x";
+
+async function loadLatestSeenByAuthor(): Promise<Map<string, string>> {
+  const rows = await db
+    .select({
+      author: viralPosts.author,
+      maxId: sql<string>`max(${viralPosts.xTweetId}::numeric)::text`,
+    })
+    .from(viralPosts)
+    .where(
+      and(isNotNull(viralPosts.author), isNotNull(viralPosts.xTweetId)),
+    )
+    .groupBy(viralPosts.author);
+  const map = new Map<string, string>();
+  for (const r of rows) {
+    if (r.author && r.maxId) map.set(r.author, r.maxId);
+  }
+  return map;
+}
 
 // Per-call hard limit so a hung X API request can't lock the whole run.
 const X_CALL_TIMEOUT_MS = 8_000;
@@ -42,11 +61,17 @@ export async function runDiscoverFetch(opts?: {
     elapsedMs: 0,
   };
 
+  const lastSeenByAuthor = await loadLatestSeenByAuthor();
+
   await writeTrace({
     generationId: null,
     agent: "discover",
     eventType: "start",
-    payload: { influencers: INFLUENCERS.length, source },
+    payload: {
+      influencers: INFLUENCERS.length,
+      source,
+      authorsWithSinceId: lastSeenByAuthor.size,
+    },
   });
 
   for (const inf of INFLUENCERS) {
@@ -71,8 +96,9 @@ export async function runDiscoverFetch(opts?: {
       }
       result.influencersResolved += 1;
 
+      const sinceId = lastSeenByAuthor.get(inf.username);
       const tweets = await withTimeout(
-        userTimeline(user.id, { max: 5 }),
+        userTimeline(user.id, { max: 5, sinceId }),
         X_CALL_TIMEOUT_MS,
         `userTimeline(@${inf.username})`,
       );
