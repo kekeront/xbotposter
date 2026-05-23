@@ -1,3 +1,4 @@
+import { AutoRefresh } from "@/components/shell/auto-refresh";
 import { Badge } from "@/components/ui/badge";
 import { env } from "@/lib/env";
 import {
@@ -51,13 +52,17 @@ export default async function AutomationPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Automation</h1>
           <p className="text-sm text-muted-foreground">
-            Autonomous loop status. Local dev: use trigger buttons. Production:
+            Autonomous loop status. Local dev: use trigger buttons or{" "}
+            <code className="font-mono">npm run cron:local</code>. Production:
             Vercel Cron runs on schedule.
           </p>
         </div>
-        <Badge variant="outline" className="font-mono">
-          slice 16
-        </Badge>
+        <div className="flex items-center gap-2">
+          <AutoRefresh intervalMs={20_000} label="live" />
+          <Badge variant="outline" className="font-mono">
+            slice 17
+          </Badge>
+        </div>
       </header>
 
       <section className="flex flex-col gap-3 rounded-lg border bg-card p-4">

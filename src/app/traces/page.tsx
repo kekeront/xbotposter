@@ -1,5 +1,6 @@
 import { desc, eq, sql } from "drizzle-orm";
 import Link from "next/link";
+import { AutoRefresh } from "@/components/shell/auto-refresh";
 import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/client";
 import { generations, traces, type Trace } from "@/db/schema";
@@ -160,13 +161,16 @@ export default async function TracesPage({ searchParams }: TracesPageProps) {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Traces</h1>
           <p className="text-sm text-muted-foreground">
-            Agent events: writer, editor, take, QRT, poster, discover, cron.
-            Latest 300 events. Grouped by generation.
+            Agent events: writer, editor, take, QRT, poster, discover, cron,
+            topic-guard, telegram. Latest 300 events. Grouped by generation.
           </p>
         </div>
-        <Badge variant="outline" className="font-mono">
-          slice 5
-        </Badge>
+        <div className="flex items-center gap-2">
+          <AutoRefresh intervalMs={15_000} label="live" />
+          <Badge variant="outline" className="font-mono">
+            slice 5
+          </Badge>
+        </div>
       </header>
 
       <nav className="flex flex-wrap gap-1 font-mono text-xs">

@@ -272,7 +272,43 @@ endpoints manually with the Bearer header or add a system crontab entry.
 | `npm run db:generate` | Generate Drizzle migration from schema diff |
 | `npm run db:migrate` | Apply migrations |
 | `npm run db:studio` | Open Drizzle Studio (DB GUI) |
+| `npm run cron:local` | Long-running local cron simulator (discover 12h / generate 4h / post 15m). Use in a second terminal while `npm run dev` runs. |
+| `npm run cron:once` | Same as cron:local but fires every job once immediately, then continues on schedule. |
 | `npx tsx scripts/x-test.mjs` | Verify X API credentials + Pay-Per-Use access |
+| `npx tsx scripts/tg-chat-id.mjs` | Resolve your Telegram chat_id after messaging the bot |
+| `npx tsx scripts/tg-test.mjs` | Send a test notification to verify TELEGRAM_* env vars |
+| `npx tsx scripts/export-traces.mjs` | Dump latest 200 trace events to `traces/agent-traces.{json,md}` |
+
+## Local autonomous mode
+
+The Vercel Cron schedule in `vercel.json` only fires after deploy. To run the
+same loop on your laptop:
+
+```bash
+# terminal 1
+npm run dev
+
+# terminal 2
+npm run cron:local   # fires discover/generate/post on real schedules
+# or
+npm run cron:once    # plus an immediate first run of each
+```
+
+While both are running, the system is fully autonomous in the same way
+production will be after deploy:
+
+- `cron/discover` pulls fresh viral content from tracked influencers (with
+  `since_id` so you only pay for new tweets)
+- `cron/generate` picks the top safe candidate through `topic-guard`, runs the
+  take + editor + eval + fact-check pipeline, saves a draft, and pushes a
+  notification to your Telegram (if configured)
+- `cron/post` drains approved + scheduled posts to X
+
+Track live activity in two places, both auto-refreshing in the background:
+
+- `/automation` — per-cron status, last run, today's autonomy stats, daily
+  spend cap progress bar, manual trigger buttons
+- `/traces` — grouped agent event log with per-event tokens + cost
 
 ## Layout
 

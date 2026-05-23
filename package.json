@@ -11,7 +11,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "cron:local": "tsx scripts/local-cron.mjs",
+    "cron:once": "RUN_ON_START=1 tsx scripts/local-cron.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
