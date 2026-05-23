@@ -36,6 +36,19 @@ const schema = z.object({
   // to the /queue page. Defaults to localhost in dev.
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
 
+  // High-confidence auto-approve gate. Off by default. When on, cron/generate
+  // can set status="approved" with a delayed scheduledFor IF every guardrail
+  // passes (see src/lib/auto-approve.ts). Telegram notification still fires
+  // and offers an "unapprove" button — user can revert before the delay
+  // window elapses.
+  AUTO_APPROVE_ENABLED: z
+    .union([z.literal("1"), z.literal("0"), z.literal("true"), z.literal("false")])
+    .transform((v) => v === "1" || v === "true")
+    .default(false),
+  AUTO_APPROVE_MIN_EVAL: z.coerce.number().min(0).max(100).default(90),
+  AUTO_APPROVE_MIN_STANCE: z.coerce.number().min(0).max(100).default(90),
+  AUTO_APPROVE_DELAY_MINUTES: z.coerce.number().int().positive().default(30),
+
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 

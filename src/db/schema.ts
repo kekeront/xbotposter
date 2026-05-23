@@ -7,6 +7,7 @@ import {
   jsonb,
   numeric,
   pgTable,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
@@ -227,6 +228,55 @@ export type Fingerprint = typeof fingerprints.$inferSelect;
 export type NewFingerprint = typeof fingerprints.$inferInsert;
 export type Trace = typeof traces.$inferSelect;
 export type NewTrace = typeof traces.$inferInsert;
+
+// Memory layer — typed assertions the system accumulates about the writer
+// (voice/preference/opinion) and the world (event signals). Hybrid retrieval
+// (pgvector + tsvector) wires these into the writer/take prompt context.
+// Schema is applied by migrations/0002_memories.sql — Drizzle is the type
+// source only (partial indexes, GENERATED tsvector, CHECK constraints are
+// not expressible here and live in the raw SQL).
+export const MEMORY_TYPE = ["fact", "preference", "opinion", "event"] as const;
+export type MemoryType = (typeof MEMORY_TYPE)[number];
+
+export const MEMORY_SOURCE_KIND = [
+  "post",
+  "telegram_seed",
+  "generation_feedback",
+  "manual",
+  "viral_observation",
+] as const;
+export type MemorySourceKind = (typeof MEMORY_SOURCE_KIND)[number];
+
+export const memories = pgTable(
+  "memories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    type: text("type", { enum: MEMORY_TYPE }).$type<MemoryType>().notNull(),
+    slot: text("slot").notNull(),
+    content: text("content").notNull(),
+    confidence: smallint("confidence").default(70).notNull(),
+    sourceKind: text("source_kind", { enum: MEMORY_SOURCE_KIND }).$type<
+      MemorySourceKind | null
+    >(),
+    sourceId: uuid("source_id"),
+    metadata: jsonb("metadata").$type<Record<string, unknown> | null>(),
+    embedding: vector("embedding", { dimensions: 1536 }),
+    supersededBy: uuid("superseded_by").references(
+      (): AnyPgColumn => memories.id,
+      { onDelete: "set null" },
+    ),
+    supersededAt: timestamp("superseded_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("memories_active_type_idx").on(table.type, table.createdAt),
+  ],
+);
+
+export type Memory = typeof memories.$inferSelect;
+export type NewMemory = typeof memories.$inferInsert;
 
 // Marker for raw SQL embedding distance helpers (used in future RAG queries).
 export const VECTOR_COSINE_OPS = sql`vector_cosine_ops`;

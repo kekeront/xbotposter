@@ -5,6 +5,7 @@ import { draft as qrtDraft } from "@/agents/qrt";
 import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import { generations, posts, viralPosts, type Post } from "@/db/schema";
+import { recallMemories } from "@/lib/recall";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
 
@@ -112,6 +113,22 @@ export async function POST(request: Request) {
 
   try {
     const voice = await loadDefaultVoice();
+    const recall = await recallMemories({
+      query: userAngle ? `${userAngle}\n\n${viral.text}` : viral.text,
+      maxChars: 900, // QRT is short — keep memory context tight
+    });
+    if (recall.memories.length > 0) {
+      await writeTrace({
+        generationId: generation.id,
+        agent: "recall",
+        eventType: "complete",
+        payload: {
+          itemsIncluded: recall.memories.length,
+          diagnostics: recall.diagnostics,
+        },
+        costUsd: recall.cost.embed.toString(),
+      });
+    }
 
     const writerResult = await qrtDraft({
       viralText: viral.text,
@@ -119,18 +136,46 @@ export async function POST(request: Request) {
       userAngle: userAngle ?? null,
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
+      memoryBlock: recall.promptBlock,
     });
 
     await writeTrace({
       generationId: generation.id,
       agent: "qrt",
-      eventType: "complete",
-      payload: { length: writerResult.text.length },
+      eventType: writerResult.skipped ? "skipped_no_angle" : "complete",
+      payload: { length: writerResult.text.length, skipped: writerResult.skipped },
       model: writerResult.model,
       tokensIn: writerResult.tokensIn,
       tokensOut: writerResult.tokensOut,
       costUsd: writerResult.costUsd.toString(),
     });
+
+    if (writerResult.skipped) {
+      await db
+        .update(generations)
+        .set({
+          status: "succeeded",
+          model: writerResult.model,
+          tokensIn: writerResult.tokensIn,
+          tokensOut: writerResult.tokensOut,
+          costUsd: writerResult.costUsd.toString(),
+          completedAt: new Date(),
+        })
+        .where(eq(generations.id, generation.id));
+
+      return Response.json(
+        {
+          skipped: true,
+          reason: "writer found no constructive angle within tone guardrails",
+          viralAuthor: author,
+          generation: {
+            id: generation.id,
+            costUsd: writerResult.costUsd,
+          },
+        },
+        { status: 200 },
+      );
+    }
 
     const editorResult = await review({
       topic: userAngle

@@ -34,6 +34,14 @@ CHECK FOR
 8. CLOSING TRICOLONS — "X, Y, and Z" used as a finishing kicker
 9. CHARACTER LENGTH — single tweets over 270 chars, threads where any post is over 270 chars. Aim for 60-180 chars on singles when possible (anchor norm is short).
 10. VOICE TONE MISMATCH — wildly different rhythm, register, or language-mix from the voice anchor (the TONE should match; the CONTENT should not). Anchor is casual / internet-register Russian — formal Russian counts as a tone mismatch.
+11. NEGATIVITY / SNARK / DUNKING — the writer's public stance is optimist + analyst.
+    REWRITE or strip lines that:
+    - mock, dunk, gloat ("вот лохи", "ну я же говорил", "наконец-то обосрались", "I told you so")
+    - attack a person, company, or community explicitly OR implicitly ("очередной хайп от X-people")
+    - frame doom without exit ("всё, конец индустрии", "AI убьёт всех")
+    - end on raw frustration. Frustration is allowed only as a setup for an observation or call-to-action (e.g. "бесит что X — поэтому Y" is fine; "бесит что X." is not).
+    - sneer at users / customers / juniors / non-experts
+    Constructive critique of a mechanism / decision / system is fine — name the trade-off, propose the alternative, offer the missing data-point. The goal is analyst-grade objectivity, NOT toxic positivity or hype.
 
 OUTPUT FORMAT
 Respond as JSON exactly:

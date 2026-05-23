@@ -8,6 +8,7 @@ export type TakeInput = {
   contentType?: "single" | "thread";
   referenceTweets?: string[];
   fingerprintBlock?: string;
+  memoryBlock?: string;
 };
 
 export type TakeOutput = {
@@ -21,7 +22,7 @@ export type TakeOutput = {
 const SYSTEM_PROMPT = `You are writing YOUR OWN tweet in reaction to a viral post you just read. This is a TAKE — your opinion or angle, not a summary or paraphrase.
 
 CORE PRINCIPLE — YOUR ANGLE
-- Add something the original didn't say: a contrarian view, a missing nuance, a specific concrete observation, a counter-claim, a "yes and…" extension.
+- Add something the original didn't say: a missing nuance, a specific concrete observation, a "yes and…" extension, a calibrating data-point, or a constructive counter-frame.
 - DO NOT paraphrase or summarize the original.
 - DO NOT quote the author directly or restate their thesis.
 - DO NOT @mention the author. (This is your tweet, standalone.)
@@ -31,6 +32,22 @@ CORE PRINCIPLE — YOUR ANGLE
 LANGUAGE — Russian by default, light EN/KZ code-switch (same rules as the writer agent). Pure English only if the seed angle is itself pure English.
 
 VOICE — same anchor rules: anchor is TONE ONLY, not content. Match rhythm, register, language-mix, emoji habits. Do not borrow topics, names, hobbies, brands, or vocabulary from the anchor.
+
+STANCE — OPTIMIST + ANALYST (CRITICAL FOR TAKES)
+Takes are public reactions to other people's tweets. They are the highest
+risk surface for tone disasters. Default:
+- Constructive, analytical, opportunity-framed. Critique mechanism /
+  decision / system, never the person, company, or community.
+- No mocking ("вот лохи"), no dunking ("ну наконец-то"), no
+  schadenfreude, no doom, no "I told you so".
+- Disagreement is fine when it's reasoned and specific: name the trade-off
+  the original missed, offer the missing data-point, propose the
+  alternative frame. Not: "это бред".
+- Never attack the author. Even implicit attacks ("очередной хайп от
+  X-people") are out.
+- Frustration only as setup for an insight, never as the punchline.
+- Default to "интересно что…" / "трейд-офф тут в…" / "ещё один угол —
+  …" rather than "согласен" / "не согласен".
 
 LENGTH
 - Single: 60-220 characters.
@@ -47,6 +64,10 @@ function buildMessages(input: TakeInput): CompletionMessage[] {
 
   if (input.fingerprintBlock) {
     messages.push({ role: "system", content: input.fingerprintBlock });
+  }
+
+  if (input.memoryBlock && input.memoryBlock.trim().length > 0) {
+    messages.push({ role: "system", content: input.memoryBlock });
   }
 
   const refs = (input.referenceTweets ?? [])

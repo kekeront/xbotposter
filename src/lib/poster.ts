@@ -1,7 +1,8 @@
 import "server-only";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
-import { posts, type Post } from "@/db/schema";
+import { generations, posts, type Post } from "@/db/schema";
+import { extractMemoriesFromPost } from "./memory-extract";
 import { writeTrace } from "./trace";
 import { postThread, postTweet } from "./x";
 
@@ -95,6 +96,11 @@ export async function shipPostById(postId: string): Promise<ShipPostResult> {
       payload: { postId, xTweetIds: xIds, count: postedRows.length },
     });
 
+    // Fire-and-forget memory extraction. We don't await — successful posting
+    // shouldn't block on extraction latency, and extraction is idempotent
+    // (canonical-slot dedupe). Errors are logged inside the extractor.
+    void runPostMemoryExtraction(root.id, root.text, root.generationId);
+
     return { ok: true, posts: postedRows, xTweetIds: xIds };
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown error";
@@ -109,5 +115,50 @@ export async function shipPostById(postId: string): Promise<ShipPostResult> {
       payload: { postId, message },
     });
     return { ok: false, status: 500, error: "post failed", message };
+  }
+}
+
+async function runPostMemoryExtraction(
+  postId: string,
+  text: string,
+  generationId: string | null,
+): Promise<void> {
+  try {
+    let topic: string | null = null;
+    if (generationId) {
+      const gen = await db
+        .select({ topic: generations.topic })
+        .from(generations)
+        .where(eq(generations.id, generationId))
+        .limit(1);
+      topic = gen[0]?.topic ?? null;
+    }
+    const result = await extractMemoriesFromPost({
+      postText: text,
+      topic,
+      outcome: "posted",
+      sourceId: postId,
+    });
+    await writeTrace({
+      generationId,
+      agent: "memory-extract",
+      eventType: "complete",
+      payload: {
+        postId,
+        outcome: "posted",
+        extracted: result.extracted.length,
+        recorded: result.recorded,
+      },
+      model: result.model,
+      costUsd: result.costUsd.toString(),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "unknown error";
+    await writeTrace({
+      generationId,
+      agent: "memory-extract",
+      eventType: "error",
+      payload: { postId, message },
+    });
   }
 }
