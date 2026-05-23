@@ -14,6 +14,7 @@ const PRIMARY: NavItem[] = [
 
 const SECONDARY: NavItem[] = [
   { label: "Voice", href: "/voice", hint: "reference posts + fingerprint" },
+  { label: "Automation", href: "/automation", hint: "cron status + autonomy stats" },
   { label: "Traces", href: "/traces", hint: "agent event log" },
   { label: "Schedule", href: "/schedule", hint: "calendar view (soon)" },
   { label: "History", href: "/history", hint: "all posts (soon)" },

@@ -26,6 +26,16 @@ const schema = z.object({
   // Manual UI actions are not gated (user opt-in).
   MAX_DAILY_USD: z.coerce.number().positive().default(2),
 
+  // Telegram bot integration. If all three are set, autonomous cron-generate
+  // pushes drafts to your Telegram with approve / skip inline buttons.
+  TELEGRAM_BOT_TOKEN: z.string().optional(),
+  TELEGRAM_CHAT_ID: z.string().optional(),
+  TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
+
+  // Public URL of this deployment, used to deep-link from Telegram messages
+  // to the /queue page. Defaults to localhost in dev.
+  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 

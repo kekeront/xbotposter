@@ -8,6 +8,7 @@ import { db } from "@/db/client";
 import { generations, posts, viralPosts } from "@/db/schema";
 import { authorizeCronRequest, unauthorized } from "@/lib/cron-auth";
 import { checkSpendCap, spendCapResponse } from "@/lib/spend-cap";
+import { sendDraftNotification } from "@/lib/telegram";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
 
@@ -233,6 +234,17 @@ export async function GET(request: Request) {
         status: "draft",
       })
       .returning();
+
+    // Fire-and-forget Telegram notification. No await — autonomous run
+    // shouldn't block on bot API delays. Silently no-op if not configured.
+    if (insertedPost) {
+      void sendDraftNotification({
+        postId: insertedPost.id,
+        text,
+        sourceLabel: `autonomous take on @${author}`,
+        evalOverall: evalResult.overall,
+      });
+    }
 
     return Response.json({
       ok: true,
