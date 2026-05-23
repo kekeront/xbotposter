@@ -1,6 +1,5 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/client";
 import {
   generations,
@@ -20,13 +19,18 @@ type GenerationMeta = {
   viralXTweetId?: string;
   viralXUrl?: string;
   userAngle?: string | null;
+  eval?: { overall?: number };
+  winnerEval?: { overall?: number };
+};
+
+type EnrichedPost = Post & {
+  threadCount: number;
+  source: PostSource | null;
+  evalOverall: number | null;
 };
 
 type Loaded =
-  | {
-      ok: true;
-      rows: Array<Post & { threadCount: number; source: PostSource | null }>;
-    }
+  | { ok: true; rows: EnrichedPost[] }
   | { ok: false; error: string };
 
 function metaToSource(meta: GenerationMeta | null): PostSource | null {
@@ -42,9 +46,43 @@ function metaToSource(meta: GenerationMeta | null): PostSource | null {
   return { kind: meta.mode };
 }
 
+function metaToEval(meta: GenerationMeta | null): number | null {
+  if (!meta) return null;
+  const v = meta.winnerEval?.overall ?? meta.eval?.overall;
+  return typeof v === "number" ? v : null;
+}
+
 type Filter = "active" | "all" | PostStatus;
 
 const ACTIVE_STATUSES: PostStatus[] = ["draft", "approved", "scheduled", "failed"];
+
+// Priority order when rendering grouped active view — most actionable first.
+const STATUS_ORDER: PostStatus[] = [
+  "scheduled",
+  "approved",
+  "draft",
+  "failed",
+  "posted",
+  "skipped",
+];
+
+const STATUS_LABEL: Record<PostStatus, string> = {
+  scheduled: "Scheduled",
+  approved: "Approved",
+  draft: "Drafts to review",
+  failed: "Failed (retryable)",
+  posted: "Posted",
+  skipped: "Skipped",
+};
+
+const STATUS_HINT: Record<PostStatus, string> = {
+  scheduled: "Will ship at scheduled time via /api/cron/post",
+  approved: "Auto-approved or queued for the next cron tick",
+  draft: "Awaiting your review",
+  failed: "Failed to ship — fix and retry",
+  posted: "Live on X",
+  skipped: "Manually skipped",
+};
 
 function parseFilter(raw: string | undefined): Filter {
   if (raw === "all") return "all";
@@ -93,14 +131,18 @@ async function loadPosts(filter: Filter): Promise<Loaded> {
 
     return {
       ok: true,
-      rows: rows.map(({ post, generationMeta }) => ({
-        ...post,
-        threadCount:
-          post.contentType === "thread"
-            ? (byParent.get(post.id) ?? 0) + 1
-            : 0,
-        source: metaToSource(generationMeta as GenerationMeta | null),
-      })),
+      rows: rows.map(({ post, generationMeta }) => {
+        const meta = generationMeta as GenerationMeta | null;
+        return {
+          ...post,
+          threadCount:
+            post.contentType === "thread"
+              ? (byParent.get(post.id) ?? 0) + 1
+              : 0,
+          source: metaToSource(meta),
+          evalOverall: metaToEval(meta),
+        };
+      }),
     };
   } catch (e) {
     return {
@@ -180,9 +222,6 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
             label="Clear skipped + failed"
             count={counts.skipped + counts.failed}
           />
-          <Badge variant="outline" className="font-mono">
-            slice 3a
-          </Badge>
         </div>
       </header>
 
@@ -214,18 +253,67 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
         <DbErrorState message={result.error} />
       ) : result.rows.length === 0 ? (
         <EmptyState filter={filter} />
+      ) : filter === "active" ? (
+        <GroupedView rows={result.rows} />
       ) : (
-        <div className="flex flex-col gap-3">
-          {result.rows.map((row) => (
-            <PostRow
-              key={row.id}
-              post={row}
-              threadCount={row.threadCount || undefined}
-              source={row.source}
-            />
-          ))}
-        </div>
+        <FlatView rows={result.rows} />
       )}
+    </div>
+  );
+}
+
+function GroupedView({ rows }: { rows: EnrichedPost[] }) {
+  // Bucket by status, render sections in STATUS_ORDER, skip empty buckets.
+  const byStatus = new Map<PostStatus, EnrichedPost[]>();
+  for (const r of rows) {
+    if (!byStatus.has(r.status)) byStatus.set(r.status, []);
+    byStatus.get(r.status)!.push(r);
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {STATUS_ORDER.filter((s) => byStatus.has(s)).map((status) => {
+        const items = byStatus.get(status)!;
+        return (
+          <section key={status} className="flex flex-col gap-3">
+            <h2 className="flex items-baseline gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+              <span>{STATUS_LABEL[status]}</span>
+              <span className="opacity-50">·</span>
+              <span>{items.length}</span>
+              <span className="ml-auto text-[10px] normal-case opacity-70">
+                {STATUS_HINT[status]}
+              </span>
+            </h2>
+            <div className="flex flex-col gap-3">
+              {items.map((row) => (
+                <PostRow
+                  key={row.id}
+                  post={row}
+                  threadCount={row.threadCount || undefined}
+                  source={row.source}
+                  evalOverall={row.evalOverall}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function FlatView({ rows }: { rows: EnrichedPost[] }) {
+  return (
+    <div className="flex flex-col gap-3">
+      {rows.map((row) => (
+        <PostRow
+          key={row.id}
+          post={row}
+          threadCount={row.threadCount || undefined}
+          source={row.source}
+          evalOverall={row.evalOverall}
+        />
+      ))}
     </div>
   );
 }
@@ -234,16 +322,26 @@ function EmptyState({ filter }: { filter: Filter }) {
   return (
     <div className="flex flex-col items-start gap-3 rounded-lg border border-dashed p-8">
       <p className="text-sm font-medium">
-        No posts in <span className="font-mono">{filter}</span>.
+        {filter === "active"
+          ? "Nothing in the queue."
+          : `No posts in ${filter}.`}
       </p>
       <p className="text-sm text-muted-foreground">
         {filter === "active" ? (
           <>
-            Head to <Link href="/compose" className="underline">Compose</Link>{" "}
-            and draft something.
+            Start with{" "}
+            <Link href="/compose" className="underline">
+              Compose
+            </Link>{" "}
+            for a manual draft, or check{" "}
+            <Link href="/discover" className="underline">
+              Discover
+            </Link>{" "}
+            for viral content to react to. The autonomous cron also fires every
+            4 hours.
           </>
         ) : (
-          <>Try a different filter above.</>
+          <>Try the active filter or another tab above.</>
         )}
       </p>
     </div>

@@ -19,6 +19,9 @@ type Props = {
   post: Post;
   threadCount?: number;
   source?: PostSource | null;
+  // Eval score 0-100 from the winner variant (compose) or single gen (cron/take/qrt).
+  // Drives the per-row score pill and lets the user prioritize what to ship.
+  evalOverall?: number | null;
 };
 
 type Phase =
@@ -96,7 +99,27 @@ function xUrl(tweetId: string | null): string | null {
   return `https://x.com/i/web/status/${tweetId}`;
 }
 
-export function PostRow({ post, threadCount, source }: Props) {
+function evalColor(v: number): string {
+  if (v >= 85) return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300";
+  if (v >= 70) return "bg-blue-500/15 text-blue-700 dark:text-blue-300";
+  if (v >= 50) return "bg-amber-500/15 text-amber-700 dark:text-amber-300";
+  return "bg-destructive/15 text-destructive";
+}
+
+function sourceModeLabel(kind: PostSource["kind"]): string {
+  switch (kind) {
+    case "ai":
+      return "AI";
+    case "manual":
+      return "manual";
+    case "take":
+      return "take";
+    case "qrt":
+      return "QRT";
+  }
+}
+
+export function PostRow({ post, threadCount, source, evalOverall }: Props) {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -206,12 +229,25 @@ export function PostRow({ post, threadCount, source }: Props) {
     <article className="flex flex-col gap-3 rounded-lg border bg-card p-4">
       <header className="flex flex-wrap items-center gap-2 text-xs">
         <Badge variant={statusVariant(post.status)}>{post.status}</Badge>
+        {source ? (
+          <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            {sourceModeLabel(source.kind)}
+          </span>
+        ) : null}
+        {evalOverall !== null && evalOverall !== undefined ? (
+          <span
+            className={`rounded px-1.5 py-0.5 font-mono text-[10px] tabular-nums ${evalColor(evalOverall)}`}
+            title="evaluator overall (insight, voice, anti-slop, length, language, faithfulness, stance)"
+          >
+            eval {evalOverall}
+          </span>
+        ) : null}
         <Badge variant="outline" className="font-mono">
           {isThread ? `thread${threadCount ? ` · ${threadCount}` : ""}` : "single"}
         </Badge>
         {source && (source.kind === "take" || source.kind === "qrt") ? (
           <span className="font-mono text-muted-foreground">
-            {source.kind === "take" ? "take on" : "QRT"}{" "}
+            on{" "}
             {source.viralXUrl ? (
               <a
                 href={source.viralXUrl}
@@ -229,9 +265,9 @@ export function PostRow({ post, threadCount, source }: Props) {
         <span className="font-mono text-muted-foreground">
           {relativeAge(post.createdAt)} ago
         </span>
-        {post.scheduledFor && post.status === "approved" ? (
+        {post.scheduledFor && (post.status === "approved" || post.status === "scheduled") ? (
           <span className="font-mono text-muted-foreground">
-            · scheduled {fmtScheduled(post.scheduledFor)}
+            · ships {fmtScheduled(post.scheduledFor)}
           </span>
         ) : null}
         {post.xTweetId ? (
@@ -296,10 +332,10 @@ export function PostRow({ post, threadCount, source }: Props) {
                 remove
               </Button>
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={doSkip}
-                className="font-mono"
+                className="font-mono text-muted-foreground"
               >
                 skip
               </Button>
@@ -313,10 +349,11 @@ export function PostRow({ post, threadCount, source }: Props) {
               </Button>
               <Button
                 size="sm"
-                onClick={() => setPhase("confirming")}
+                onClick={doPost}
                 className="font-mono"
+                title={isThread ? "ship the whole thread as chained replies" : "ship now to @kekeront"}
               >
-                {isThread ? "post thread" : "post"}
+                {isThread ? "ship thread ▸" : "ship now ▸"}
               </Button>
             </>
           ) : null}

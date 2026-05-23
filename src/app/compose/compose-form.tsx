@@ -96,6 +96,7 @@ export function ComposeForm() {
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ComposeResult | null>(null);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -121,6 +122,7 @@ export function ComposeForm() {
     setStatus("generating");
     setError(null);
     setResult(null);
+    setStartedAt(Date.now());
     try {
       const res = await fetch("/api/compose", {
         method: "POST",
@@ -287,10 +289,159 @@ export function ComposeForm() {
         </CardContent>
       </Card>
 
+      {status === "generating" && startedAt !== null ? (
+        <PipelineProgress
+          startedAt={startedAt}
+          contentType={contentType}
+          variants={isManual ? 1 : variants}
+          isManual={isManual}
+        />
+      ) : null}
+
       {result ? (
         <ResultCard result={result} onUpdate={(r) => setResult(r)} />
       ) : null}
     </div>
+  );
+}
+
+type Stage = {
+  name: string;
+  hint: string;
+  // estimated start/end seconds into the generation
+  startSec: number;
+  endSec: number;
+};
+
+function pipelineStages(opts: {
+  contentType: ContentType;
+  variants: number;
+  isManual: boolean;
+}): Stage[] {
+  if (opts.isManual) {
+    return [{ name: "queue", hint: "inserting draft row(s)", startSec: 0, endSec: 1 }];
+  }
+  // Times are rough, tuned for a typical run on Tier 1 OpenAI.
+  // We scale stages by variant count where they parallel-fan-out.
+  const v = opts.variants;
+  const stages: Stage[] = [];
+  let t = 0;
+  stages.push({ name: "recall", hint: "fetching memory + voice context", startSec: t, endSec: (t = t + 2) });
+  if (opts.contentType === "thread") {
+    stages.push({ name: "outliner", hint: "deciding thread beats", startSec: t, endSec: (t = t + 6) });
+  }
+  // writer + editor are sequential per variant; variants run in parallel.
+  const writerDur = 8;
+  const editorDur = 8;
+  stages.push({
+    name: v > 1 ? `writer × ${v}` : "writer",
+    hint: "drafting tweet text",
+    startSec: t,
+    endSec: (t = t + writerDur),
+  });
+  stages.push({
+    name: v > 1 ? `editor × ${v}` : "editor",
+    hint: "anti-slop + tone + length pass",
+    startSec: t,
+    endSec: (t = t + editorDur),
+  });
+  // eval + fact-check fan out in parallel within each variant.
+  stages.push({
+    name: "evaluator",
+    hint: "7-criterion rubric (insight / voice / stance / …)",
+    startSec: t,
+    endSec: t + 10,
+  });
+  stages.push({
+    name: "fact-check",
+    hint: "extract claims, flag invented specifics",
+    startSec: t,
+    endSec: t + 10,
+  });
+  return stages;
+}
+
+function PipelineProgress({
+  startedAt,
+  contentType,
+  variants,
+  isManual,
+}: {
+  startedAt: number;
+  contentType: ContentType;
+  variants: number;
+  isManual: boolean;
+}) {
+  const [now, setNow] = useState<number>(() => startedAt);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 500);
+    return () => clearInterval(id);
+  }, []);
+
+  const elapsedSec = (now - startedAt) / 1000;
+  const stages = pipelineStages({ contentType, variants, isManual });
+  const totalSec = stages.reduce((m, s) => Math.max(m, s.endSec), 0);
+  const pct = Math.min(99, Math.round((elapsedSec / totalSec) * 100));
+
+  return (
+    <Card>
+      <CardContent className="flex flex-col gap-3 py-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            generating
+          </span>
+          <span className="font-mono text-xs tabular-nums text-muted-foreground">
+            {elapsedSec.toFixed(1)}s / ~{totalSec}s · est {pct}%
+          </span>
+        </div>
+        <div className="h-1 w-full overflow-hidden rounded bg-muted">
+          <div
+            className="h-full bg-foreground transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <ul className="flex flex-col gap-1.5 font-mono text-xs">
+          {stages.map((s) => {
+            const status: "pending" | "running" | "done" =
+              elapsedSec >= s.endSec
+                ? "done"
+                : elapsedSec >= s.startSec
+                  ? "running"
+                  : "pending";
+            return (
+              <li key={s.name} className="flex items-baseline gap-2">
+                <span
+                  className={
+                    status === "done"
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : status === "running"
+                        ? "text-foreground"
+                        : "text-muted-foreground/40"
+                  }
+                >
+                  {status === "done" ? "✓" : status === "running" ? "▸" : "·"}
+                </span>
+                <span
+                  className={
+                    status === "pending"
+                      ? "text-muted-foreground/60"
+                      : "text-foreground"
+                  }
+                >
+                  {s.name}
+                </span>
+                <span className="text-muted-foreground/70">— {s.hint}</span>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="text-[10px] text-muted-foreground/70 italic">
+          Estimated timing. The actual run may be faster or slower depending on
+          OpenAI latency.
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
