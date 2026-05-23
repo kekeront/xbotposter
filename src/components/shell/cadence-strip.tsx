@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm";
 import { db } from "@/db/client";
 import { posts } from "@/db/schema";
+import { loadBilling, type SpendBucket } from "@/lib/billing";
 
 type Stats = {
   postedLast7d: number;
@@ -67,8 +68,21 @@ function fmtRelativeFuture(d: Date): string {
   return `in ${Math.floor(h / 24)}d ${h % 24}h`;
 }
 
+function fmtCents(usd: number): string {
+  if (usd < 0.01) return "<¢1";
+  if (usd < 1) return `${Math.round(usd * 100)}¢`;
+  return `$${usd.toFixed(2)}`;
+}
+
+// Color hint: green if under 10¢/day, amber 10¢-$1, red over $1.
+function spendColor(usd: number): string {
+  if (usd < 0.1) return "text-emerald-700 dark:text-emerald-400";
+  if (usd < 1) return "text-amber-700 dark:text-amber-400";
+  return "text-destructive";
+}
+
 export async function CadenceStrip() {
-  const stats = await loadStats();
+  const [stats, billing] = await Promise.all([loadStats(), loadBilling()]);
   if (!stats) return null;
 
   return (
@@ -97,6 +111,30 @@ export async function CadenceStrip() {
           <span>nothing scheduled</span>
         )}
       </span>
+
+      {billing ? (
+        <>
+          <span className="ml-auto text-muted-foreground/40">·</span>
+          <BillingPill label="today" bucket={billing.today} />
+          <span className="text-muted-foreground/40">·</span>
+          <BillingPill label="7d" bucket={billing.last7d} />
+          <span className="text-muted-foreground/40">·</span>
+          <BillingPill label="month" bucket={billing.thisMonth} />
+        </>
+      ) : null}
     </div>
+  );
+}
+
+function BillingPill({ label, bucket }: { label: string; bucket: SpendBucket }) {
+  const tooltip = `${label}: OpenAI ${fmtCents(bucket.openaiUsd)} · X est ${fmtCents(bucket.xUsd)}\n` +
+    `${bucket.breakdown.generationCount} gens · ${bucket.breakdown.postedTweetCount} posts · ${bucket.breakdown.discoverRunCount} discover runs`;
+  return (
+    <span title={tooltip}>
+      <span className="text-muted-foreground">{label}:</span>{" "}
+      <span className={`font-semibold ${spendColor(bucket.totalUsd)}`}>
+        {fmtCents(bucket.totalUsd)}
+      </span>
+    </span>
   );
 }

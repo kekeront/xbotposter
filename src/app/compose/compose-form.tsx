@@ -265,6 +265,7 @@ export function ComposeForm() {
                 onClick={submit}
                 disabled={status === "generating" || !trimmed}
                 className="font-mono"
+                data-compose-submit="true"
               >
                 {buttonLabel}
               </Button>
@@ -284,6 +285,24 @@ function scoreColor(n: number): string {
   if (n >= 80) return "text-emerald-700 dark:text-emerald-400";
   if (n >= 60) return "text-amber-700 dark:text-amber-400";
   return "text-destructive";
+}
+
+function RegenerateButton() {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const btn = document.querySelector<HTMLButtonElement>(
+          'button[data-compose-submit="true"]',
+        );
+        btn?.click();
+      }}
+      className="rounded-md border bg-background px-2 py-1 font-mono text-xs hover:bg-accent"
+      title="Re-roll: same topic, fresh draft"
+    >
+      ⟳ regenerate
+    </button>
+  );
 }
 
 function ResultCard({
@@ -318,12 +337,15 @@ function ResultCard({
               eval {result.eval.overall}
             </Badge>
           ) : null}
-          <Link
-            href="/queue"
-            className="ml-auto font-mono text-xs underline text-muted-foreground"
-          >
-            view in queue →
-          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            <RegenerateButton />
+            <Link
+              href="/queue"
+              className="font-mono text-xs underline text-muted-foreground"
+            >
+              view in queue →
+            </Link>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">

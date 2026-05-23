@@ -34,12 +34,19 @@ type Phase =
   | "error";
 
 function defaultScheduleLocal(): string {
-  const d = new Date(Date.now() + 60 * 60 * 1000); // +1h
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mn = String(d.getMinutes()).padStart(2, "0");
+  // Default: tomorrow at 09:00 local time — a typical "wake up and post" slot.
+  // If it's currently before 9am today, default to 9am today instead.
+  const now = new Date();
+  const target = new Date(now);
+  if (now.getHours() >= 9) {
+    target.setDate(target.getDate() + 1);
+  }
+  target.setHours(9, 0, 0, 0);
+  const yyyy = target.getFullYear();
+  const mm = String(target.getMonth() + 1).padStart(2, "0");
+  const dd = String(target.getDate()).padStart(2, "0");
+  const hh = String(target.getHours()).padStart(2, "0");
+  const mn = String(target.getMinutes()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}T${hh}:${mn}`;
 }
 

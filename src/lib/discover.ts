@@ -51,20 +51,28 @@ export async function runDiscoverFetch(opts?: {
 
   for (const inf of INFLUENCERS) {
     try {
-      const user = await withTimeout(
-        userByUsername(inf.username),
-        X_CALL_TIMEOUT_MS,
-        `userByUsername(@${inf.username})`,
-      );
-      result.apiCallsApprox += 1;
-      if (!user) {
-        result.errors.push(`@${inf.username}: not found`);
-        continue;
+      // Skip userByUsername entirely if id is pre-resolved in config —
+      // saves ~$0.005-0.010 per influencer per fetch run.
+      let user: { id: string; username: string };
+      if (inf.id) {
+        user = { id: inf.id, username: inf.username };
+      } else {
+        const resolved = await withTimeout(
+          userByUsername(inf.username),
+          X_CALL_TIMEOUT_MS,
+          `userByUsername(@${inf.username})`,
+        );
+        result.apiCallsApprox += 1;
+        if (!resolved) {
+          result.errors.push(`@${inf.username}: not found`);
+          continue;
+        }
+        user = resolved;
       }
       result.influencersResolved += 1;
 
       const tweets = await withTimeout(
-        userTimeline(user.id, { max: 10 }),
+        userTimeline(user.id, { max: 5 }),
         X_CALL_TIMEOUT_MS,
         `userTimeline(@${inf.username})`,
       );

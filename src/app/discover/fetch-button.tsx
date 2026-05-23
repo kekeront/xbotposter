@@ -57,7 +57,7 @@ export function FetchButton({ trackedCount }: { trackedCount: number }) {
         {phase === "confirming" ? (
           <>
             <span className="font-mono text-xs text-muted-foreground">
-              fetch from {trackedCount} accounts (~${(trackedCount * 0.02).toFixed(2)} X cost)?
+              fetch from {trackedCount} accounts (~${(trackedCount * 0.025).toFixed(2)}-${(trackedCount * 0.05).toFixed(2)} X PPU)?
             </span>
             <Button
               variant="outline"

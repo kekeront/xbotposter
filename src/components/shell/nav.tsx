@@ -3,18 +3,20 @@ import Link from "next/link";
 type NavItem = {
   label: string;
   href: string;
-  slice: number;
-  active?: boolean;
+  hint?: string;
 };
 
-const NAV_ITEMS: NavItem[] = [
-  { label: "Queue", href: "/queue", slice: 0 },
-  { label: "Compose", href: "/compose", slice: 1 },
-  { label: "Voice", href: "/voice", slice: 6 },
-  { label: "Discover", href: "/discover", slice: 4 },
-  { label: "Schedule", href: "/schedule", slice: 3 },
-  { label: "History", href: "/history", slice: 2 },
-  { label: "Traces", href: "/traces", slice: 5 },
+const PRIMARY: NavItem[] = [
+  { label: "Queue", href: "/queue", hint: "drafts to review + ship" },
+  { label: "Compose", href: "/compose", hint: "AI or manual draft" },
+  { label: "Discover", href: "/discover", hint: "viral content + takes" },
+];
+
+const SECONDARY: NavItem[] = [
+  { label: "Voice", href: "/voice", hint: "reference posts + fingerprint" },
+  { label: "Traces", href: "/traces", hint: "agent event log" },
+  { label: "Schedule", href: "/schedule", hint: "calendar view (soon)" },
+  { label: "History", href: "/history", hint: "all posts (soon)" },
 ];
 
 export function SidebarNav({ activePath }: { activePath?: string }) {
@@ -27,27 +29,50 @@ export function SidebarNav({ activePath }: { activePath?: string }) {
         >
           nfactz
         </Link>
-        <p className="font-mono text-xs text-muted-foreground">admin</p>
+        <p className="font-mono text-xs text-muted-foreground">
+          x content engine
+        </p>
       </div>
-      {NAV_ITEMS.map((item) => {
+
+      <NavSection items={PRIMARY} activePath={activePath} />
+
+      <div className="my-3 border-t border-border/50" />
+
+      <NavSection items={SECONDARY} activePath={activePath} dim />
+    </nav>
+  );
+}
+
+function NavSection({
+  items,
+  activePath,
+  dim = false,
+}: {
+  items: NavItem[];
+  activePath?: string;
+  dim?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      {items.map((item) => {
         const isActive = activePath === item.href;
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent ${
+            title={item.hint}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent ${
               isActive
                 ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground"
+                : dim
+                  ? "text-muted-foreground/70"
+                  : "text-muted-foreground"
             }`}
           >
-            <span>{item.label}</span>
-            <span className="ml-2 font-mono text-xs text-muted-foreground/60">
-              slice {item.slice}
-            </span>
+            {item.label}
           </Link>
         );
       })}
-    </nav>
+    </div>
   );
 }
