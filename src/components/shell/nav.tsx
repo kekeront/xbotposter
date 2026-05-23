@@ -7,7 +7,6 @@ type NavItem = {
 };
 
 const PRIMARY: NavItem[] = [
-  { label: "Dashboard", href: "/", hint: "status at a glance" },
   { label: "Queue", href: "/queue", hint: "drafts to review + ship" },
   { label: "Compose", href: "/compose", hint: "AI or manual draft" },
   { label: "Discover", href: "/discover", hint: "viral content + takes" },
@@ -27,7 +26,7 @@ export function SidebarNav({ activePath }: { activePath?: string }) {
     <nav className="flex flex-col gap-1 p-4">
       <div className="px-2 pb-4">
         <Link
-          href="/"
+          href="/queue"
           className="font-mono text-lg font-semibold tracking-tight"
         >
           nfactz
