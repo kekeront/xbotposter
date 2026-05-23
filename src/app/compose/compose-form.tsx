@@ -18,7 +18,6 @@ type EvalScores = {
   charFit: number;
   language: number;
   faithfulness: number;
-  stance: number;
 };
 
 type VariantSummary = {
@@ -431,7 +430,6 @@ function EvalBreakdown({
         <ScorePill label="length" v={evaluation.scores.charFit} />
         <ScorePill label="lang" v={evaluation.scores.language} />
         <ScorePill label="faithful" v={evaluation.scores.faithfulness} />
-        <ScorePill label="stance" v={evaluation.scores.stance} />
       </div>
       {evaluation.critique ? (
         <p className="text-xs text-muted-foreground italic">

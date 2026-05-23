@@ -9,7 +9,6 @@ import {
   type Post,
   type PostStatus,
 } from "@/db/schema";
-import { ClearQueueButton } from "./clear-button";
 import { PostRow, type PostSource } from "./post-row";
 
 export const dynamic = "force-dynamic";
@@ -162,28 +161,16 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
 
   return (
     <div className="flex flex-col gap-6 p-8">
-      <header className="flex items-baseline justify-between gap-4">
+      <header className="flex items-baseline justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Queue</h1>
           <p className="text-sm text-muted-foreground">
             Review, skip, or ship drafts. Threads post as chained replies.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <ClearQueueButton
-            statuses={["draft"]}
-            label="Clear drafts"
-            count={counts.draft}
-          />
-          <ClearQueueButton
-            statuses={["skipped", "failed"]}
-            label="Clear skipped + failed"
-            count={counts.skipped + counts.failed}
-          />
-          <Badge variant="outline" className="font-mono">
-            slice 3a
-          </Badge>
-        </div>
+        <Badge variant="outline" className="font-mono">
+          slice 3a
+        </Badge>
       </header>
 
       <nav className="flex flex-wrap gap-1 font-mono text-xs">

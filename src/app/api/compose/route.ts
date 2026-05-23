@@ -13,7 +13,6 @@ import {
   posts,
   type Post,
 } from "@/db/schema";
-import { recallMemories } from "@/lib/recall";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice, type LoadedVoice } from "@/lib/voice-load";
 
@@ -52,7 +51,6 @@ async function runVariant(
   topic: string,
   contentType: "single" | "thread",
   voice: LoadedVoice,
-  memoryBlock: string,
   generationId: string,
   sharedOutlineBeats?: string[],
 ): Promise<VariantResult> {
@@ -63,7 +61,6 @@ async function runVariant(
     payload: {
       variantIndex: index,
       outlineBeats: sharedOutlineBeats?.length ?? 0,
-      memoryItems: memoryBlock ? memoryBlock.split("\n- ").length - 1 : 0,
     },
   });
   const writerResult = await draft({
@@ -72,7 +69,6 @@ async function runVariant(
     referenceTweets: voice.referenceTweets,
     fingerprintBlock: voice.fingerprintBlock,
     outlineBeats: sharedOutlineBeats,
-    memoryBlock,
   });
   await writeTrace({
     generationId,
@@ -313,19 +309,6 @@ export async function POST(request: Request) {
 
     // mode === "ai" — outline (threads only) → writer → editor → [eval | fact-check] in parallel
     const voice = await loadDefaultVoice();
-    const recall = await recallMemories({ query: topic });
-    if (recall.memories.length > 0) {
-      await writeTrace({
-        generationId: generation.id,
-        agent: "recall",
-        eventType: "complete",
-        payload: {
-          itemsIncluded: recall.memories.length,
-          diagnostics: recall.diagnostics,
-        },
-        costUsd: recall.cost.embed.toString(),
-      });
-    }
 
     let outlineBeats: string[] | undefined;
     let outlineCost = 0;
@@ -353,15 +336,7 @@ export async function POST(request: Request) {
 
     const variantResults = await Promise.all(
       Array.from({ length: variants }, (_, i) =>
-        runVariant(
-          i,
-          topic,
-          contentType,
-          voice,
-          recall.promptBlock,
-          generation.id,
-          outlineBeats,
-        ),
+        runVariant(i, topic, contentType, voice, generation.id, outlineBeats),
       ),
     );
 

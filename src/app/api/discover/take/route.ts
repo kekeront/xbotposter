@@ -11,7 +11,6 @@ import {
   viralPosts,
   type Post,
 } from "@/db/schema";
-import { recallMemories } from "@/lib/recall";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
 
@@ -144,21 +143,6 @@ export async function POST(request: Request) {
 
   try {
     const voice = await loadDefaultVoice();
-    const recall = await recallMemories({
-      query: userAngle ? `${userAngle}\n\n${viral.text}` : viral.text,
-    });
-    if (recall.memories.length > 0) {
-      await writeTrace({
-        generationId: generation.id,
-        agent: "recall",
-        eventType: "complete",
-        payload: {
-          itemsIncluded: recall.memories.length,
-          diagnostics: recall.diagnostics,
-        },
-        costUsd: recall.cost.embed.toString(),
-      });
-    }
 
     const writerResult = await takeDraft({
       viralText: viral.text,
@@ -167,7 +151,6 @@ export async function POST(request: Request) {
       contentType,
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
-      memoryBlock: recall.promptBlock,
     });
 
     await writeTrace({

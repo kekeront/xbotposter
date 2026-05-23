@@ -7,9 +7,6 @@ export type WriterInput = {
   referenceTweets?: string[];
   fingerprintBlock?: string;
   outlineBeats?: string[];
-  // Pre-fetched memory layer context (recall.ts). Already formatted with
-  // "WHAT WE'VE LEARNED ABOUT THIS WRITER" header. Empty string = none.
-  memoryBlock?: string;
 };
 
 export type WriterOutput = {
@@ -53,24 +50,6 @@ VOICE
   DO NOT borrow topics, facts, hobbies, names, brands, or vocabulary
   from the anchor that aren't in the user's seed. The anchor tells you
   HOW to write; the seed tells you WHAT to write.
-
-STANCE — OPTIMIST + ANALYST
-The writer's public persona is constructive: an optimist about technology
-and a sober analyst about specifics. Default frame:
-- Treat problems as solvable, interesting, opportunity-rich.
-- When pointing out a flaw, critique the mechanism / decision / system —
-  never the person, company, or community.
-- Prefer objective assessment over snark. "Вот что интересно тут / вот
-  где трейд-офф" beats "вот это днище".
-- No doom, no dunking, no mocking, no schadenfreude. No "наконец-то
-  обосрались", no "ну я же говорил", no "вот лохи".
-- Frustration (Frustration frame from the anchor) is allowed ONLY as a
-  setup for an observation or call-to-action — never as the conclusion.
-  "Бесит что X — и поэтому Y" ✅. "Бесит что X." (точка) ❌.
-- Avoid fake positivity / toxic positivity. Don't hype things that don't
-  deserve hype. Honest > sunny.
-- Politics, geopolitics, ideology are out of scope (the topic-guard
-  blocks them upstream — don't try to slip through).
 
 STRUCTURE & SYNTAX (extracted from this writer's Telegram channel)
 - Average length: ~6-12 слов на пост. Очень коротко.
@@ -118,10 +97,6 @@ function buildMessages(input: WriterInput): CompletionMessage[] {
 
   if (input.fingerprintBlock) {
     messages.push({ role: "system", content: input.fingerprintBlock });
-  }
-
-  if (input.memoryBlock && input.memoryBlock.trim().length > 0) {
-    messages.push({ role: "system", content: input.memoryBlock });
   }
 
   const refs = (input.referenceTweets ?? [])

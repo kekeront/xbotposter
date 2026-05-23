@@ -16,7 +16,6 @@ export type EvalScores = {
   charFit: number;
   language: number;
   faithfulness: number;
-  stance: number;
 };
 
 export type EvalOutput = {
@@ -47,14 +46,6 @@ RUBRIC — each criterion scored 0 to 100:
 - faithfulness: 100 if draft sticks to the seed. Penalize invented specifics
   (numbers, dollars, fake stories), topics borrowed from voice anchor that
   weren't in the seed, fabricated brands/people.
-- stance: writer's public persona is optimist + analyst. 100 = constructive,
-  analytical, opportunity-framed, critiques the mechanism not the person.
-  Penalize mocking, dunking, schadenfreude ("I told you so", "вот лохи",
-  "наконец-то обосрались"), attacks on a person/company/community (explicit
-  OR implicit), doom-without-exit, and raw frustration used as the
-  conclusion instead of setup. Constructive disagreement with a specific
-  trade-off named = full score. Toxic positivity / hype is NOT what 100
-  means — honest > sunny.
 
 OUTPUT — return ONLY this JSON shape, no preamble, no code fences:
 {
@@ -64,8 +55,7 @@ OUTPUT — return ONLY this JSON shape, no preamble, no code fences:
     "antiSlop": <int 0-100>,
     "charFit": <int 0-100>,
     "language": <int 0-100>,
-    "faithfulness": <int 0-100>,
-    "stance": <int 0-100>
+    "faithfulness": <int 0-100>
   },
   "overall": <int 0-100, simple average rounded>,
   "critique": "<one short sentence, plain prose, RU or EN>"
@@ -133,7 +123,6 @@ export async function evaluate(input: EvalInput): Promise<EvalOutput> {
         charFit: 0,
         language: 0,
         faithfulness: 0,
-        stance: 0,
       },
       overall: 0,
       critique: "evaluator returned non-JSON output",
@@ -152,7 +141,6 @@ export async function evaluate(input: EvalInput): Promise<EvalOutput> {
     charFit: clampScore(s.charFit),
     language: clampScore(s.language),
     faithfulness: clampScore(s.faithfulness),
-    stance: clampScore(s.stance),
   };
 
   const computedOverall = Math.round(
@@ -161,9 +149,8 @@ export async function evaluate(input: EvalInput): Promise<EvalOutput> {
       scores.antiSlop +
       scores.charFit +
       scores.language +
-      scores.faithfulness +
-      scores.stance) /
-      7,
+      scores.faithfulness) /
+      6,
   );
 
   return {

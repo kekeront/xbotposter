@@ -6,9 +6,7 @@ import { draft as takeDraft } from "@/agents/take";
 import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import { generations, posts, viralPosts } from "@/db/schema";
-import { shouldAutoApprove } from "@/lib/auto-approve";
 import { authorizeCronRequest, unauthorized } from "@/lib/cron-auth";
-import { recallMemories } from "@/lib/recall";
 import { checkSpendCap, spendCapResponse } from "@/lib/spend-cap";
 import { sendDraftNotification } from "@/lib/telegram";
 import { writeTrace } from "@/lib/trace";
@@ -144,19 +142,6 @@ export async function GET(request: Request) {
 
   try {
     const voice = await loadDefaultVoice();
-    const recall = await recallMemories({ query: candidate.text });
-    if (recall.memories.length > 0) {
-      await writeTrace({
-        generationId: generation.id,
-        agent: "recall",
-        eventType: "complete",
-        payload: {
-          itemsIncluded: recall.memories.length,
-          diagnostics: recall.diagnostics,
-        },
-        costUsd: recall.cost.embed.toString(),
-      });
-    }
 
     const writerResult = await takeDraft({
       viralText: candidate.text,
@@ -164,7 +149,6 @@ export async function GET(request: Request) {
       contentType: "single",
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
-      memoryBlock: recall.promptBlock,
     });
     const editorResult = await review({
       topic: `Reacting to @${author}: ${candidate.text}`,
@@ -241,40 +225,15 @@ export async function GET(request: Request) {
       );
     }
 
-    const verdict = shouldAutoApprove({
-      mode: "take",
-      contentType: "single",
-      text,
-      evaluation: { overall: evalResult.overall, scores: evalResult.scores },
-      factCheck: { inventedCount: factResult.inventedCount },
-    });
-
     const [insertedPost] = await db
       .insert(posts)
       .values({
         generationId: generation.id,
         contentType: "single",
         text,
-        status: verdict.eligible ? "approved" : "draft",
-        scheduledFor: verdict.eligible ? verdict.scheduledFor : null,
+        status: "draft",
       })
       .returning();
-
-    await writeTrace({
-      generationId: generation.id,
-      agent: "auto-approve",
-      eventType: verdict.eligible ? "approved" : "held_for_review",
-      payload: {
-        postId: insertedPost?.id,
-        reason: verdict.reason,
-        scheduledFor: verdict.eligible
-          ? verdict.scheduledFor.toISOString()
-          : null,
-        evalOverall: evalResult.overall,
-        stance: evalResult.scores.stance,
-        inventedClaims: factResult.inventedCount,
-      },
-    });
 
     // Fire-and-forget Telegram notification. No await — autonomous run
     // shouldn't block on bot API delays. Silently no-op if not configured.
@@ -284,7 +243,6 @@ export async function GET(request: Request) {
         text,
         sourceLabel: `autonomous take on @${author}`,
         evalOverall: evalResult.overall,
-        autoApprovedFor: verdict.eligible ? verdict.scheduledFor : null,
       });
     }
 
@@ -296,11 +254,7 @@ export async function GET(request: Request) {
         viralAuthor: author,
         viralXUrl: candidate.xUrl,
         evalOverall: evalResult.overall,
-        stanceScore: evalResult.scores.stance,
         inventedClaims: factResult.inventedCount,
-        autoApproved: verdict.eligible,
-        autoApproveReason: verdict.reason,
-        scheduledFor: verdict.eligible ? verdict.scheduledFor : null,
         costUsd: totalCost,
       },
     });
