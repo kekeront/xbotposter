@@ -127,8 +127,10 @@ export async function CadenceStrip() {
 }
 
 function BillingPill({ label, bucket }: { label: string; bucket: SpendBucket }) {
-  const tooltip = `${label}: OpenAI ${fmtCents(bucket.openaiUsd)} · X est ${fmtCents(bucket.xUsd)}\n` +
-    `${bucket.breakdown.generationCount} gens · ${bucket.breakdown.postedTweetCount} posts · ${bucket.breakdown.discoverRunCount} discover runs`;
+  const tooltip =
+    `${label}: OpenAI ${fmtCents(bucket.openaiUsd)} · X est ${fmtCents(bucket.xUsd)}\n` +
+    `${bucket.breakdown.generationCount} gens · ${bucket.breakdown.postedTweetCount} posts · ` +
+    `${bucket.breakdown.discoverRunCount} discover runs · ${bucket.breakdown.discoverResourcesTotal} tweets fetched`;
   return (
     <span title={tooltip}>
       <span className="text-muted-foreground">{label}:</span>{" "}

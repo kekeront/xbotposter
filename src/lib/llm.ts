@@ -22,8 +22,8 @@ const PRICING: Record<
 > = {
   "gpt-5-nano": { input: 0.05, output: 0.4, cachedInput: 0.005 },
   "gpt-5-mini": { input: 0.25, output: 2.0, cachedInput: 0.025 },
-  "gpt-5.4-mini": { input: 0.75, output: 4.5 },
-  "gpt-5.4": { input: 2.5, output: 15.0 },
+  "gpt-5.4-mini": { input: 0.75, output: 4.5, cachedInput: 0.075 },
+  "gpt-5.4": { input: 2.5, output: 15.0, cachedInput: 0.25 },
   "gpt-4o-mini": { input: 0.15, output: 0.6 },
   "gpt-4o": { input: 2.5, output: 10.0 },
   "text-embedding-3-small": { input: 0.02, output: 0 },

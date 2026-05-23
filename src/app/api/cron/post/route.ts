@@ -3,12 +3,16 @@ import { db } from "@/db/client";
 import { posts } from "@/db/schema";
 import { authorizeCronRequest, unauthorized } from "@/lib/cron-auth";
 import { shipPostById } from "@/lib/poster";
+import { checkSpendCap, spendCapResponse } from "@/lib/spend-cap";
 import { writeTrace } from "@/lib/trace";
 
 const BATCH_LIMIT = 5; // per cron tick — avoid X rate limits
 
 export async function GET(request: Request) {
   if (!authorizeCronRequest(request)) return unauthorized();
+
+  const verdict = await checkSpendCap();
+  if (!verdict.allow) return spendCapResponse(verdict);
 
   const dueRows = await db
     .select({ id: posts.id })

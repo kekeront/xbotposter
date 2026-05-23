@@ -7,11 +7,15 @@ import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import { generations, posts, viralPosts } from "@/db/schema";
 import { authorizeCronRequest, unauthorized } from "@/lib/cron-auth";
+import { checkSpendCap, spendCapResponse } from "@/lib/spend-cap";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
 
 export async function GET(request: Request) {
   if (!authorizeCronRequest(request)) return unauthorized();
+
+  const verdict = await checkSpendCap();
+  if (!verdict.allow) return spendCapResponse(verdict);
 
   const sub48h = new Date(Date.now() - 48 * 3600 * 1000);
   const sub7d = new Date(Date.now() - 7 * 24 * 3600 * 1000);

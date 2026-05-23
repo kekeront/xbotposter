@@ -3,9 +3,8 @@ import { and, count, eq, gt, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { generations, posts, traces } from "@/db/schema";
 
-// Rough X PPU rates from docs (2026-05). Used for estimates only — actual
-// billing lives in the X dev console.
-const X_DISCOVER_RUN_AVG = 0.25; // post-optimization: 5 inf × 5 tweets cached IDs
+// X PPU rates from docs (2026-05). Reads are per-resource returned.
+const X_READ_PER_RESOURCE = 0.0075; // mid of $0.005-0.010 range
 const X_TWEET_POST = 0.015; // POST /2/tweets without URL
 
 export type SpendBucket = {
@@ -17,6 +16,7 @@ export type SpendBucket = {
     standaloneTraceCount: number;
     postedTweetCount: number;
     discoverRunCount: number;
+    discoverResourcesTotal: number;
   };
 };
 
@@ -49,7 +49,12 @@ async function spendSince(since: Date | null): Promise<SpendBucket> {
         ),
       ),
     db
-      .select({ c: count() })
+      .select({
+        c: count(),
+        // tweetsFetched is the actual resources returned; this is what X bills
+        // per discover run. Falls back to 0 for runs without the field.
+        resources: sql<string>`coalesce(sum(coalesce((${traces.payload} ->> 'tweetsFetched')::int, 0)), 0)`,
+      })
       .from(traces)
       .where(
         and(
@@ -66,8 +71,10 @@ async function spendSince(since: Date | null): Promise<SpendBucket> {
 
   const postedTweetCount = postedAgg[0]?.c ?? 0;
   const discoverRunCount = discoverAgg[0]?.c ?? 0;
+  const discoverResourcesTotal = Number(discoverAgg[0]?.resources ?? "0");
   const xUsd =
-    postedTweetCount * X_TWEET_POST + discoverRunCount * X_DISCOVER_RUN_AVG;
+    postedTweetCount * X_TWEET_POST +
+    discoverResourcesTotal * X_READ_PER_RESOURCE;
 
   return {
     openaiUsd,
@@ -78,6 +85,7 @@ async function spendSince(since: Date | null): Promise<SpendBucket> {
       standaloneTraceCount: traceAgg[0]?.c ?? 0,
       postedTweetCount,
       discoverRunCount,
+      discoverResourcesTotal,
     },
   };
 }

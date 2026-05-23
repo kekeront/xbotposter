@@ -111,6 +111,9 @@ export function ComposeForm() {
   const charCount = trimmed.length;
   const overSoftLimit =
     isManual && contentType === "single" && charCount > X_SOFT_LIMIT;
+  // X charges $0.20 per tweet that contains a URL vs $0.015 without. 13× cost.
+  // Warn manual users in real time so they can decide if the link is worth it.
+  const hasUrl = isManual && /\bhttps?:\/\/\S+/i.test(topic);
 
   async function submit() {
     if (!trimmed) return;
@@ -223,6 +226,15 @@ export function ComposeForm() {
             placeholder={placeholder}
             disabled={status === "generating"}
           />
+          {hasUrl ? (
+            <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 font-mono text-xs text-amber-900 dark:text-amber-200">
+              ⚠ This tweet contains a URL. X charges{" "}
+              <span className="font-semibold">$0.20</span> per tweet with a
+              link vs $0.015 without — a <span className="font-semibold">13×</span>{" "}
+              difference. Strip the link if you can post it as a reply or QRT
+              instead.
+            </div>
+          ) : null}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
               {isManual ? (

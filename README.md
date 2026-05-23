@@ -107,6 +107,7 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
 
 | Agent | Where | What |
 |---|---|---|
+| **topic-guard** | `src/agents/topic-guard.ts` | Fail-closed safety gate. Classifies the source viral post. Blocks politics / tragedy / conspiracy / crypto-calls. Runs BEFORE any expensive generation. |
 | **outliner** | `src/agents/outliner.ts` | For threads only. Produces 3-7 numbered beats before the writer runs. |
 | **writer** | `src/agents/writer.ts` | Drafts the post(s). RU-default, voice-anchored, anti-slop, anti-hallucination prompt. Threads follow the outline. |
 | **editor** | `src/agents/editor.ts` | Reviews + revises in one JSON pass: strips invented specifics, em-dashes, threadbait, slop phrases (RU + EN). |
@@ -116,9 +117,10 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
 | **qrt** | `src/agents/qrt.ts` | Short commentary line for a quote retweet (30-140 chars typical). |
 | **poster** | `src/lib/poster.ts` | Sends to X via twitter-api-v2. Threads chain via `in_reply_to_tweet_id`; QRTs use `quote_tweet_id`. |
 
-Pipeline composition (in `/api/compose`):
-- Single: writer → editor → [evaluator ‖ fact-checker]
-- Thread: outliner → writer → editor → [evaluator ‖ fact-checker]
+Pipeline composition:
+- `/api/compose` (manual seed): outliner (threads only) → writer → editor → [evaluator ‖ fact-checker]
+- `/api/discover/take` / `/qrt`: **topic-guard** → writer → editor → [evaluator ‖ fact-checker]
+- `/api/cron/generate` (autonomous): walks top viral list, **topic-guard** filters at the top — first safe candidate runs through the take pipeline
 - Multi-thesis (`variants: 1-3`): run pipeline N times in parallel, rank by eval.overall, winner becomes the draft. Runner-ups visible in UI, switchable.
 
 ## Voice fingerprinting (slice 6)
@@ -181,26 +183,66 @@ HNSW indexes on the three embedding columns.
 
 ## Cost model
 
-Per generation:
+### OpenAI per generation
 
-| Component | Cost (gpt-5.4-mini writer, gpt-5-mini others) |
+| Component | gpt-5.4-mini writer · gpt-5-mini others |
 |---|---|
+| Topic-guard (discover-driven only) | ~$0.00003 (gpt-5-nano) |
 | Outliner (threads only) | ~$0.0005 |
 | Writer | ~$0.001 |
 | Editor | ~$0.001 |
 | Evaluator | ~$0.001 |
 | Fact-checker | ~$0.001 |
-| **Per variant total** | **~$0.004** |
-| 3 variants | ~$0.012 |
+| **Per variant total** | **~$0.004-0.005** |
+| 3 variants | ~$0.012-0.015 |
 
-Per X API:
+### X PPU per call
 
-- Read (userByUsername / userTimeline): ~$0.001-0.005 each
-- Discover fetch (10 influencers × 2 calls): ~$0.10-0.20
-- Tweet post: ~$0.01-0.04
+X bills **per resource returned**, not per request. Rates from X docs (2026-05):
 
-Daily auto-run at default cron (discover 12h, generate 4h, post 15m):
-~$0.20-0.50/day on X PPU + ~$0.10-0.30/day on OpenAI.
+| Operation | Cost |
+|---|---|
+| Read (per Tweet / User returned) | $0.005-0.010 |
+| Owned Read (your own data: posts, bookmarks) | $0.001 |
+| Write — tweet without URL | $0.015 |
+| **Write — tweet WITH URL** ⚠️ | **$0.200** (13×) |
+
+### Discover fetch cost (optimized)
+
+| Configuration | Per run |
+|---|---|
+| Baseline (10 inf × 10 tweets, resolve usernames each time) | $0.55-1.10 |
+| + Pre-resolved user IDs in `INFLUENCERS` config | $0.50-1.00 |
+| + `max_results: 5` instead of 10 | $0.13-0.25 |
+| + `since_id` per author (only fetch new tweets) | **$0.00-0.10 steady state** |
+
+Steady-state monthly estimate (10 influencers, 12h cron, normal activity,
+3 posts/day shipped):
+
+| Component | Per day | Per month |
+|---|---|---|
+| Discover (since_id, steady state) | $0.06-0.20 | $1.80-6.00 |
+| Cron-generate (OpenAI only — viral already in DB) | $0.03 | $0.90 |
+| Manual compose (~5 drafts) | $0.05 | $1.50 |
+| Posted tweets (3/day × $0.015) | $0.05 | $1.50 |
+| Topic-guard (~10/day × $0.00003) | <$0.01 | <$0.01 |
+| **Total** | **~$0.20-0.35** | **~$6-10** |
+
+With $5 X PPU + $3 OpenAI ≈ 30 days of fully autonomous operation.
+
+### Billing visibility
+
+The admin shell exposes spend live:
+
+- **Cadence strip** in the layout shows today / 7d / month totals with
+  color thresholds (green < 10¢/day, amber, red > $1/day). Tooltip
+  breaks out OpenAI vs X.
+- `/api/billing` GET returns the JSON snapshot for external monitoring
+  (e.g. a daily digest to Telegram or Slack — not yet wired).
+- `src/lib/billing.ts` aggregates from `generations.cost_usd` +
+  `traces.cost_usd` (for standalone events like topic-guard) + a
+  derived X estimate from `posts.posted_at` count and discover trace
+  events.
 
 ## Deploy to Vercel
 
@@ -300,6 +342,9 @@ src/
 | 10 | Outliner agent for threads | this commit |
 | 11 | Variant selector UI ("use this instead") | this commit |
 | 12 | README + deploy notes | this commit |
+| 13 | Topic guard — fail-closed safety gate (politics / tragedy / conspiracy) | `193680c` |
+| 14 | Billing tracker + cadence pills + X cost optimizations (cached IDs, max_results=5) + PD UX polish | `109041a` |
+| 15 | `since_id` per author — only pay for new tweets | this commit |
 
 Anti-slop, RU-first output, and tone-only voice anchor enforcement are
 extracted from the Telegram channel `t.me/kekerontsky` and baked into the

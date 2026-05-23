@@ -305,6 +305,143 @@ fetch. Это slice 4d+.
 
 ---
 
+## 2026-05-22 — Topic guard: fail-closed gate (slice 13)
+
+**Проблема.** Live тест: discover вытащил viral пост от @paulg про
+Эпштейновские файлы. Take agent сгенерил гладкий RU комментарий («Если
+это и правда так, то самое опасное тут не "что в файлах", а кто первым
+решит ботать версию под себя 😬»). Драфт сел в queue в одном клике от
+production timeline'а @kekeront. Approval gate спас, но autonomous
+mode без guard'а бы зашипил.
+
+**Ход мыслей.** Personal brand в tech/AI не может позволить commentary
+про политику/конспирологию/трагедии — даже умное. Topic — это
+бинарная классификация перед любой генерацией. И эта классификация
+должна быть fail-closed: parse error → unsafe.
+
+**Рассмотренные варианты.**
+1. Чёрный список авторов (выкинуть paulg из INFLUENCERS). Потеряем
+   его tech-takes, плюс другие авторы тоже иногда уходят в политику.
+2. Whitelist топиков в writer/take/qrt промпте. Модель часто игнорит
+   «only if topic is AI/SWE/startup».
+3. Отдельный classifier agent (`topic-guard`) на gpt-5-nano перед
+   генерацией. Дешёвый ($0.00003), быстрый, fail-closed.
+4. RLHF-стиль fine-tune собственного фильтра. 1+ неделя работы.
+
+**Причина выбора.** №3. Чистая separation: writer пишет, guard
+фильтрует. Категории явные: ALLOW (AI/SWE/startup/science) и BLOCK
+(politics by name, geopolitics, conspiracy-adjacent incl Epstein,
+tragedies, religion, identity, crypto calls, ambiguous).
+
+**Результат.** `src/agents/topic-guard.ts` гонит JSON через gpt-5-nano,
+вшит в /api/discover/take, /qrt, /cron/generate. В take/qrt: при
+blocked возвращаем 200 OK с {blocked: true, category, reason} —
+ничего не пишется в generations, не тратим OpenAI tokens. В
+cron-generate: walk top viral list, берём первого кто прошёл guard.
+UI показывает «🛡 blocked by topic guard: politics — ...» вместо
+draft. Trace events topic-guard.safe / .blocked с категорией и
+причиной.
+
+**Дальше.** Watchlist для категорий, где guard «sometimes wrong» —
+например, finance/markets edge case. Может быть UI override «I know
+better, run anyway» для тех редких случаев когда юзер сам уверен.
+
+---
+
+## 2026-05-22 — Billing visibility + X cost optimizations (slice 14)
+
+**Проблема.** Cost discipline была невидимой. Юзер не понимает где
+утекает $5 X PPU кредит. Каждый discover run жрал $0.55-1.10
+(подтверждено: 10 userByUsername + 10 userTimeline×10 = 110
+resources × $0.005-0.010). При 12h schedule = $1.10-2.20/день, на $5
+хватит на 2-4 дня. Это unacceptable для long-term autonomy.
+
+**Ход мыслей.** Два независимых ходда: (1) сделать spend visible
+прямо в layout, чтобы юзер видел burn rate в реальном времени, (2)
+вычистить очевидные waste'ы в discover pipeline.
+
+**Рассмотренные варианты для opt'а.**
+1. Reduce INFLUENCERS list — но юзер хочет breadth.
+2. Reduce cron schedule с 12h до 24h — теряем актуальность.
+3. Cache user IDs в config — `userByUsername` возвращает один и тот
+   же ID для karpathy всегда, мы платим за бесполезный лукап.
+4. `max_results: 10 → 5` — меньше resources per call.
+5. `since_id` per author — самое мощное, отдельный слайс 15.
+
+**Причина выбора.** Сделали 3 + 4 в этом слайсе (5 в следующем). 3 +
+4 вместе = $0.55-1.10 → $0.13-0.25 per run. Это уже -75%. UI billing
+через `loadBilling()` в layout cadence strip с цветовой шкалой
+(green <10¢/день, amber, red >$1/день).
+
+**Результат.** Pricing table из X docs (per-resource read $0.005-0.010,
+write tweet $0.015, write tweet с URL $0.20 (13×!)). Cost-per-run
+шёл с ~$0.77 (average) до ~$0.19. Cadence strip показывает today /
+7d / month real-time, tooltip с разбивкой OpenAI vs X est. PD review
+дал side-effect фиксы: removed dev-only «slice X» labels из nav,
+схему picker default «tomorrow 9am», compose result regenerate
+button, fetch confirm уточнил cost estimate.
+
+**Дальше.** Slice 15 — since_id (самая мощная оптимизация). После
+этого — owned reads через own timeline (потенциально 5-10× дешевле,
+если эндпойнт работает для followed accounts).
+
+---
+
+## 2026-05-22 — since_id + spend cap + URL warning (slice 15)
+
+**Проблема.** Даже после slice 14 дискавер тянул одни и те же 5
+твитов с каждого инфлюенсера каждый раз. Steady-state cost оставался
+постоянным ($0.13-0.25 per run), хотя реально новых твитов могло
+быть 0-2 per author. Платим за дубликаты.
+
+**Ход мыслей.** X API поддерживает `since_id` — вернёт только твиты
+с ID больше указанного. Если в `viral_posts` уже сохранены max ID
+per author, передаём как since_id, X возвращает только инкремент.
+Cost становится proportional to actual new content. Параллельно:
+juser нужен hard spend cap (cron auto burn до $$$ без oversight) и
+URL warning для manual compose (один пост с URL = $0.20 = 13× normal).
+
+**Рассмотренные варианты для cap'а.**
+1. Soft warning при превышении — easy to ignore.
+2. Hard 429 на cron endpoints при превышении daily threshold — manual
+   actions остаются (юзер opt-in).
+3. Hard cap на ВСЁ — слишком жёстко, юзер может специально дожать
+   demo.
+
+**Причина выбора.** №2. Cron автоматический, юзер не видит каждое
+срабатывание — там лимит обязателен. Manual UI — юзер видит cadence
+strip с цветом и сам решает.
+
+**Результат.** `since_id` в lib/x.ts + lib/discover.ts:
+`loadLatestSeenByAuthor()` запрашивает MAX(xTweetId::numeric) per
+author из viral_posts; в каждый userTimeline call передаём sinceId.
+Steady-state cost: $0.00-0.10 per run (было $0.13-0.25). При тихих
+инфлюенсерах — near zero. `MAX_DAILY_USD` env (default $2.00) +
+`src/lib/spend-cap.ts` `checkSpendCap()` встроен в /api/cron/discover,
+/cron/generate, /cron/post. При превышении: 429 + JSON
+{skipped, todayUsd, capUsd}. Manual UI не gated.
+
+Billing tracker заменил статичную оценку `discoverRunCount × $0.25`
+на динамическую `discoverResourcesTotal × $0.0075` — извлекает
+`payload->>'tweetsFetched'` из traces. Cadence strip tooltip
+теперь показывает реальное число fetched tweets, не только runs.
+
+URL detection в manual compose: regex `\bhttps?:\/\/\S+` в реальном
+времени, если поймали — амбер warning «X charges $0.20 per tweet
+with a link vs $0.015 without — a 13× difference».
+
+Pricing table: добавил `cachedInput` для gpt-5.4-mini ($0.075) и
+gpt-5.4 ($0.25). Prompt caching уже работал в SDK, но мы не
+учитывали скидку для writer-tier моделей — теперь costFor() даёт
+точные числа.
+
+**Дальше.** Owned reads (если X разрешит для followed accounts через
+home timeline). Daily spend digest в Telegram/Slack (cap на $2 → push
+если >50% к концу дня). Streaming filtered subscription как
+альтернатива polling — сильно дешевле если X включит для PPU.
+
+---
+
 ## История слайсов
 
 ```
@@ -326,6 +463,9 @@ fetch. Это slice 4d+.
 10 outliner agent для тредов
 11 variant selector UI
 12 README + deploy notes
+13 topic-guard agent (fail-closed safety gate)
+14 billing tracker + cadence pills + X cost opts (cached IDs, max_results=5) + PD UX polish
+15 since_id (pay only for new) + spend cap + URL warning + cached pricing
 ```
 
 Полный лог — `git log --oneline`. Cost-per-pipeline и live evidence — в

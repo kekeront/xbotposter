@@ -21,6 +21,11 @@ const schema = z.object({
 
   CRON_SECRET: z.string().min(8).optional(),
 
+  // Hard spend cap. When today's combined OpenAI+X estimate exceeds this,
+  // /api/cron/* endpoints return 429 instead of triggering more spend.
+  // Manual UI actions are not gated (user opt-in).
+  MAX_DAILY_USD: z.coerce.number().positive().default(2),
+
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
