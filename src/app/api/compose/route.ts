@@ -13,8 +13,12 @@ import {
   posts,
   type Post,
 } from "@/db/schema";
+import { recallMemoryBlock } from "@/lib/memory-bridge";
+import { checkSpendCap } from "@/lib/spend-cap";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice, type LoadedVoice } from "@/lib/voice-load";
+
+export const maxDuration = 120;
 
 const ComposeRequest = z.object({
   topic: z.string().min(1).max(2000),
@@ -46,14 +50,21 @@ type VariantResult = {
   factModel: string;
 };
 
+type ProgressEmitter = (step: string, detail?: string) => void;
+
 async function runVariant(
   index: number,
   topic: string,
   contentType: "single" | "thread",
   voice: LoadedVoice,
   generationId: string,
+  emit: ProgressEmitter,
   sharedOutlineBeats?: string[],
+  memoryBlock?: string,
 ): Promise<VariantResult> {
+  const tag = `variant ${index + 1}`;
+
+  emit("writer", tag);
   await writeTrace({
     generationId,
     agent: "writer",
@@ -61,6 +72,7 @@ async function runVariant(
     payload: {
       variantIndex: index,
       outlineBeats: sharedOutlineBeats?.length ?? 0,
+      memoryBytes: memoryBlock?.length ?? 0,
     },
   });
   const writerResult = await draft({
@@ -69,6 +81,7 @@ async function runVariant(
     referenceTweets: voice.referenceTweets,
     fingerprintBlock: voice.fingerprintBlock,
     outlineBeats: sharedOutlineBeats,
+    memoryBlock,
   });
   await writeTrace({
     generationId,
@@ -81,6 +94,7 @@ async function runVariant(
     costUsd: writerResult.costUsd.toString(),
   });
 
+  emit("editor", tag);
   const editorResult = await review({
     topic,
     drafts: writerResult.texts,
@@ -105,7 +119,7 @@ async function runVariant(
     costUsd: editorResult.costUsd.toString(),
   });
 
-  // Fact-checker and evaluator both inspect the editor output — run in parallel.
+  emit("eval", tag);
   const [evalResult, factResult] = await Promise.all([
     evaluate({
       seed: topic,
@@ -205,7 +219,7 @@ async function insertPostChain(
         threadPosition: contentType === "thread" ? i + 1 : null,
         contentType,
         text,
-        status: "draft",
+        status: "approved",
       })
       .returning();
     const row = inserted[0];
@@ -214,6 +228,12 @@ async function insertPostChain(
     if (i === 0 && contentType === "thread") parentId = row.id;
   }
   return out;
+}
+
+const encoder = new TextEncoder();
+
+function sseEncode(event: string, data: unknown): Uint8Array {
+  return encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
 export async function POST(request: Request) {
@@ -232,6 +252,21 @@ export async function POST(request: Request) {
     );
   }
   const { topic, contentType, mode, variants } = parsed.data;
+
+  if (mode === "ai") {
+    const verdict = await checkSpendCap();
+    if (!verdict.allow) {
+      return Response.json(
+        {
+          error: "spend_cap",
+          message: verdict.reason,
+          todayUsd: verdict.todayUsd,
+          capUsd: verdict.capUsd,
+        },
+        { status: 429 },
+      );
+    }
+  }
 
   const [generation] = await db
     .insert(generations)
@@ -256,167 +291,39 @@ export async function POST(request: Request) {
     payload: { contentType, mode, variants, length: topic.length },
   });
 
-  try {
-    if (mode === "manual") {
-      const texts =
-        contentType === "thread"
-          ? topic
-              .split(/\n?---\n?/)
-              .map((t) => t.trim())
-              .filter(Boolean)
-          : [topic.trim()];
+  // Manual mode: no streaming needed, return immediately.
+  if (mode === "manual") {
+    const texts =
+      contentType === "thread"
+        ? topic
+            .split(/\n?---\n?/)
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [topic.trim()];
 
-      const createdPosts = await insertPostChain(
-        generation.id,
-        contentType,
-        texts,
-      );
-
-      await db
-        .update(generations)
-        .set({
-          status: "succeeded",
-          model: "manual",
-          tokensIn: 0,
-          tokensOut: 0,
-          costUsd: "0",
-          completedAt: new Date(),
-        })
-        .where(eq(generations.id, generation.id));
-
-      await writeTrace({
-        generationId: generation.id,
-        agent: "compose",
-        eventType: "complete",
-        payload: { postCount: createdPosts.length, mode: "manual" },
-      });
-
-      return Response.json(
-        {
-          generation: {
-            id: generation.id,
-            status: "succeeded" as const,
-            model: "manual",
-            tokensIn: 0,
-            tokensOut: 0,
-            costUsd: 0,
-          },
-          posts: createdPosts,
-        },
-        { status: 201 },
-      );
-    }
-
-    // mode === "ai" — outline (threads only) → writer → editor → [eval | fact-check] in parallel
-    const voice = await loadDefaultVoice();
-
-    let outlineBeats: string[] | undefined;
-    let outlineCost = 0;
-    let outlineModel: string | null = null;
-    if (contentType === "thread") {
-      const outlineResult = await outlineAgent({
-        topic,
-        referenceTweets: voice.referenceTweets,
-        fingerprintBlock: voice.fingerprintBlock,
-      });
-      outlineBeats = outlineResult.beats.length > 0 ? outlineResult.beats : undefined;
-      outlineCost = outlineResult.costUsd;
-      outlineModel = outlineResult.model;
-      await writeTrace({
-        generationId: generation.id,
-        agent: "outliner",
-        eventType: outlineResult.beats.length > 0 ? "complete" : "empty",
-        payload: { beats: outlineResult.beats },
-        model: outlineResult.model,
-        tokensIn: outlineResult.tokensIn,
-        tokensOut: outlineResult.tokensOut,
-        costUsd: outlineResult.costUsd.toString(),
-      });
-    }
-
-    const variantResults = await Promise.all(
-      Array.from({ length: variants }, (_, i) =>
-        runVariant(i, topic, contentType, voice, generation.id, outlineBeats),
-      ),
+    const createdPosts = await insertPostChain(
+      generation.id,
+      contentType,
+      texts,
     );
-
-    // Sort by overall eval score desc; winner becomes the actual queue draft.
-    variantResults.sort((a, b) => b.evalOverall - a.evalOverall);
-    const winner = variantResults[0]!;
-
-    const totalCost =
-      outlineCost + variantResults.reduce((s, v) => s + v.totalCost, 0);
-    const totalTokensIn = variantResults.reduce((s, v) => s + v.tokensIn, 0);
-    const totalTokensOut = variantResults.reduce((s, v) => s + v.tokensOut, 0);
 
     await db
       .update(generations)
       .set({
         status: "succeeded",
-        model: `${outlineModel ? `${outlineModel} + ` : ""}${winner.writerModel} + ${winner.editorModel} + ${winner.evalModel} + ${winner.factModel}`,
-        inputMeta: {
-          contentType,
-          mode,
-          variants,
-          outlineBeats: outlineBeats ?? null,
-          winnerEval: {
-            scores: winner.evalScores,
-            overall: winner.evalOverall,
-            critique: winner.evalCritique,
-          },
-          allVariants: variantResults.map((v) => ({
-            index: v.index,
-            overall: v.evalOverall,
-            scores: v.evalScores,
-            critique: v.evalCritique,
-            texts: v.texts,
-          })),
-        },
-        tokensIn: totalTokensIn,
-        tokensOut: totalTokensOut,
-        costUsd: totalCost.toString(),
+        model: "manual",
+        tokensIn: 0,
+        tokensOut: 0,
+        costUsd: "0",
         completedAt: new Date(),
       })
       .where(eq(generations.id, generation.id));
-
-    const createdPosts = await insertPostChain(
-      generation.id,
-      contentType,
-      winner.texts,
-    );
-
-    // Persist the winner's fact-check claims linked to the first post.
-    if (winner.factClaims.length > 0 && createdPosts[0]) {
-      const rootPostId = createdPosts[0].id;
-      const claimRows = winner.factClaims.slice(0, 20).map((c) => ({
-        postId: rootPostId,
-        claimText: c.text,
-        verified: c.verdict === "supported",
-        notes: `${c.verdict}: ${c.reason}`,
-      }));
-      try {
-        await db.insert(claims).values(claimRows);
-      } catch (err) {
-        await writeTrace({
-          generationId: generation.id,
-          agent: "compose",
-          eventType: "claims_insert_failed",
-          payload: { message: err instanceof Error ? err.message : String(err) },
-        });
-      }
-    }
 
     await writeTrace({
       generationId: generation.id,
       agent: "compose",
       eventType: "complete",
-      payload: {
-        variants,
-        winnerIndex: winner.index,
-        winnerOverall: winner.evalOverall,
-        rankedScores: variantResults.map((v) => v.evalOverall),
-        winnerInventedClaims: winner.factInventedCount,
-      },
+      payload: { postCount: createdPosts.length, mode: "manual" },
     });
 
     return Response.json(
@@ -424,60 +331,261 @@ export async function POST(request: Request) {
         generation: {
           id: generation.id,
           status: "succeeded" as const,
-          model: `${winner.writerModel} + ${winner.editorModel} + ${winner.evalModel} + ${winner.factModel}`,
-          tokensIn: totalTokensIn,
-          tokensOut: totalTokensOut,
-          costUsd: totalCost,
+          model: "manual",
+          tokensIn: 0,
+          tokensOut: 0,
+          costUsd: 0,
         },
-        editor: {
-          changed: winner.editorChanged,
-          issuesFound: winner.editorIssues,
-        },
-        eval: {
-          scores: winner.evalScores,
-          overall: winner.evalOverall,
-          critique: winner.evalCritique,
-        },
-        factCheck: {
-          claims: winner.factClaims,
-          inventedCount: winner.factInventedCount,
-        },
-        variants: variantResults.map((v) => ({
-          index: v.index,
-          texts: v.texts,
-          overall: v.evalOverall,
-          scores: v.evalScores,
-          critique: v.evalCritique,
-          factClaims: v.factClaims,
-          factInventedCount: v.factInventedCount,
-          isWinner: v.index === winner.index,
-        })),
         posts: createdPosts,
       },
       { status: 201 },
     );
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "unknown error";
-
-    await db
-      .update(generations)
-      .set({
-        status: "failed",
-        error: message,
-        completedAt: new Date(),
-      })
-      .where(eq(generations.id, generation.id));
-
-    await writeTrace({
-      generationId: generation.id,
-      agent: "compose",
-      eventType: "error",
-      payload: { message },
-    });
-
-    return Response.json(
-      { error: "generation failed", message, generationId: generation.id },
-      { status: 500 },
-    );
   }
+
+  // AI mode: load voice + memory before the stream so the first SSE event
+  // flushes immediately once the response starts.
+  const voice = await loadDefaultVoice();
+  const memoryContext = await recallMemoryBlock(topic);
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      // Flush a 2KB padding comment to push past any HTTP/gzip buffering.
+      controller.enqueue(sseEncode("progress", { step: "writer", detail: "starting pipeline" }));
+      controller.enqueue(encoder.encode(`: ${" ".repeat(2048)}\n\n`));
+
+      const emit: ProgressEmitter = (step, detail) => {
+        try {
+          controller.enqueue(sseEncode("progress", { step, detail }));
+        } catch {
+          // stream closed by client
+        }
+      };
+
+      let dbSucceeded = false;
+
+      try {
+        if (memoryContext.block) {
+          await writeTrace({
+            generationId: generation.id,
+            agent: "memory",
+            eventType: "recall",
+            payload: {
+              citations: memoryContext.citationCount,
+              bytes: memoryContext.block.length,
+              embedError: memoryContext.embedError,
+            },
+          });
+        }
+
+        let outlineBeats: string[] | undefined;
+        let outlineCost = 0;
+        let outlineModel: string | null = null;
+        if (contentType === "thread") {
+          emit("outline", "planning thread beats");
+          const outlineResult = await outlineAgent({
+            topic,
+            referenceTweets: voice.referenceTweets,
+            fingerprintBlock: voice.fingerprintBlock,
+          });
+          outlineBeats =
+            outlineResult.beats.length > 0
+              ? outlineResult.beats
+              : undefined;
+          outlineCost = outlineResult.costUsd;
+          outlineModel = outlineResult.model;
+          await writeTrace({
+            generationId: generation.id,
+            agent: "outliner",
+            eventType:
+              outlineResult.beats.length > 0 ? "complete" : "empty",
+            payload: { beats: outlineResult.beats },
+            model: outlineResult.model,
+            tokensIn: outlineResult.tokensIn,
+            tokensOut: outlineResult.tokensOut,
+            costUsd: outlineResult.costUsd.toString(),
+          });
+        }
+
+        const variantResults = await Promise.all(
+          Array.from({ length: variants }, (_, i) =>
+            runVariant(
+              i,
+              topic,
+              contentType,
+              voice,
+              generation.id,
+              emit,
+              outlineBeats,
+              memoryContext.block,
+            ),
+          ),
+        );
+
+        variantResults.sort((a, b) => b.evalOverall - a.evalOverall);
+        const winner = variantResults[0]!;
+
+        const totalCost =
+          outlineCost +
+          variantResults.reduce((s, v) => s + v.totalCost, 0);
+        const totalTokensIn = variantResults.reduce(
+          (s, v) => s + v.tokensIn,
+          0,
+        );
+        const totalTokensOut = variantResults.reduce(
+          (s, v) => s + v.tokensOut,
+          0,
+        );
+
+        emit("saving", "persisting to queue");
+
+        await db
+          .update(generations)
+          .set({
+            status: "succeeded",
+            model: `${outlineModel ? `${outlineModel} + ` : ""}${winner.writerModel} + ${winner.editorModel} + ${winner.evalModel} + ${winner.factModel}`,
+            inputMeta: {
+              contentType,
+              mode,
+              variants,
+              outlineBeats: outlineBeats ?? null,
+              winnerEval: {
+                scores: winner.evalScores,
+                overall: winner.evalOverall,
+                critique: winner.evalCritique,
+              },
+              allVariants: variantResults.map((v) => ({
+                index: v.index,
+                overall: v.evalOverall,
+                scores: v.evalScores,
+                critique: v.evalCritique,
+                texts: v.texts,
+              })),
+            },
+            tokensIn: totalTokensIn,
+            tokensOut: totalTokensOut,
+            costUsd: totalCost.toString(),
+            completedAt: new Date(),
+          })
+          .where(eq(generations.id, generation.id));
+
+        dbSucceeded = true;
+
+        const createdPosts = await insertPostChain(
+          generation.id,
+          contentType,
+          winner.texts,
+        );
+
+        if (winner.factClaims.length > 0 && createdPosts[0]) {
+          const rootPostId = createdPosts[0].id;
+          const claimRows = winner.factClaims.slice(0, 20).map((c) => ({
+            postId: rootPostId,
+            claimText: c.text,
+            verified: c.verdict === "supported",
+            notes: `${c.verdict}: ${c.reason}`,
+          }));
+          try {
+            await db.insert(claims).values(claimRows);
+          } catch (err) {
+            await writeTrace({
+              generationId: generation.id,
+              agent: "compose",
+              eventType: "claims_insert_failed",
+              payload: {
+                message:
+                  err instanceof Error ? err.message : String(err),
+              },
+            });
+          }
+        }
+
+        await writeTrace({
+          generationId: generation.id,
+          agent: "compose",
+          eventType: "complete",
+          payload: {
+            variants,
+            winnerIndex: winner.index,
+            winnerOverall: winner.evalOverall,
+            rankedScores: variantResults.map((v) => v.evalOverall),
+            winnerInventedClaims: winner.factInventedCount,
+          },
+        });
+
+        controller.enqueue(
+          sseEncode("result", {
+            generation: {
+              id: generation.id,
+              status: "succeeded" as const,
+              model: `${winner.writerModel} + ${winner.editorModel} + ${winner.evalModel} + ${winner.factModel}`,
+              tokensIn: totalTokensIn,
+              tokensOut: totalTokensOut,
+              costUsd: totalCost,
+            },
+            editor: {
+              changed: winner.editorChanged,
+              issuesFound: winner.editorIssues,
+            },
+            eval: {
+              scores: winner.evalScores,
+              overall: winner.evalOverall,
+              critique: winner.evalCritique,
+            },
+            factCheck: {
+              claims: winner.factClaims,
+              inventedCount: winner.factInventedCount,
+            },
+            variants: variantResults.map((v) => ({
+              index: v.index,
+              texts: v.texts,
+              overall: v.evalOverall,
+              scores: v.evalScores,
+              critique: v.evalCritique,
+              factClaims: v.factClaims,
+              factInventedCount: v.factInventedCount,
+              isWinner: v.index === winner.index,
+            })),
+            posts: createdPosts,
+          }),
+        );
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "unknown error";
+
+        if (!dbSucceeded) {
+          await db
+            .update(generations)
+            .set({
+              status: "failed",
+              error: message,
+              completedAt: new Date(),
+            })
+            .where(eq(generations.id, generation.id));
+        }
+
+        await writeTrace({
+          generationId: generation.id,
+          agent: "compose",
+          eventType: "error",
+          payload: { message },
+        });
+
+        try {
+          controller.enqueue(sseEncode("error", { message }));
+        } catch {
+          // stream already closed by client disconnect
+        }
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+    },
+  });
 }

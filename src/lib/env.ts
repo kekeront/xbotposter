@@ -36,6 +36,18 @@ const schema = z.object({
   // to the /queue page. Defaults to localhost in dev.
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
 
+  // Agentic memory layer (src/memory). Off by default. When true, poster
+  // records a turn after ship; writer/take/qrt routes call recall() and
+  // inject a memory context block. Apply migration 0002_memory.sql in
+  // Supabase before flipping this on.
+  MEMORY_ENABLED: z
+    .string()
+    .optional()
+    .transform((v) => v === "true" || v === "1"),
+  MEMORY_RECALL_MAX_TOKENS: z.coerce.number().int().positive().default(400),
+  MEMORY_RECALL_TIMEOUT_MS: z.coerce.number().int().positive().default(2000),
+  MEMORY_RECORD_TIMEOUT_MS: z.coerce.number().int().positive().default(15000),
+
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 

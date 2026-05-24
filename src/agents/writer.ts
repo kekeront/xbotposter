@@ -7,6 +7,7 @@ export type WriterInput = {
   referenceTweets?: string[];
   fingerprintBlock?: string;
   outlineBeats?: string[];
+  memoryBlock?: string;
 };
 
 export type WriterOutput = {
@@ -97,6 +98,13 @@ function buildMessages(input: WriterInput): CompletionMessage[] {
 
   if (input.fingerprintBlock) {
     messages.push({ role: "system", content: input.fingerprintBlock });
+  }
+
+  if (input.memoryBlock && input.memoryBlock.trim()) {
+    messages.push({
+      role: "system",
+      content: `MEMORY — known facts and recent activity for this account. Use to stay consistent with past claims and avoid contradicting yourself. Do not restate these literally; they inform tone and topic, not the tweet's text.\n\n${input.memoryBlock.trim()}`,
+    });
   }
 
   const refs = (input.referenceTweets ?? [])

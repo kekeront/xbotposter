@@ -5,6 +5,7 @@ import { draft as qrtDraft } from "@/agents/qrt";
 import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import { generations, posts, viralPosts, type Post } from "@/db/schema";
+import { recallMemoryBlock } from "@/lib/memory-bridge";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
 
@@ -112,6 +113,20 @@ export async function POST(request: Request) {
 
   try {
     const voice = await loadDefaultVoice();
+    const recallQuery = `${author} ${viral.text} ${userAngle ?? ""}`.trim();
+    const memoryContext = await recallMemoryBlock(recallQuery);
+    if (memoryContext.block) {
+      await writeTrace({
+        generationId: generation.id,
+        agent: "memory",
+        eventType: "recall",
+        payload: {
+          citations: memoryContext.citationCount,
+          bytes: memoryContext.block.length,
+          embedError: memoryContext.embedError,
+        },
+      });
+    }
 
     const writerResult = await qrtDraft({
       viralText: viral.text,
@@ -119,6 +134,7 @@ export async function POST(request: Request) {
       userAngle: userAngle ?? null,
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
+      memoryBlock: memoryContext.block,
     });
 
     await writeTrace({

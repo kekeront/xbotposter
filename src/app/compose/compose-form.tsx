@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
 type ContentType = "single" | "thread";
-type Mode = "ai" | "manual";
+type Mode = "ai" | "manual" | "bulk";
 
 type EvalScores = {
   insightDensity: number;
@@ -51,7 +51,46 @@ type ComposeResult = {
   }>;
 };
 
+type BulkAngleResult = {
+  angleIndex: number;
+  hook: string;
+  generationId: string;
+  texts: string[];
+  overall: number;
+  scores: Record<string, number>;
+  critique: string;
+  costUsd: number;
+  tokensIn: number;
+  tokensOut: number;
+  model: string;
+  posts: Array<{
+    id: string;
+    text: string;
+    threadPosition: number | null;
+  }>;
+};
+
+type BulkResult = {
+  totalAngles: number;
+  completedAngles: number;
+  totalCostUsd: number;
+  results: BulkAngleResult[];
+};
+
 const X_SOFT_LIMIT = 280;
+
+const STEP_LABELS: Record<string, string> = {
+  angles: "generating angles",
+  memory: "recalling memory",
+  outline: "planning thread",
+  writer: "writing draft",
+  editor: "editing",
+  eval: "scoring + fact-checking",
+  saving: "saving to queue",
+};
+
+const CLIENT_TIMEOUT_MS = 120_000;
+const BULK_CLIENT_TIMEOUT_MS = 300_000;
 
 function ToggleButton({
   active,
@@ -82,7 +121,67 @@ const MODE_STORAGE_KEY = "nfactz.compose.mode";
 function readStoredMode(): Mode {
   if (typeof window === "undefined") return "ai";
   const v = window.localStorage.getItem(MODE_STORAGE_KEY);
-  return v === "manual" ? "manual" : "ai";
+  if (v === "manual" || v === "bulk") return v;
+  return "ai";
+}
+
+function useElapsed(running: boolean): number {
+  const [elapsed, setElapsed] = useState(0);
+  const startRef = useRef(0);
+
+  useEffect(() => {
+    if (!running) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setElapsed(0);
+      return;
+    }
+    startRef.current = Date.now();
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [running]);
+
+  return elapsed;
+}
+
+function fmtElapsed(s: number): string {
+  if (s < 60) return `${s}s`;
+  return `${Math.floor(s / 60)}m ${s % 60}s`;
+}
+
+function consumeSSE(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  handlers: Record<string, (payload: Record<string, unknown>) => void>,
+  signal: AbortSignal,
+): Promise<void> {
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let eventType: string | null = null;
+
+  async function pump(): Promise<void> {
+    while (true) {
+      if (signal.aborted) return;
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+
+      for (const line of lines) {
+        if (line.startsWith("event: ")) {
+          eventType = line.slice(7).trim();
+        } else if (line.startsWith("data: ") && eventType) {
+          const payload = JSON.parse(line.slice(6));
+          handlers[eventType]?.(payload);
+          eventType = null;
+        }
+      }
+    }
+  }
+
+  return pump();
 }
 
 export function ComposeForm() {
@@ -90,11 +189,23 @@ export function ComposeForm() {
   const [contentType, setContentType] = useState<ContentType>("single");
   const [mode, setMode] = useState<Mode>("ai");
   const [variants, setVariants] = useState<1 | 2 | 3>(1);
+  const [angleCount, setAngleCount] = useState<2 | 3 | 4 | 5 | 6>(3);
   const [status, setStatus] = useState<
     "idle" | "generating" | "done" | "error"
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ComposeResult | null>(null);
+  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
+  const [bulkAngles, setBulkAngles] = useState<
+    Array<{ angle: string; hook: string }> | null
+  >(null);
+  const [bulkProgress, setBulkProgress] = useState<BulkAngleResult[]>([]);
+  const [currentStep, setCurrentStep] = useState<string | null>(null);
+  const [stepDetail, setStepDetail] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const cancelledRef = useRef(false);
+
+  const elapsed = useElapsed(status === "generating");
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -107,19 +218,47 @@ export function ComposeForm() {
   }, [mode]);
 
   const isManual = mode === "manual";
+  const isBulk = mode === "bulk";
   const trimmed = topic.trim();
   const charCount = trimmed.length;
   const overSoftLimit =
     isManual && contentType === "single" && charCount > X_SOFT_LIMIT;
-  // X charges $0.20 per tweet that contains a URL vs $0.015 without. 13× cost.
-  // Warn manual users in real time so they can decide if the link is worth it.
   const hasUrl = isManual && /\bhttps?:\/\/\S+/i.test(topic);
+
+  function abort() {
+    cancelledRef.current = true;
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setStatus("error");
+    setError("cancelled");
+    setCurrentStep(null);
+    setStepDetail(null);
+  }
 
   async function submit() {
     if (!trimmed) return;
     setStatus("generating");
     setError(null);
     setResult(null);
+    setBulkResult(null);
+    setBulkAngles(null);
+    setBulkProgress([]);
+    setCurrentStep(null);
+    setStepDetail(null);
+    cancelledRef.current = false;
+
+    if (isBulk) {
+      await submitBulk();
+    } else {
+      await submitSingle();
+    }
+  }
+
+  async function submitSingle() {
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timeout = setTimeout(() => controller.abort(), CLIENT_TIMEOUT_MS);
+
     try {
       const res = await fetch("/api/compose", {
         method: "POST",
@@ -130,22 +269,167 @@ export function ComposeForm() {
           mode,
           variants: isManual ? 1 : variants,
         }),
+        signal: controller.signal,
       });
-      const data: ComposeResult | { error: string; message?: string } =
-        await res.json();
-      if (!res.ok) {
-        const err = data as { error: string; message?: string };
-        throw new Error(err.message ?? err.error ?? `HTTP ${res.status}`);
+
+      if (
+        !res.ok ||
+        !res.headers.get("content-type")?.includes("text/event-stream")
+      ) {
+        const data = await res.json();
+        if (!res.ok) {
+          const err = data as { error: string; message?: string };
+          throw new Error(err.message ?? err.error ?? `HTTP ${res.status}`);
+        }
+        setResult(data as ComposeResult);
+        setStatus("done");
+        return;
       }
-      setResult(data as ComposeResult);
-      setStatus("done");
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("no response body");
+
+      await consumeSSE(
+        reader,
+        {
+          progress: (p) => {
+            setCurrentStep(p.step as string);
+            setStepDetail((p.detail as string) ?? null);
+          },
+          result: (p) => {
+            setResult(p as unknown as ComposeResult);
+            setStatus("done");
+            setCurrentStep(null);
+            setStepDetail(null);
+          },
+          error: (p) => {
+            throw new Error(
+              (p.message as string) ?? "generation failed",
+            );
+          },
+        },
+        controller.signal,
+      );
     } catch (e) {
+      if (cancelledRef.current) {
+        // abort() already set the error
+      } else if (controller.signal.aborted) {
+        setError("timed out — try fewer variants or a shorter topic");
+      } else {
+        setError(e instanceof Error ? e.message : "unknown error");
+      }
       setStatus("error");
-      setError(e instanceof Error ? e.message : "unknown error");
+      setCurrentStep(null);
+      setStepDetail(null);
+    } finally {
+      clearTimeout(timeout);
+      abortRef.current = null;
     }
   }
 
-  const label = isManual ? "Tweet text" : "Idea / topic";
+  async function submitBulk() {
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timeout = setTimeout(
+      () => controller.abort(),
+      BULK_CLIENT_TIMEOUT_MS,
+    );
+
+    try {
+      const res = await fetch("/api/compose/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, contentType, angles: angleCount }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        const err = data as { error: string; message?: string };
+        throw new Error(err.message ?? err.error ?? `HTTP ${res.status}`);
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("no response body");
+
+      await consumeSSE(
+        reader,
+        {
+          progress: (p) => {
+            setCurrentStep(p.step as string);
+            setStepDetail((p.detail as string) ?? null);
+          },
+          angles_ready: (p) => {
+            setBulkAngles(
+              p.angles as Array<{ angle: string; hook: string }>,
+            );
+          },
+          angle_done: (p) => {
+            setBulkProgress((prev) => [
+              ...prev,
+              p as unknown as BulkAngleResult,
+            ]);
+          },
+          angle_error: (p) => {
+            setBulkProgress((prev) => [
+              ...prev,
+              {
+                angleIndex: p.angleIndex as number,
+                hook: p.hook as string,
+                generationId: "",
+                texts: [],
+                overall: 0,
+                scores: {},
+                critique: (p.message as string) ?? "failed",
+                costUsd: 0,
+                tokensIn: 0,
+                tokensOut: 0,
+                model: "",
+                posts: [],
+              },
+            ]);
+          },
+          spend_cap: (p) => {
+            setError(
+              `spend cap hit after ${p.completedAngles}/${p.totalAngles} angles — ${p.message}`,
+            );
+          },
+          result: (p) => {
+            setBulkResult(p as unknown as BulkResult);
+            setStatus("done");
+            setCurrentStep(null);
+            setStepDetail(null);
+          },
+          error: (p) => {
+            throw new Error(
+              (p.message as string) ?? "bulk generation failed",
+            );
+          },
+        },
+        controller.signal,
+      );
+    } catch (e) {
+      if (cancelledRef.current) {
+        // abort() already set the error
+      } else if (controller.signal.aborted) {
+        setError("timed out — try fewer angles");
+      } else {
+        setError(e instanceof Error ? e.message : "unknown error");
+      }
+      setStatus("error");
+      setCurrentStep(null);
+      setStepDetail(null);
+    } finally {
+      clearTimeout(timeout);
+      abortRef.current = null;
+    }
+  }
+
+  const label = isManual
+    ? "Tweet text"
+    : isBulk
+      ? "Topic (one idea, multiple angles)"
+      : "Idea / topic";
   const placeholder = isManual
     ? contentType === "thread"
       ? `Type the exact tweets, separated by --- on its own line.\n\nExample:\n\nfirst tweet here\n---\nsecond tweet\n---\nthird tweet`
@@ -153,13 +437,14 @@ export function ComposeForm() {
     : `Paste a thought, a link, a rough idea. Anything.\n\nExample: small models are getting weirdly close to frontier on narrow tasks. write a take.`;
 
   const buttonLabel = (() => {
-    if (status === "generating")
-      return isManual
-        ? "queueing…"
-        : variants > 1
-          ? `drafting ${variants}×…`
-          : "drafting…";
-    return isManual ? "queue" : variants > 1 ? `draft ${variants}` : "draft";
+    if (status === "generating") {
+      if (isBulk) return `generating ${angleCount} angles...`;
+      if (isManual) return "queueing...";
+      return variants > 1 ? `drafting ${variants}x...` : "drafting...";
+    }
+    if (isBulk) return `bulk ${angleCount}`;
+    if (isManual) return "queue";
+    return variants > 1 ? `draft ${variants}` : "draft";
   })();
 
   return (
@@ -181,6 +466,12 @@ export function ComposeForm() {
                 ai draft
               </ToggleButton>
               <ToggleButton
+                active={mode === "bulk"}
+                onClick={() => setMode("bulk")}
+              >
+                bulk
+              </ToggleButton>
+              <ToggleButton
                 active={mode === "manual"}
                 onClick={() => setMode("manual")}
               >
@@ -199,7 +490,7 @@ export function ComposeForm() {
               >
                 thread
               </ToggleButton>
-              {!isManual ? (
+              {mode === "ai" ? (
                 <>
                   <span className="text-muted-foreground/40">·</span>
                   <span className="text-muted-foreground">variants:</span>
@@ -208,6 +499,21 @@ export function ComposeForm() {
                       key={n}
                       active={variants === n}
                       onClick={() => setVariants(n)}
+                    >
+                      {n}
+                    </ToggleButton>
+                  ))}
+                </>
+              ) : null}
+              {isBulk ? (
+                <>
+                  <span className="text-muted-foreground/40">·</span>
+                  <span className="text-muted-foreground">angles:</span>
+                  {([2, 3, 4, 5, 6] as const).map((n) => (
+                    <ToggleButton
+                      key={n}
+                      active={angleCount === n}
+                      onClick={() => setAngleCount(n)}
                     >
                       {n}
                     </ToggleButton>
@@ -228,13 +534,25 @@ export function ComposeForm() {
           />
           {hasUrl ? (
             <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 font-mono text-xs text-amber-900 dark:text-amber-200">
-              ⚠ This tweet contains a URL. X charges{" "}
+              This tweet contains a URL. X charges{" "}
               <span className="font-semibold">$0.20</span> per tweet with a
-              link vs $0.015 without — a <span className="font-semibold">13×</span>{" "}
-              difference. Strip the link if you can post it as a reply or QRT
-              instead.
+              link vs $0.015 without — a{" "}
+              <span className="font-semibold">13x</span> difference. Strip
+              the link if you can post it as a reply or QRT instead.
             </div>
           ) : null}
+
+          {status === "generating" ? (
+            <ProgressBar
+              step={currentStep}
+              detail={stepDetail}
+              elapsed={elapsed}
+              onCancel={abort}
+              completedAngles={isBulk ? bulkProgress.length : undefined}
+              totalAngles={isBulk ? angleCount : undefined}
+            />
+          ) : null}
+
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
               {isManual ? (
@@ -242,9 +560,16 @@ export function ComposeForm() {
                   Manual mode — text is queued as-is. No AI rewrite, no OpenAI
                   call.
                 </span>
+              ) : isBulk ? (
+                <span>
+                  Bulk mode — generates {angleCount} different angles, each
+                  through writer → editor → evaluator. Runs sequentially,
+                  spend-capped per angle.
+                </span>
               ) : (
                 <span>
-                  Writer → editor → evaluator. {variants > 1
+                  Writer → editor → evaluator.{" "}
+                  {variants > 1
                     ? `${variants} variants, top score wins.`
                     : "1 variant."}{" "}
                   Voice from{" "}
@@ -289,7 +614,161 @@ export function ComposeForm() {
       {result ? (
         <ResultCard result={result} onUpdate={(r) => setResult(r)} />
       ) : null}
+
+      {(bulkProgress.length > 0 || bulkResult) ? (
+        <BulkResultsCard
+          angles={bulkAngles}
+          progress={bulkProgress}
+          result={bulkResult}
+        />
+      ) : null}
     </div>
+  );
+}
+
+function ProgressBar({
+  step,
+  detail,
+  elapsed,
+  onCancel,
+  completedAngles,
+  totalAngles,
+}: {
+  step: string | null;
+  detail: string | null;
+  elapsed: number;
+  onCancel: () => void;
+  completedAngles?: number;
+  totalAngles?: number;
+}) {
+  const stepLabel = step ? (STEP_LABELS[step] ?? step) : "starting";
+  return (
+    <div className="flex items-center gap-3 rounded-md border bg-muted/30 px-3 py-2">
+      <div className="h-2 w-2 animate-pulse rounded-full bg-foreground/60" />
+      <div className="flex flex-1 flex-col gap-0.5">
+        <span className="font-mono text-xs">
+          {stepLabel}
+          {detail ? (
+            <span className="ml-1 text-muted-foreground">({detail})</span>
+          ) : null}
+        </span>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          {fmtElapsed(elapsed)} elapsed
+          {completedAngles != null && totalAngles != null ? (
+            <span>
+              {" · "}
+              {completedAngles}/{totalAngles} angles done
+            </span>
+          ) : null}
+        </span>
+      </div>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="rounded px-2 py-0.5 font-mono text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+      >
+        cancel
+      </button>
+    </div>
+  );
+}
+
+function BulkResultsCard({
+  angles,
+  progress,
+  result,
+}: {
+  angles: Array<{ angle: string; hook: string }> | null;
+  progress: BulkAngleResult[];
+  result: BulkResult | null;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium">
+            Bulk — {progress.length} angle{progress.length !== 1 ? "s" : ""}
+          </span>
+          {result ? (
+            <span className="font-mono text-xs text-muted-foreground">
+              {result.completedAngles}/{result.totalAngles} completed · $
+              {result.totalCostUsd.toFixed(5)}
+            </span>
+          ) : null}
+          <Link
+            href="/queue"
+            className="ml-auto font-mono text-xs underline text-muted-foreground"
+          >
+            view in queue →
+          </Link>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        {angles?.map((a, i) => {
+          const done = progress.find((p) => p.angleIndex === i);
+          const failed = done && done.texts.length === 0;
+          return (
+            <div
+              key={i}
+              className={`flex flex-col gap-2 rounded-lg border p-4 ${
+                failed
+                  ? "border-destructive/40 bg-destructive/5"
+                  : done
+                    ? "border-border"
+                    : "border-dashed opacity-50"
+              }`}
+            >
+              <div className="flex flex-wrap items-baseline gap-2 font-mono text-xs">
+                <span className="font-semibold">#{i + 1}</span>
+                <span className="text-muted-foreground">{a.hook}</span>
+                {done && !failed ? (
+                  <Badge
+                    variant="outline"
+                    className={`ml-auto font-mono ${scoreColor(done.overall)}`}
+                  >
+                    eval {done.overall}
+                  </Badge>
+                ) : null}
+                {failed ? (
+                  <span className="ml-auto text-destructive">
+                    {done.critique}
+                  </span>
+                ) : null}
+                {!done ? (
+                  <span className="ml-auto text-muted-foreground">
+                    pending
+                  </span>
+                ) : null}
+              </div>
+              {done && !failed ? (
+                <div className="flex flex-col gap-1">
+                  {done.texts.map((t, ti) => (
+                    <p
+                      key={ti}
+                      className="whitespace-pre-wrap text-sm leading-relaxed"
+                    >
+                      {done.texts.length > 1
+                        ? `${ti + 1}/${done.texts.length} · `
+                        : ""}
+                      {t}
+                    </p>
+                  ))}
+                  <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                    <span>
+                      {done.texts.reduce((s, t) => s + t.length, 0)} chars
+                    </span>
+                    <span>·</span>
+                    <span>${done.costUsd.toFixed(5)}</span>
+                    <span>·</span>
+                    <span>{done.tokensIn + done.tokensOut} tokens</span>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -312,7 +791,7 @@ function RegenerateButton() {
       className="rounded-md border bg-background px-2 py-1 font-mono text-xs hover:bg-accent"
       title="Re-roll: same topic, fresh draft"
     >
-      ⟳ regenerate
+      regenerate
     </button>
   );
 }
@@ -458,7 +937,11 @@ function VariantsList({
   generationId: string;
   onSwitched: (
     newWinnerIndex: number,
-    newPosts: Array<{ id: string; text: string; threadPosition: number | null }>,
+    newPosts: Array<{
+      id: string;
+      text: string;
+      threadPosition: number | null;
+    }>,
   ) => void;
 }) {
   const router = useRouter();
@@ -532,7 +1015,7 @@ function VariantsList({
                   onClick={() => pickVariant(v.index)}
                   disabled={switchingIndex !== null}
                 >
-                  {switchingIndex === v.index ? "switching…" : "use this"}
+                  {switchingIndex === v.index ? "switching..." : "use this"}
                 </Button>
               )}
             </div>

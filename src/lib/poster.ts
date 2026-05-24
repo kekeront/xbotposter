@@ -2,6 +2,7 @@ import "server-only";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { posts, type Post } from "@/db/schema";
+import { recordMemoryTurn } from "./memory-bridge";
 import { writeTrace } from "./trace";
 import { postThread, postTweet } from "./x";
 
@@ -93,6 +94,23 @@ export async function shipPostById(postId: string): Promise<ShipPostResult> {
       agent: "poster",
       eventType: "complete",
       payload: { postId, xTweetIds: xIds, count: postedRows.length },
+    });
+
+    // Record this ship as a memory turn. No-op if MEMORY_ENABLED is off.
+    // Hard-timeouted via bridge; failures here never block post return.
+    await recordMemoryTurn({
+      sessionId: `post:${root.id}`,
+      messages: postedRows.map((p) => ({
+        role: "assistant" as const,
+        content: p.text,
+      })),
+      metadata: {
+        kind: "shipped_post",
+        postId: root.id,
+        contentType: root.contentType,
+        xTweetIds: xIds,
+        generationId: root.generationId,
+      },
     });
 
     return { ok: true, posts: postedRows, xTweetIds: xIds };

@@ -10,6 +10,7 @@ import {
   type PostStatus,
 } from "@/db/schema";
 import { PostRow, type PostSource } from "./post-row";
+import { ResetQueueButton } from "./reset-queue-button";
 
 export const dynamic = "force-dynamic";
 
@@ -168,9 +169,12 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
             Review, skip, or ship drafts. Threads post as chained replies.
           </p>
         </div>
-        <Badge variant="outline" className="font-mono">
-          slice 3a
-        </Badge>
+        <div className="flex items-center gap-3">
+          <ResetQueueButton activeCount={counts.active} />
+          <Badge variant="outline" className="font-mono">
+            slice 3a
+          </Badge>
+        </div>
       </header>
 
       <nav className="flex flex-wrap gap-1 font-mono text-xs">

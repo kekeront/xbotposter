@@ -81,17 +81,20 @@ export async function complete(
   const model = opts.model ?? modelFor(opts.tier);
   const client = getClient();
 
-  const response = await client.chat.completions.create({
-    model,
-    messages: opts.messages,
-    max_completion_tokens: opts.maxTokens,
-    ...(typeof opts.temperature === "number"
-      ? { temperature: opts.temperature }
-      : {}),
-    ...(opts.responseFormat === "json_object"
-      ? { response_format: { type: "json_object" as const } }
-      : {}),
-  });
+  const response = await client.chat.completions.create(
+    {
+      model,
+      messages: opts.messages,
+      max_completion_tokens: opts.maxTokens,
+      ...(typeof opts.temperature === "number"
+        ? { temperature: opts.temperature }
+        : {}),
+      ...(opts.responseFormat === "json_object"
+        ? { response_format: { type: "json_object" as const } }
+        : {}),
+    },
+    { timeout: 60_000 },
+  );
 
   const choice = response.choices[0];
   const text = choice?.message.content ?? "";
@@ -114,7 +117,10 @@ export type EmbedResult = {
 export async function embed(input: string | string[]): Promise<EmbedResult> {
   const model = env.EMBEDDING_MODEL;
   const client = getClient();
-  const response = await client.embeddings.create({ model, input });
+  const response = await client.embeddings.create(
+    { model, input },
+    { timeout: 30_000 },
+  );
   const vectors = response.data.map((d) => d.embedding);
   const tokens = response.usage?.prompt_tokens ?? 0;
   const costUsd = costFor(model, tokens, 0);

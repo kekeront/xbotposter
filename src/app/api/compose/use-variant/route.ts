@@ -48,7 +48,7 @@ async function insertPostChain(
         threadPosition: contentType === "thread" ? i + 1 : null,
         contentType,
         text,
-        status: "draft",
+        status: "approved",
       })
       .returning();
     const row = inserted[0];

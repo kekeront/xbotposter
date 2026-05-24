@@ -7,6 +7,7 @@ export type QrtInput = {
   userAngle?: string | null;
   referenceTweets?: string[];
   fingerprintBlock?: string;
+  memoryBlock?: string;
 };
 
 export type QrtOutput = {
@@ -41,6 +42,13 @@ function buildMessages(input: QrtInput): CompletionMessage[] {
 
   if (input.fingerprintBlock) {
     messages.push({ role: "system", content: input.fingerprintBlock });
+  }
+
+  if (input.memoryBlock && input.memoryBlock.trim()) {
+    messages.push({
+      role: "system",
+      content: `MEMORY — known facts and recent activity for this account. Use to avoid contradicting past stances on @${input.viralAuthor} or the topic.\n\n${input.memoryBlock.trim()}`,
+    });
   }
 
   const refs = (input.referenceTweets ?? [])
