@@ -9,6 +9,7 @@ export type TakeInput = {
   referenceTweets?: string[];
   fingerprintBlock?: string;
   memoryBlock?: string;
+  researchBlock?: string;
 };
 
 export type TakeOutput = {
@@ -54,6 +55,13 @@ function buildMessages(input: TakeInput): CompletionMessage[] {
     messages.push({
       role: "system",
       content: `MEMORY — known facts and recent activity for this account. Use to avoid contradicting past stances on @${input.viralAuthor} or the topic.\n\n${input.memoryBlock.trim()}`,
+    });
+  }
+
+  if (input.researchBlock && input.researchBlock.trim()) {
+    messages.push({
+      role: "system",
+      content: `RESEARCH — verified facts from web sources about this topic and the viral post's claims. You MAY use these to ground your take with concrete detail. Prefer specific numbers, names, and dates from this research over vague assertions. Do NOT copy-paste — synthesize into your own voice.\n\n${input.researchBlock.trim()}`,
     });
   }
 

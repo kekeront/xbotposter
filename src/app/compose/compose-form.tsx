@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
-type ContentType = "single" | "thread";
+type ContentType = "single" | "thread" | "essay";
 type Mode = "ai" | "manual" | "bulk";
 
 type EvalScores = {
@@ -434,8 +434,12 @@ export function ComposeForm() {
   const placeholder = isManual
     ? contentType === "thread"
       ? `Type the exact tweets, separated by --- on its own line.\n\nExample:\n\nfirst tweet here\n---\nsecond tweet\n---\nthird tweet`
-      : `Type the exact tweet you want to ship.\n\nExample: just shipped a thing. small win, but a win.`
-    : `Paste a thought, a link, a rough idea. Anything.\n\nExample: small models are getting weirdly close to frontier on narrow tasks. write a take.`;
+      : contentType === "essay"
+        ? `Type the full essay / long-form post.`
+        : `Type the exact tweet you want to ship.\n\nExample: just shipped a thing. small win, but a win.`
+    : contentType === "essay"
+      ? `Paste a topic or rough outline for a long-form X note (800-2500 chars).\n\nExample: why most AI startups die at the prod transition — outline the key failure modes.`
+      : `Paste a thought, a link, a rough idea. Anything.\n\nExample: small models are getting weirdly close to frontier on narrow tasks. write a take.`;
 
   const buttonLabel = (() => {
     if (status === "generating") {
@@ -468,7 +472,10 @@ export function ComposeForm() {
               </ToggleButton>
               <ToggleButton
                 active={mode === "bulk"}
-                onClick={() => setMode("bulk")}
+                onClick={() => {
+                  setMode("bulk");
+                  if (contentType === "essay") setContentType("single");
+                }}
               >
                 bulk
               </ToggleButton>
@@ -491,6 +498,14 @@ export function ComposeForm() {
               >
                 thread
               </ToggleButton>
+              {!isBulk && (
+                <ToggleButton
+                  active={contentType === "essay"}
+                  onClick={() => setContentType("essay")}
+                >
+                  essay
+                </ToggleButton>
+              )}
               {mode === "ai" ? (
                 <>
                   <span className="text-muted-foreground/40">·</span>

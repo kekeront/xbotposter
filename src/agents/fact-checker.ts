@@ -13,6 +13,7 @@ export type ExtractedClaim = {
   text: string;
   verdict: ClaimVerdict;
   reason: string;
+  sourceUrl?: string;
 };
 
 export type FactCheckOutput = {
@@ -42,7 +43,7 @@ When RESEARCH SOURCES are provided, use them as ground truth. A claim backed by 
 OUTPUT — JSON only, no preamble:
 {
   "claims": [
-    { "text": "<the claim, short>", "verdict": "supported" | "invented" | "uncertain", "reason": "<one short clause>" },
+    { "text": "<the claim, short>", "verdict": "supported" | "invented" | "uncertain", "reason": "<one short clause>", "sourceUrl": "<URL from RESEARCH SOURCES that backs this claim, or null if none>" },
     ...
   ]
 }
@@ -77,7 +78,7 @@ export async function check(input: FactCheckInput): Promise<FactCheckOutput> {
     responseFormat: "json_object",
   });
 
-  let parsed: { claims?: Array<{ text?: unknown; verdict?: unknown; reason?: unknown }> };
+  let parsed: { claims?: Array<{ text?: unknown; verdict?: unknown; reason?: unknown; sourceUrl?: unknown }> };
   try {
     parsed = JSON.parse(result.text);
   } catch {
@@ -106,7 +107,11 @@ export async function check(input: FactCheckInput): Promise<FactCheckOutput> {
             ? "invented"
             : "uncertain";
       const reason = typeof c.reason === "string" ? c.reason.trim() : "";
-      return { text, verdict, reason };
+      const sourceUrl =
+        typeof c.sourceUrl === "string" && c.sourceUrl.startsWith("http")
+          ? c.sourceUrl.trim()
+          : undefined;
+      return { text, verdict, reason, sourceUrl };
     })
     .filter((c) => c.text.length > 0);
 

@@ -8,6 +8,7 @@ export type QrtInput = {
   referenceTweets?: string[];
   fingerprintBlock?: string;
   memoryBlock?: string;
+  researchBlock?: string;
 };
 
 export type QrtOutput = {
@@ -48,6 +49,13 @@ function buildMessages(input: QrtInput): CompletionMessage[] {
     messages.push({
       role: "system",
       content: `MEMORY — known facts and recent activity for this account. Use to avoid contradicting past stances on @${input.viralAuthor} or the topic.\n\n${input.memoryBlock.trim()}`,
+    });
+  }
+
+  if (input.researchBlock && input.researchBlock.trim()) {
+    messages.push({
+      role: "system",
+      content: `RESEARCH — verified facts from web sources. You MAY reference a concrete detail to make your commentary sharper. Keep it very short — one fact at most.\n\n${input.researchBlock.trim()}`,
     });
   }
 

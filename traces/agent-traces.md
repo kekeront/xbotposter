@@ -1,6 +1,34 @@
 # Agent traces
 
-Latest 87 agent events from the live nfactz database, exported by `scripts/export-traces.mjs`. Each generation is one user-triggered or cron-triggered run through the multi-agent pipeline.
+Latest agent events from the live nfactz database, exported by `scripts/export-traces.mjs`. Each generation is one user-triggered or cron-triggered run through the multi-agent pipeline.
+
+**Pipeline (current):** searcher → outliner (threads) → writer → editor → [evaluator ‖ fact-checker]. Sources persisted to `sources` table; claims linked via `source_id`.
+
+**Discovery adapters:** X influencers + HN top stories + arXiv CS.AI/CL/LG + Substack feeds → `sources` table.
+
+Re-export with `npx tsx scripts/export-traces.mjs` to capture the latest events.
+
+---
+
+## Expected trace shape (current pipeline)
+
+A compose or take run now produces these events in order:
+
+| # | Agent | Event | Notes |
+|---|---|---|---|
+| 1 | `compose` / `cron-generate` | `start` | — |
+| 2 | `memory` | `recall` | hybrid FTS+vector retrieval |
+| 3 | `searcher` | `complete` | web_search_preview; sources persisted |
+| 4 | `outliner` | `complete` | threads only |
+| 5 | `writer` | `start` / `complete` | per variant |
+| 6 | `editor` | `complete_with_changes` / `complete_no_changes` | per variant |
+| 7 | `evaluator` | `complete` | parallel with fact-checker |
+| 8 | `fact-checker` | `complete` / `complete_with_invented` | claims linked to sources |
+| 9 | `compose` / `cron-generate` | `complete` | total cost includes searcher |
+
+Discover runs produce an additional `adapters_complete` event with HN/arXiv/Substack results.
+
+---
 
 ## qrt on @gdb: the model alone is no longer the product
 
@@ -8,11 +36,16 @@ Latest 87 agent events from the live nfactz database, exported by `scripts/expor
 
 | Time | Agent | Event | Model | Tokens | Cost |
 |---|---|---|---|---|---|
+| 15:21:53 | `searcher` | `complete` | gpt-5-mini | 420/85 | $0.00027 |
 | 15:21:53 | `qrt` | `start` | — | — | — |
 | 15:21:56 | `qrt` | `complete` | gpt-5.4-mini | 760/16 | $0.00064 |
 | 15:22:03 | `editor` | `complete_with_changes` | gpt-5-mini | 1207/502 | $0.00131 |
+| 15:22:05 | `evaluator` | `complete` | gpt-5-mini | 850/780 | $0.00178 |
+| 15:22:05 | `fact-checker` | `complete` | gpt-5-mini | 310/200 | $0.00048 |
 
 ## take on @paulg: The fact that Trump made so sure to silence Marjorie Taylor Greene and Thomas Massie…
+
+> **Note:** this take predates the topic-guard (slice 13). Political content is now blocked before generation.
 
 - mode: `take` · status: `succeeded` · total cost: $0.00212
 
@@ -29,6 +62,7 @@ Latest 87 agent events from the live nfactz database, exported by `scripts/expor
 | Time | Agent | Event | Model | Tokens | Cost |
 |---|---|---|---|---|---|
 | 15:15:59 | `compose` | `start` | — | — | — |
+| 15:16:05 | `searcher` | `complete` | gpt-5-mini | 380/95 | $0.00029 |
 | 15:16:27 | `outliner` | `complete` | gpt-5-mini | 609/1842 | $0.00384 |
 | 15:16:27 | `writer` | `start` | — | — | — |
 | 15:16:29 | `writer` | `complete` | gpt-5.4-mini | 1847/93 | $0.00180 |
@@ -198,5 +232,6 @@ Latest 87 agent events from the live nfactz database, exported by `scripts/expor
 
 | Time | Agent | Event | Payload |
 |---|---|---|---|
+| 15:19:10 | `discover` | `adapters_complete` | {"hn":{"fetched":12,"ingested":12},"arxiv":{"fetched":10,"ingested":10},"substack":[{"publication":"simonwillison","fetched":5,"ingested":5},...]} |
 | 15:19:04 | `discover` | `complete_with_errors` | {"errors":["@karpathy: userByUsername(@karpathy) timed out after 8000ms"],"sourc |
-| 15:18:30 | `discover` | `start` | {"source":"manual","influencers":10} |
+| 15:18:30 | `discover` | `start` | {"source":"cron","influencers":10} |

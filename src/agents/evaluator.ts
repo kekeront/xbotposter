@@ -4,7 +4,7 @@ import { complete, type CompletionMessage } from "@/lib/llm";
 export type EvalInput = {
   seed: string;
   draft: string[];
-  contentType?: "single" | "thread";
+  contentType?: "single" | "thread" | "essay";
   referenceTweets?: string[];
   fingerprintBlock?: string;
 };

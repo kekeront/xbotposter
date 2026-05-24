@@ -15,6 +15,12 @@ import {
 } from "@/db/schema";
 import { search as searchWeb } from "@/agents/searcher";
 import { recallMemoryBlock } from "@/lib/memory-bridge";
+import {
+  persistSearchSources,
+  buildSourceUrlToIdMap,
+  fetchRecentUploadedSources,
+  buildSourceContextBlock,
+} from "@/lib/source-persist";
 import { checkSpendCap } from "@/lib/spend-cap";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice, type LoadedVoice } from "@/lib/voice-load";
@@ -23,7 +29,7 @@ export const maxDuration = 120;
 
 const ComposeRequest = z.object({
   topic: z.string().min(1).max(2000),
-  contentType: z.enum(["single", "thread"]).default("single"),
+  contentType: z.enum(["single", "thread", "essay"]).default("single"),
   mode: z.enum(["ai", "manual"]).default("ai"),
   variants: z.number().int().min(1).max(3).default(1),
 });
@@ -56,7 +62,7 @@ type ProgressEmitter = (step: string, detail?: string) => void;
 async function runVariant(
   index: number,
   topic: string,
-  contentType: "single" | "thread",
+  contentType: "single" | "thread" | "essay",
   voice: LoadedVoice,
   generationId: string,
   emit: ProgressEmitter,
@@ -381,16 +387,22 @@ export async function POST(request: Request) {
         }
 
         let researchBlock = "";
+        let sourceUrlToId = new Map<string, string>();
+        let searchCost = 0;
         try {
           const searchResult = await searchWeb({ topic });
           researchBlock = searchResult.researchBlock;
+          searchCost = searchResult.costUsd;
           if (researchBlock) {
+            const persisted = await persistSearchSources(searchResult.sources);
+            sourceUrlToId = buildSourceUrlToIdMap(persisted);
             await writeTrace({
               generationId: generation.id,
               agent: "searcher",
               eventType: "complete",
               payload: {
                 sources: searchResult.sources.length,
+                persisted: persisted.length,
                 bytes: researchBlock.length,
               },
               model: searchResult.model,
@@ -406,6 +418,21 @@ export async function POST(request: Request) {
             eventType: "error",
             payload: { message: err instanceof Error ? err.message : String(err) },
           });
+        }
+
+        try {
+          const uploaded = await fetchRecentUploadedSources({ limit: 5 });
+          const uploadedBlock = buildSourceContextBlock(uploaded);
+          if (uploadedBlock) {
+            researchBlock = researchBlock
+              ? `${researchBlock}\n\n${uploadedBlock}`
+              : uploadedBlock;
+            for (const s of uploaded) {
+              if (s.url) sourceUrlToId.set(s.url, s.id);
+            }
+          }
+        } catch {
+          // uploaded context is best-effort
         }
 
         emit("writer", "starting pipeline");
@@ -459,6 +486,7 @@ export async function POST(request: Request) {
         const winner = variantResults[0]!;
 
         const totalCost =
+          searchCost +
           outlineCost +
           variantResults.reduce((s, v) => s + v.totalCost, 0);
         const totalTokensIn = variantResults.reduce(
@@ -515,6 +543,7 @@ export async function POST(request: Request) {
           const claimRows = winner.factClaims.slice(0, 20).map((c) => ({
             postId: rootPostId,
             claimText: c.text,
+            sourceId: c.sourceUrl ? sourceUrlToId.get(c.sourceUrl) ?? null : null,
             verified: c.verdict === "supported",
             notes: `${c.verdict}: ${c.reason}`,
           }));

@@ -2,10 +2,16 @@ import { desc, eq, gt, sql } from "drizzle-orm";
 import { review } from "@/agents/editor";
 import { evaluate } from "@/agents/evaluator";
 import { check } from "@/agents/fact-checker";
+import { search as searchWeb } from "@/agents/searcher";
 import { draft as takeDraft } from "@/agents/take";
+import { draft as writerDraft } from "@/agents/writer";
 import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
-import { generations, posts, viralPosts } from "@/db/schema";
+import { claims, generations, posts, sources, viralPosts } from "@/db/schema";
+import {
+  persistSearchSources,
+  buildSourceUrlToIdMap,
+} from "@/lib/source-persist";
 import { authorizeCronRequest, unauthorized } from "@/lib/cron-auth";
 import { checkSpendCap, spendCapResponse } from "@/lib/spend-cap";
 import { sendDraftNotification } from "@/lib/telegram";
@@ -34,10 +40,9 @@ export async function GET(request: Request) {
     await writeTrace({
       generationId: null,
       agent: "cron-generate",
-      eventType: "skip",
-      payload: { reason: "no viral posts captured in last 48h" },
+      eventType: "no_viral",
+      payload: { reason: "no viral posts captured in last 48h, will try sources" },
     });
-    return Response.json({ ok: true, skipped: "no recent viral posts" });
   }
 
   const takenRows = await db
@@ -83,52 +88,125 @@ export async function GET(request: Request) {
     });
   }
 
+  // --- Source-based fallback: if no viral candidate, try HN/arXiv/Substack ---
+  type SourceCandidate = {
+    id: string;
+    title: string;
+    url: string | null;
+    content: string | null;
+    type: string;
+  };
+  let sourceCandidate: SourceCandidate | null = null;
+
   if (!candidate) {
+    const takenSourceIds = await db
+      .select({
+        sid: sql<string>`${generations.inputMeta}->>'sourceId'`,
+      })
+      .from(generations)
+      .where(gt(generations.createdAt, sub7d));
+    const takenSIds = new Set(
+      takenSourceIds.map((t) => t.sid).filter(Boolean),
+    );
+
+    const recentSources = await db
+      .select()
+      .from(sources)
+      .where(
+        gt(sources.ingestedAt, sub48h),
+      )
+      .orderBy(desc(sources.ingestedAt))
+      .limit(20);
+
+    for (const s of recentSources) {
+      if (takenSIds.has(s.id)) continue;
+      if (!s.title) continue;
+      const guard = await guardCheck({ text: `${s.title} ${s.content ?? ""}`.slice(0, 500), author: s.type });
+      if (guard.safe) {
+        sourceCandidate = {
+          id: s.id,
+          title: s.title,
+          url: s.url,
+          content: s.content,
+          type: s.type,
+        };
+        break;
+      }
+    }
+  }
+
+  if (!candidate && !sourceCandidate) {
     await writeTrace({
       generationId: null,
       agent: "cron-generate",
       eventType: "skip",
       payload: {
-        reason: "no safe candidates after topic-guard filter",
-        considered: recent.length,
+        reason: "no safe candidates from viral posts or sources",
+        viralConsidered: recent.length,
         blocked: blockedCategories,
       },
     });
     return Response.json({
       ok: true,
-      skipped: "no brand-safe viral candidates",
+      skipped: "no brand-safe candidates (viral or sources)",
       consideredCount: recent.length,
       blocked: blockedCategories,
     });
   }
 
-  const author = candidate.author ?? "unknown";
+  const isSourceBased = !candidate && !!sourceCandidate;
+  const author = candidate ? (candidate.author ?? "unknown") : sourceCandidate!.type;
+  const topicText = candidate
+    ? candidate.text
+    : `${sourceCandidate!.title}: ${(sourceCandidate!.content ?? "").slice(0, 200)}`;
 
   await writeTrace({
     generationId: null,
     agent: "cron-generate",
     eventType: "picked",
-    payload: {
-      viralId: candidate.id,
-      viralAuthor: author,
-      likes:
-        (candidate.engagement as { likes?: number } | null)?.likes ?? null,
-    },
+    payload: isSourceBased
+      ? {
+          sourceId: sourceCandidate!.id,
+          sourceType: sourceCandidate!.type,
+          sourceTitle: sourceCandidate!.title,
+          mode: "source",
+        }
+      : {
+          viralId: candidate!.id,
+          viralAuthor: author,
+          likes:
+            (candidate!.engagement as { likes?: number } | null)?.likes ?? null,
+          mode: "viral",
+        },
   });
+
+  const generationTopic = isSourceBased
+    ? `autonomous post on ${sourceCandidate!.type}: ${sourceCandidate!.title.slice(0, 100)}`
+    : `autonomous take on @${author}: ${candidate!.text.slice(0, 100)}`;
 
   const [generation] = await db
     .insert(generations)
     .values({
-      topic: `autonomous take on @${author}: ${candidate.text.slice(0, 100)}`,
-      inputMeta: {
-        contentType: "single",
-        mode: "take",
-        source: "cron",
-        viralPostId: candidate.id,
-        viralAuthor: author,
-        viralXTweetId: candidate.xTweetId,
-        viralXUrl: candidate.xUrl,
-      },
+      topic: generationTopic,
+      inputMeta: isSourceBased
+        ? {
+            contentType: "single",
+            mode: "source-compose",
+            source: "cron",
+            sourceId: sourceCandidate!.id,
+            sourceType: sourceCandidate!.type,
+            sourceTitle: sourceCandidate!.title,
+            sourceUrl: sourceCandidate!.url,
+          }
+        : {
+            contentType: "single",
+            mode: "take",
+            source: "cron",
+            viralPostId: candidate!.id,
+            viralAuthor: author,
+            viralXTweetId: candidate!.xTweetId,
+            viralXUrl: candidate!.xUrl,
+          },
       status: "running",
     })
     .returning();
@@ -143,15 +221,61 @@ export async function GET(request: Request) {
   try {
     const voice = await loadDefaultVoice();
 
-    const writerResult = await takeDraft({
-      viralText: candidate.text,
-      viralAuthor: author,
-      contentType: "single",
-      referenceTweets: voice.referenceTweets,
-      fingerprintBlock: voice.fingerprintBlock,
-    });
+    let researchBlock = "";
+    let sourceUrlToId = new Map<string, string>();
+    let searchCost = 0;
+    try {
+      const searchResult = await searchWeb({ topic: topicText.slice(0, 500) });
+      researchBlock = searchResult.researchBlock;
+      searchCost = searchResult.costUsd;
+      if (researchBlock) {
+        const persisted = await persistSearchSources(searchResult.sources);
+        sourceUrlToId = buildSourceUrlToIdMap(persisted);
+        await writeTrace({
+          generationId: generation.id,
+          agent: "searcher",
+          eventType: "complete",
+          payload: {
+            sources: searchResult.sources.length,
+            persisted: persisted.length,
+            bytes: researchBlock.length,
+          },
+          model: searchResult.model,
+          tokensIn: searchResult.tokensIn,
+          tokensOut: searchResult.tokensOut,
+          costUsd: searchResult.costUsd.toString(),
+        });
+      }
+    } catch (err) {
+      await writeTrace({
+        generationId: generation.id,
+        agent: "searcher",
+        eventType: "error",
+        payload: {
+          message: err instanceof Error ? err.message : String(err),
+        },
+      });
+    }
+
+    const writerResult = isSourceBased
+      ? await writerDraft({
+          topic: topicText,
+          contentType: "single",
+          referenceTweets: voice.referenceTweets,
+          fingerprintBlock: voice.fingerprintBlock,
+          researchBlock,
+        })
+      : await takeDraft({
+          viralText: candidate!.text,
+          viralAuthor: author,
+          contentType: "single",
+          referenceTweets: voice.referenceTweets,
+          fingerprintBlock: voice.fingerprintBlock,
+          researchBlock,
+        });
+    const editorSeed = generationTopic;
     const editorResult = await review({
-      topic: `Reacting to @${author}: ${candidate.text}`,
+      topic: editorSeed,
       drafts: writerResult.texts,
       contentType: "single",
       referenceTweets: voice.referenceTweets,
@@ -159,15 +283,16 @@ export async function GET(request: Request) {
     });
     const [evalResult, factResult] = await Promise.all([
       evaluate({
-        seed: `Reacting to @${author}: ${candidate.text}`,
+        seed: editorSeed,
         draft: editorResult.texts,
         contentType: "single",
         referenceTweets: voice.referenceTweets,
         fingerprintBlock: voice.fingerprintBlock,
       }),
       check({
-        seed: `Reacting to @${author}: ${candidate.text}`,
+        seed: editorSeed,
         draft: editorResult.texts,
+        researchBlock,
       }),
     ]);
 
@@ -182,6 +307,7 @@ export async function GET(request: Request) {
       evalResult.tokensOut +
       factResult.tokensOut;
     const totalCost =
+      searchCost +
       writerResult.costUsd +
       editorResult.costUsd +
       evalResult.costUsd +
@@ -193,13 +319,7 @@ export async function GET(request: Request) {
         status: "succeeded",
         model: `${writerResult.model} + ${editorResult.model} + ${evalResult.model}`,
         inputMeta: {
-          contentType: "single",
-          mode: "take",
-          source: "cron",
-          viralPostId: candidate.id,
-          viralAuthor: author,
-          viralXTweetId: candidate.xTweetId,
-          viralXUrl: candidate.xUrl,
+          ...(generation.inputMeta as Record<string, unknown>),
           eval: {
             overall: evalResult.overall,
             scores: evalResult.scores,
@@ -235,13 +355,29 @@ export async function GET(request: Request) {
       })
       .returning();
 
-    // Fire-and-forget Telegram notification. No await — autonomous run
-    // shouldn't block on bot API delays. Silently no-op if not configured.
+    if (factResult.claims.length > 0 && insertedPost) {
+      const claimRows = factResult.claims.slice(0, 20).map((c) => ({
+        postId: insertedPost.id,
+        claimText: c.text,
+        sourceId: c.sourceUrl ? sourceUrlToId.get(c.sourceUrl) ?? null : null,
+        verified: c.verdict === "supported",
+        notes: `${c.verdict}: ${c.reason}`,
+      }));
+      try {
+        await db.insert(claims).values(claimRows);
+      } catch {
+        // best-effort
+      }
+    }
+
     if (insertedPost) {
+      const sourceLabel = isSourceBased
+        ? `autonomous post from ${sourceCandidate!.type}: ${sourceCandidate!.title.slice(0, 60)}`
+        : `autonomous take on @${author}`;
       void sendDraftNotification({
         postId: insertedPost.id,
         text,
-        sourceLabel: `autonomous take on @${author}`,
+        sourceLabel,
         evalOverall: evalResult.overall,
       });
     }
@@ -251,8 +387,10 @@ export async function GET(request: Request) {
       generated: {
         generationId: generation.id,
         postId: insertedPost?.id,
-        viralAuthor: author,
-        viralXUrl: candidate.xUrl,
+        mode: isSourceBased ? "source-compose" : "take",
+        source: isSourceBased
+          ? { type: sourceCandidate!.type, title: sourceCandidate!.title }
+          : { author, xUrl: candidate!.xUrl },
         evalOverall: evalResult.overall,
         inventedClaims: factResult.inventedCount,
         costUsd: totalCost,

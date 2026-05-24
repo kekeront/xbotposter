@@ -3,7 +3,7 @@ import { complete, type CompletionMessage } from "@/lib/llm";
 
 export type WriterInput = {
   topic: string;
-  contentType?: "single" | "thread";
+  contentType?: "single" | "thread" | "essay";
   referenceTweets?: string[];
   fingerprintBlock?: string;
   outlineBeats?: string[];
@@ -86,11 +86,13 @@ DO NOT (anti-slop)
 LENGTH
 - Single tweet: aim for 120–250 characters. Hard max 270.
 - Threads: 3 to 7 posts, each within the same range.
+- Essay: 800-2500 characters. A mini-article — structured paragraphs, not bullet points. Still concise. Still your voice. Think "long tweet" or "X note", not a blog post.
 
 OUTPUT FORMAT
 Respond with ONLY the tweet text. No quotes, no preamble, no labels.
 For threads, separate posts with a single line containing exactly: ---
-Do not number the posts.`;
+Do not number the posts.
+For essays, output a single continuous text. Use paragraph breaks (double newline) for structure.`;
 
 function buildMessages(input: WriterInput): CompletionMessage[] {
   const messages: CompletionMessage[] = [
@@ -150,7 +152,9 @@ ${block}`,
   const formatLine =
     contentType === "thread"
       ? "Write a thread."
-      : "Write a single tweet.";
+      : contentType === "essay"
+        ? "Write an essay (long-form X note, 800-2500 chars)."
+        : "Write a single tweet.";
 
   const outlineBlock =
     contentType === "thread" && input.outlineBeats && input.outlineBeats.length > 0
@@ -176,7 +180,7 @@ export async function draft(input: WriterInput): Promise<WriterOutput> {
   const result = await complete({
     tier: "writer",
     messages: buildMessages(input),
-    maxTokens: 1500,
+    maxTokens: input.contentType === "essay" ? 3000 : 1500,
   });
 
   const texts =

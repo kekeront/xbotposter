@@ -15,6 +15,12 @@ import {
 } from "@/db/schema";
 import { search as searchWeb } from "@/agents/searcher";
 import { recallMemoryBlock } from "@/lib/memory-bridge";
+import {
+  persistSearchSources,
+  buildSourceUrlToIdMap,
+  fetchRecentUploadedSources,
+  buildSourceContextBlock,
+} from "@/lib/source-persist";
 import { checkSpendCap } from "@/lib/spend-cap";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
@@ -97,11 +103,32 @@ export async function POST(request: Request) {
   const voice = await loadDefaultVoice();
   const memoryContext = await recallMemoryBlock(topic);
   let researchBlock = "";
+  let sourceUrlToId = new Map<string, string>();
+  let searchCost = 0;
   try {
     const searchResult = await searchWeb({ topic });
     researchBlock = searchResult.researchBlock;
+    searchCost = searchResult.costUsd;
+    if (researchBlock) {
+      const persisted = await persistSearchSources(searchResult.sources);
+      sourceUrlToId = buildSourceUrlToIdMap(persisted);
+    }
   } catch {
     // search is best-effort
+  }
+  try {
+    const uploaded = await fetchRecentUploadedSources({ limit: 5 });
+    const uploadedBlock = buildSourceContextBlock(uploaded);
+    if (uploadedBlock) {
+      researchBlock = researchBlock
+        ? `${researchBlock}\n\n${uploadedBlock}`
+        : uploadedBlock;
+      for (const s of uploaded) {
+        if (s.url) sourceUrlToId.set(s.url, s.id);
+      }
+    }
+  } catch {
+    // uploaded context is best-effort
   }
 
   const stream = new ReadableStream({
@@ -118,7 +145,7 @@ export async function POST(request: Request) {
         }
       };
 
-      let totalCostUsd = 0;
+      let totalCostUsd = searchCost;
 
       try {
         const anglesResult = await generateAngles({
@@ -319,6 +346,7 @@ export async function POST(request: Request) {
               const claimRows = factResult.claims.slice(0, 20).map((c) => ({
                 postId: createdPosts[0]!.id,
                 claimText: c.text,
+                sourceId: c.sourceUrl ? sourceUrlToId.get(c.sourceUrl) ?? null : null,
                 verified: c.verdict === "supported",
                 notes: `${c.verdict}: ${c.reason}`,
               }));

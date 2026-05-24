@@ -1,10 +1,14 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { review } from "@/agents/editor";
+import { evaluate } from "@/agents/evaluator";
+import { check as factCheck } from "@/agents/fact-checker";
+import { search as searchWeb } from "@/agents/searcher";
 import { draft as takeDraft } from "@/agents/take";
 import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import {
+  claims,
   type ContentType,
   generations,
   posts,
@@ -12,6 +16,10 @@ import {
   type Post,
 } from "@/db/schema";
 import { recallMemoryBlock } from "@/lib/memory-bridge";
+import {
+  persistSearchSources,
+  buildSourceUrlToIdMap,
+} from "@/lib/source-persist";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
 
@@ -159,6 +167,42 @@ export async function POST(request: Request) {
       });
     }
 
+    let researchBlock = "";
+    let sourceUrlToId = new Map<string, string>();
+    let searchCost = 0;
+    try {
+      const searchResult = await searchWeb({
+        topic: `${viral.text} (by @${author})`,
+      });
+      researchBlock = searchResult.researchBlock;
+      searchCost = searchResult.costUsd;
+      if (researchBlock) {
+        const persisted = await persistSearchSources(searchResult.sources);
+        sourceUrlToId = buildSourceUrlToIdMap(persisted);
+        await writeTrace({
+          generationId: generation.id,
+          agent: "searcher",
+          eventType: "complete",
+          payload: {
+            sources: searchResult.sources.length,
+            persisted: persisted.length,
+            bytes: researchBlock.length,
+          },
+          model: searchResult.model,
+          tokensIn: searchResult.tokensIn,
+          tokensOut: searchResult.tokensOut,
+          costUsd: searchResult.costUsd.toString(),
+        });
+      }
+    } catch (err) {
+      await writeTrace({
+        generationId: generation.id,
+        agent: "searcher",
+        eventType: "error",
+        payload: { message: err instanceof Error ? err.message : String(err) },
+      });
+    }
+
     const writerResult = await takeDraft({
       viralText: viral.text,
       viralAuthor: author,
@@ -167,6 +211,7 @@ export async function POST(request: Request) {
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
       memoryBlock: memoryContext.block,
+      researchBlock,
     });
 
     await writeTrace({
@@ -180,10 +225,12 @@ export async function POST(request: Request) {
       costUsd: writerResult.costUsd.toString(),
     });
 
+    const editorTopic = userAngle
+      ? `${userAngle} (reacting to @${author}: ${viral.text})`
+      : `Reacting to @${author}: ${viral.text}`;
+
     const editorResult = await review({
-      topic: userAngle
-        ? `${userAngle} (reacting to @${author}: ${viral.text})`
-        : `Reacting to @${author}: ${viral.text}`,
+      topic: editorTopic,
       drafts: writerResult.texts,
       contentType,
       referenceTweets: voice.referenceTweets,
@@ -203,15 +250,84 @@ export async function POST(request: Request) {
       costUsd: editorResult.costUsd.toString(),
     });
 
-    const totalTokensIn = writerResult.tokensIn + editorResult.tokensIn;
-    const totalTokensOut = writerResult.tokensOut + editorResult.tokensOut;
-    const totalCost = writerResult.costUsd + editorResult.costUsd;
+    const [evalResult, factResult] = await Promise.all([
+      evaluate({
+        seed: editorTopic,
+        draft: editorResult.texts,
+        contentType,
+        referenceTweets: voice.referenceTweets,
+        fingerprintBlock: voice.fingerprintBlock,
+      }),
+      factCheck({
+        seed: editorTopic,
+        draft: editorResult.texts,
+        researchBlock,
+      }),
+    ]);
+
+    await writeTrace({
+      generationId: generation.id,
+      agent: "evaluator",
+      eventType: "complete",
+      payload: {
+        overall: evalResult.overall,
+        scores: evalResult.scores,
+        critique: evalResult.critique,
+      },
+      model: evalResult.model,
+      tokensIn: evalResult.tokensIn,
+      tokensOut: evalResult.tokensOut,
+      costUsd: evalResult.costUsd.toString(),
+    });
+
+    await writeTrace({
+      generationId: generation.id,
+      agent: "fact-checker",
+      eventType: factResult.hasInvented ? "complete_with_invented" : "complete",
+      payload: {
+        claimsCount: factResult.claims.length,
+        invented: factResult.inventedCount,
+        uncertain: factResult.uncertainCount,
+      },
+      model: factResult.model,
+      tokensIn: factResult.tokensIn,
+      tokensOut: factResult.tokensOut,
+      costUsd: factResult.costUsd.toString(),
+    });
+
+    const totalTokensIn =
+      writerResult.tokensIn + editorResult.tokensIn +
+      evalResult.tokensIn + factResult.tokensIn;
+    const totalTokensOut =
+      writerResult.tokensOut + editorResult.tokensOut +
+      evalResult.tokensOut + factResult.tokensOut;
+    const totalCost =
+      searchCost + writerResult.costUsd + editorResult.costUsd +
+      evalResult.costUsd + factResult.costUsd;
 
     await db
       .update(generations)
       .set({
         status: "succeeded",
-        model: `${writerResult.model} + ${editorResult.model}`,
+        model: `${writerResult.model} + ${editorResult.model} + ${evalResult.model}`,
+        inputMeta: {
+          contentType,
+          mode: "take",
+          viralPostId: viral.id,
+          viralAuthor: author,
+          viralXTweetId: viral.xTweetId,
+          viralXUrl: viral.xUrl,
+          userAngle: userAngle ?? null,
+          eval: {
+            overall: evalResult.overall,
+            scores: evalResult.scores,
+            critique: evalResult.critique,
+          },
+          factCheck: {
+            claimsCount: factResult.claims.length,
+            invented: factResult.inventedCount,
+          },
+        },
         tokensIn: totalTokensIn,
         tokensOut: totalTokensOut,
         costUsd: totalCost.toString(),
@@ -225,11 +341,26 @@ export async function POST(request: Request) {
       editorResult.texts,
     );
 
+    if (factResult.claims.length > 0 && createdPosts[0]) {
+      const claimRows = factResult.claims.slice(0, 20).map((c) => ({
+        postId: createdPosts[0]!.id,
+        claimText: c.text,
+        sourceId: c.sourceUrl ? sourceUrlToId.get(c.sourceUrl) ?? null : null,
+        verified: c.verdict === "supported",
+        notes: `${c.verdict}: ${c.reason}`,
+      }));
+      try {
+        await db.insert(claims).values(claimRows);
+      } catch {
+        // best-effort
+      }
+    }
+
     return Response.json(
       {
         generation: {
           id: generation.id,
-          model: `${writerResult.model} + ${editorResult.model}`,
+          model: `${writerResult.model} + ${editorResult.model} + ${evalResult.model}`,
           tokensIn: totalTokensIn,
           tokensOut: totalTokensOut,
           costUsd: totalCost,
@@ -237,6 +368,15 @@ export async function POST(request: Request) {
         editor: {
           changed: editorResult.changed,
           issuesFound: editorResult.issuesFound,
+        },
+        eval: {
+          scores: evalResult.scores,
+          overall: evalResult.overall,
+          critique: evalResult.critique,
+        },
+        factCheck: {
+          claims: factResult.claims,
+          inventedCount: factResult.inventedCount,
         },
         posts: createdPosts,
       },

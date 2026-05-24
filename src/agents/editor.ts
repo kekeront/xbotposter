@@ -4,7 +4,7 @@ import { complete, type CompletionMessage } from "@/lib/llm";
 export type EditorInput = {
   topic: string;
   drafts: string[];
-  contentType: "single" | "thread";
+  contentType: "single" | "thread" | "essay";
   referenceTweets?: string[];
   fingerprintBlock?: string;
 };

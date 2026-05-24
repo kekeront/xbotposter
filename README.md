@@ -9,6 +9,8 @@ tech voices and writes takes + quote retweets in your style.
 Built for personal branding first — the same code that wins the assignment is
 the tool the author uses to post on @kekeront.
 
+**Live:** [xbotposter.vercel.app](https://xbotposter.vercel.app) · [github.com/kekeront/xbotposter](https://github.com/kekeront/xbotposter)
+
 ## What it does
 
 ```
@@ -115,12 +117,14 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
 | **evaluator** | `src/agents/evaluator.ts` | Scores draft 0-100 on 6 criteria (insight density, voice match, anti-slop, char fit, language, faithfulness) + overall + critique. |
 | **take** | `src/agents/take.ts` | Generates YOUR reaction to a viral post (not a paraphrase). |
 | **qrt** | `src/agents/qrt.ts` | Short commentary line for a quote retweet (30-140 chars typical). |
+| **searcher** | `src/agents/searcher.ts` | Web search via OpenAI responses API. Returns research brief + source URLs. Sources persisted to DB. |
 | **poster** | `src/lib/poster.ts` | Sends to X via twitter-api-v2. Threads chain via `in_reply_to_tweet_id`; QRTs use `quote_tweet_id`. |
 
 Pipeline composition:
-- `/api/compose` (manual seed): outliner (threads only) → writer → editor → [evaluator ‖ fact-checker]
-- `/api/discover/take` / `/qrt`: **topic-guard** → writer → editor → [evaluator ‖ fact-checker]
-- `/api/cron/generate` (autonomous): walks top viral list, **topic-guard** filters at the top — first safe candidate runs through the take pipeline
+- `/api/compose` (manual seed): **searcher** → outliner (threads only) → writer → editor → [evaluator ‖ fact-checker] · sources persisted, claims linked
+- `/api/discover/take` / `/qrt`: **topic-guard** → **searcher** → writer → editor → [evaluator ‖ fact-checker] · sources persisted, claims linked
+- `/api/cron/generate` (autonomous): tries top viral first (topic-guard filtered); falls back to HN/arXiv/Substack sources if no safe viral candidates → **searcher** → take or writer + editor + [eval ‖ fact-check] · sources persisted, claims linked
+- `/api/cron/discover`: X influencer fetch + HN top stories + arXiv CS.AI/CL/LG + Substack feeds → `sources` table
 - Multi-thesis (`variants: 1-3`): run pipeline N times in parallel, rank by eval.overall, winner becomes the draft. Runner-ups visible in UI, switchable.
 
 ## Voice fingerprinting (slice 6)
@@ -155,17 +159,18 @@ both stylistic structure AND examples.
 
 | Endpoint | Method | What |
 |---|---|---|
-| `/api/compose` | POST | `{ topic, contentType, mode, variants }` → outline / writer / editor / eval / fact-check pipeline → save draft. |
+| `/api/compose` | POST | `{ topic, contentType (single/thread/essay), mode, variants }` → searcher → outline (threads) / writer / editor / eval / fact-check pipeline → save draft. |
 | `/api/compose/use-variant` | POST | `{ generationId, variantIndex }` → skip current winner posts, insert chosen variant as new draft. |
 | `/api/posts/[id]` | GET / PATCH / DELETE | Read · update (status, text, scheduledFor) · hard delete. |
 | `/api/posts/[id]/post` | POST | Ship single or thread root via `lib/poster.shipPostById`. Honors `quote_tweet_id` for QRTs. |
 | `/api/discover/fetch` | POST | Resolve tracked influencer usernames, pull top recent tweets, upsert into `viral_posts`. Wrapped in 8s timeout per X call. |
 | `/api/discover/take` | POST | `{ viralPostId, userAngle?, contentType? }` → take agent → editor → save draft. |
 | `/api/discover/qrt` | POST | `{ viralPostId, userAngle? }` → qrt agent → editor → save draft with `quote_tweet_id`. |
+| `/api/upload` | GET / POST | GET: list sources. POST: `{ title, content, url?, type? }` → ingest text/document as a source for compose context. |
 | `/api/voice` | GET / POST | Load / save reference posts. POST re-extracts fingerprint. |
-| `/api/cron/discover` | GET (Bearer) | Cron-driven discover. Vercel Cron `0 */12 * * *`. |
-| `/api/cron/post` | GET (Bearer) | Drains up to 5 approved posts whose `scheduled_for <= now()`. Vercel Cron `*/15 * * * *`. |
-| `/api/cron/generate` | GET (Bearer) | Picks top-engagement viral from last 48h (dedup against last 7d generations), runs take + editor + eval + fact-check, saves draft. Vercel Cron `0 */4 * * *`. |
+| `/api/cron/discover` | GET (Bearer) | Cron-driven discover (X + HN + arXiv + Substack). Vercel Cron `0 7 * * *` (daily 7am UTC). |
+| `/api/cron/post` | GET (Bearer) | Drains up to 5 approved posts whose `scheduled_for <= now()`. Vercel Cron `0 9 * * *` (daily 9am UTC). |
+| `/api/cron/generate` | GET (Bearer) | Picks top-engagement viral from last 48h (dedup against last 7d), runs searcher + take + editor + eval + fact-check, saves draft. Vercel Cron `0 8 * * *` (daily 8am UTC). |
 
 ## Database schema
 
@@ -173,9 +178,9 @@ Tables (`src/db/schema.ts`, pgvector enabled):
 
 - **generations** — every AI run. Status, model, tokens, cost, `input_meta` JSON.
 - **posts** — drafts and shipped tweets. `parent_post_id` chains threads. `quote_tweet_id` for QRTs. `scheduled_for` for delayed ship. `embedding vector(1536)` for future RAG.
-- **sources** — research sources (HN / arXiv / etc — schema only, adapters pending).
+- **sources** — research sources (web search results, HN top stories, arXiv papers, Substack posts). Persisted on searcher runs and adapter fetches, linked to claims via `source_id`.
 - **viral_posts** — captured tweets from `INFLUENCERS` list. `embedding vector(1536)`.
-- **claims** — fact-checked claims linked to posts. `verified` boolean, verdict notes.
+- **claims** — fact-checked claims linked to posts. `verified` boolean, verdict notes, `source_id` FK to backing source.
 - **fingerprints** — per-name profile JSON `{ referenceTweets, fingerprint }`.
 - **traces** — every agent event with timestamps, tokens, cost, payload JSON.
 
@@ -255,7 +260,7 @@ The admin shell exposes spend live:
 
 The cron schedule in `vercel.json` activates automatically on production.
 Required: project is on a paid Vercel plan for unlimited cron, or stay on Hobby
-(daily cron limit is fine for our 4h/12h/15m mix on small accounts).
+(daily cron limit is fine for our once-daily schedule on small accounts).
 
 Local dev does NOT run Vercel Cron. To simulate locally, either curl the
 endpoints manually with the Bearer header or add a system crontab entry.
@@ -272,7 +277,7 @@ endpoints manually with the Bearer header or add a system crontab entry.
 | `npm run db:generate` | Generate Drizzle migration from schema diff |
 | `npm run db:migrate` | Apply migrations |
 | `npm run db:studio` | Open Drizzle Studio (DB GUI) |
-| `npm run cron:local` | Long-running local cron simulator (discover 12h / generate 4h / post 15m). Use in a second terminal while `npm run dev` runs. |
+| `npm run cron:local` | Long-running local cron simulator (discover 12h / generate 4h / post 15m — intentionally more aggressive than vercel.json daily cadence for faster local iteration). Use in a second terminal while `npm run dev` runs. |
 | `npm run cron:once` | Same as cron:local but fires every job once immediately, then continues on schedule. |
 | `npx tsx scripts/x-test.mjs` | Verify X API credentials + Pay-Per-Use access |
 | `npx tsx scripts/tg-chat-id.mjs` | Resolve your Telegram chat_id after messaging the bot |
@@ -352,7 +357,12 @@ src/
     ├── voice-load.ts        loads default fingerprint + reference posts
     ├── fingerprint.ts       structural fingerprint extractor (no LLM)
     ├── trace.ts             best-effort trace event writer
-    └── cron-auth.ts         Bearer header check
+    ├── cron-auth.ts         Bearer header check
+    ├── source-persist.ts    persists searcher sources → sources table
+    └── adapters/
+        ├── hn.ts            Hacker News top stories → sources
+        ├── arxiv.ts         arXiv CS.AI/CL/LG → sources
+        └── substack.ts      Substack feed → sources
 ```
 
 ## Roadmap (all done)
