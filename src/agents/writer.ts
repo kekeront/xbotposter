@@ -8,6 +8,7 @@ export type WriterInput = {
   fingerprintBlock?: string;
   outlineBeats?: string[];
   memoryBlock?: string;
+  researchBlock?: string;
 };
 
 export type WriterOutput = {
@@ -104,6 +105,13 @@ function buildMessages(input: WriterInput): CompletionMessage[] {
     messages.push({
       role: "system",
       content: `MEMORY — known facts and recent activity for this account. Use to stay consistent with past claims and avoid contradicting yourself. Do not restate these literally; they inform tone and topic, not the tweet's text.\n\n${input.memoryBlock.trim()}`,
+    });
+  }
+
+  if (input.researchBlock && input.researchBlock.trim()) {
+    messages.push({
+      role: "system",
+      content: `RESEARCH — verified facts from web sources. You MAY use these to add concrete, grounded detail to the tweet. Prefer specific numbers, names, and dates from this research over vague claims. Do NOT copy-paste — synthesize into the tweet's voice.\n\n${input.researchBlock.trim()}`,
     });
   }
 

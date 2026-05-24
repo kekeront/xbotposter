@@ -13,6 +13,7 @@ import {
   posts,
   type Post,
 } from "@/db/schema";
+import { search as searchWeb } from "@/agents/searcher";
 import { recallMemoryBlock } from "@/lib/memory-bridge";
 import { checkSpendCap } from "@/lib/spend-cap";
 import { writeTrace } from "@/lib/trace";
@@ -92,9 +93,16 @@ export async function POST(request: Request) {
     );
   }
 
-  // Load voice + memory before the stream so the first SSE event flushes.
+  // Load voice + memory + research before the stream so the first SSE event flushes.
   const voice = await loadDefaultVoice();
   const memoryContext = await recallMemoryBlock(topic);
+  let researchBlock = "";
+  try {
+    const searchResult = await searchWeb({ topic });
+    researchBlock = searchResult.researchBlock;
+  } catch {
+    // search is best-effort
+  }
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -201,6 +209,7 @@ export async function POST(request: Request) {
               referenceTweets: voice.referenceTweets,
               fingerprintBlock: voice.fingerprintBlock,
               memoryBlock: memoryContext.block,
+              researchBlock,
             });
             await writeTrace({
               generationId: generation.id,
@@ -248,7 +257,7 @@ export async function POST(request: Request) {
                 referenceTweets: voice.referenceTweets,
                 fingerprintBlock: voice.fingerprintBlock,
               }),
-              check({ seed: angle.angle, draft: editorResult.texts }),
+              check({ seed: angle.angle, draft: editorResult.texts, researchBlock }),
             ]);
 
             await writeTrace({

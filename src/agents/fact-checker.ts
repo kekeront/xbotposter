@@ -4,6 +4,7 @@ import { complete, type CompletionMessage } from "@/lib/llm";
 export type FactCheckInput = {
   seed: string;
   draft: string[];
+  researchBlock?: string;
 };
 
 export type ClaimVerdict = "supported" | "invented" | "uncertain";
@@ -32,9 +33,11 @@ Definitions:
 - Opinions, hedges, jokes, and pure rhetorical lines are NOT factual claims (skip them).
 
 Classification per claim:
-- "supported"  → the claim is present (in spirit or specifics) in the user's seed.
-- "invented"   → the claim adds specifics that the seed does NOT contain (numbers, dollar amounts, product features, brands, percentages, claims about behavior) — i.e. the model fabricated them.
-- "uncertain"  → general assertion that might be true but isn't directly stated in the seed (background knowledge). Caller decides if this is acceptable.
+- "supported"  → the claim is present (in spirit or specifics) in the user's seed OR in the RESEARCH SOURCES provided.
+- "invented"   → the claim adds specifics that neither the seed NOR the research sources contain (numbers, dollar amounts, product features, brands, percentages, claims about behavior) — i.e. the model fabricated them.
+- "uncertain"  → general assertion that might be true but isn't directly stated in the seed or research (background knowledge). Caller decides if this is acceptable.
+
+When RESEARCH SOURCES are provided, use them as ground truth. A claim backed by a research source is "supported" even if the seed doesn't mention it.
 
 OUTPUT — JSON only, no preamble:
 {
@@ -52,11 +55,16 @@ function buildMessages(input: FactCheckInput): CompletionMessage[] {
       ? (input.draft[0] ?? "")
       : input.draft.map((t, i) => `[${i + 1}] ${t}`).join("\n---\n");
 
+  const researchSection =
+    input.researchBlock && input.researchBlock.trim()
+      ? `\n\nRESEARCH SOURCES (verified web context):\n${input.researchBlock.trim()}`
+      : "";
+
   return [
     { role: "system", content: SYSTEM_PROMPT },
     {
       role: "user",
-      content: `User's seed:\n${input.seed.trim()}\n\nDraft:\n${draftBlock}\n\nExtract and classify factual claims. JSON only.`,
+      content: `User's seed:\n${input.seed.trim()}${researchSection}\n\nDraft:\n${draftBlock}\n\nExtract and classify factual claims. JSON only.`,
     },
   ];
 }

@@ -13,6 +13,7 @@ import {
   posts,
   type Post,
 } from "@/db/schema";
+import { search as searchWeb } from "@/agents/searcher";
 import { recallMemoryBlock } from "@/lib/memory-bridge";
 import { checkSpendCap } from "@/lib/spend-cap";
 import { writeTrace } from "@/lib/trace";
@@ -61,6 +62,7 @@ async function runVariant(
   emit: ProgressEmitter,
   sharedOutlineBeats?: string[],
   memoryBlock?: string,
+  researchBlock?: string,
 ): Promise<VariantResult> {
   const tag = `variant ${index + 1}`;
 
@@ -82,6 +84,7 @@ async function runVariant(
     fingerprintBlock: voice.fingerprintBlock,
     outlineBeats: sharedOutlineBeats,
     memoryBlock,
+    researchBlock,
   });
   await writeTrace({
     generationId,
@@ -128,7 +131,7 @@ async function runVariant(
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
     }),
-    check({ seed: topic, draft: editorResult.texts }),
+    check({ seed: topic, draft: editorResult.texts, researchBlock }),
   ]);
 
   await writeTrace({
@@ -350,7 +353,7 @@ export async function POST(request: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       // Flush a 2KB padding comment to push past any HTTP/gzip buffering.
-      controller.enqueue(sseEncode("progress", { step: "writer", detail: "starting pipeline" }));
+      controller.enqueue(sseEncode("progress", { step: "search", detail: "researching topic" }));
       controller.enqueue(encoder.encode(`: ${" ".repeat(2048)}\n\n`));
 
       const emit: ProgressEmitter = (step, detail) => {
@@ -376,6 +379,36 @@ export async function POST(request: Request) {
             },
           });
         }
+
+        let researchBlock = "";
+        try {
+          const searchResult = await searchWeb({ topic });
+          researchBlock = searchResult.researchBlock;
+          if (researchBlock) {
+            await writeTrace({
+              generationId: generation.id,
+              agent: "searcher",
+              eventType: "complete",
+              payload: {
+                sources: searchResult.sources.length,
+                bytes: researchBlock.length,
+              },
+              model: searchResult.model,
+              tokensIn: searchResult.tokensIn,
+              tokensOut: searchResult.tokensOut,
+              costUsd: searchResult.costUsd.toString(),
+            });
+          }
+        } catch (err) {
+          await writeTrace({
+            generationId: generation.id,
+            agent: "searcher",
+            eventType: "error",
+            payload: { message: err instanceof Error ? err.message : String(err) },
+          });
+        }
+
+        emit("writer", "starting pipeline");
 
         let outlineBeats: string[] | undefined;
         let outlineCost = 0;
@@ -417,6 +450,7 @@ export async function POST(request: Request) {
               emit,
               outlineBeats,
               memoryContext.block,
+              researchBlock,
             ),
           ),
         );

@@ -80,6 +80,7 @@ type BulkResult = {
 const X_SOFT_LIMIT = 280;
 
 const STEP_LABELS: Record<string, string> = {
+  search: "researching topic",
   angles: "generating angles",
   memory: "recalling memory",
   outline: "planning thread",

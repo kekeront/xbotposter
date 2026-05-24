@@ -1,0 +1,96 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - navigation [ref=e4]:
+        - generic [ref=e5]:
+          - link "nfactz" [ref=e6] [cursor=pointer]:
+            - /url: /queue
+          - paragraph [ref=e7]: x content engine
+        - generic [ref=e8]:
+          - link "Queue" [ref=e9] [cursor=pointer]:
+            - /url: /queue
+          - link "Compose" [ref=e10] [cursor=pointer]:
+            - /url: /compose
+          - link "Discover" [ref=e11] [cursor=pointer]:
+            - /url: /discover
+        - generic [ref=e13]:
+          - link "Voice" [ref=e14] [cursor=pointer]:
+            - /url: /voice
+          - link "Automation" [ref=e15] [cursor=pointer]:
+            - /url: /automation
+          - link "Traces" [ref=e16] [cursor=pointer]:
+            - /url: /traces
+          - link "Schedule" [ref=e17] [cursor=pointer]:
+            - /url: /schedule
+          - link "History" [ref=e18] [cursor=pointer]:
+            - /url: /history
+    - main [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: 2 posted last 7d
+        - generic [ref=e22]: ·
+        - generic [ref=e23]: 2 in queue
+        - generic [ref=e24]: ·
+        - generic [ref=e25]: nothing scheduled
+        - generic [ref=e26]: ·
+        - 'generic "today: OpenAI 4¢ · X est 10¢ 6 gens · 1 posts · 1 discover runs · 11 tweets fetched" [ref=e27]':
+          - generic [ref=e28]: "today:"
+          - text: 14¢
+        - generic [ref=e29]: ·
+        - 'generic "7d: OpenAI 12¢ · X est 79¢ 21 gens · 2 posts · 3 discover runs · 101 tweets fetched" [ref=e30]':
+          - generic [ref=e31]: "7d:"
+          - text: 91¢
+        - generic [ref=e32]: ·
+        - 'generic "month: OpenAI 12¢ · X est 79¢ 21 gens · 2 posts · 3 discover runs · 101 tweets fetched" [ref=e33]':
+          - generic [ref=e34]: "month:"
+          - text: 91¢
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - heading "Queue" [level=1] [ref=e38]
+            - paragraph [ref=e39]: Review, skip, or ship drafts. Threads post as chained replies.
+          - generic [ref=e40]:
+            - button "reset queue" [ref=e42]
+            - generic [ref=e43]: slice 3a
+        - navigation [ref=e44]:
+          - link "active2" [ref=e45] [cursor=pointer]:
+            - /url: /queue
+          - link "draft0" [ref=e46] [cursor=pointer]:
+            - /url: /queue?filter=draft
+          - link "posted2" [ref=e47] [cursor=pointer]:
+            - /url: /queue?filter=posted
+          - link "failed0" [ref=e48] [cursor=pointer]:
+            - /url: /queue?filter=failed
+          - link "skipped1" [ref=e49] [cursor=pointer]:
+            - /url: /queue?filter=skipped
+          - link "all5" [ref=e50] [cursor=pointer]:
+            - /url: /queue?filter=all
+        - generic [ref=e51]:
+          - article [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: approved
+              - generic [ref=e55]: single
+              - generic [ref=e56]: 10m ago
+            - paragraph [ref=e57]: nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌
+            - generic [ref=e58]:
+              - generic [ref=e59]: 64 chars
+              - generic [ref=e60]:
+                - button "remove" [ref=e61]
+                - button "skip" [ref=e62]
+                - button "schedule" [ref=e63]
+                - button "post" [ref=e64]
+          - article [ref=e65]:
+            - generic [ref=e66]:
+              - generic [ref=e67]: approved
+              - generic [ref=e68]: single
+              - generic [ref=e69]: 12h ago
+              - generic [ref=e70]: · scheduled 696m ago (overdue)
+            - paragraph [ref=e71]: Пофиг на flashy демки, на хакатоне важна простая механика, стабильная интеграция модели и воспроизводимое демо, а не самая новая архитектура
+            - generic [ref=e72]:
+              - generic [ref=e73]: 140 chars
+              - generic [ref=e74]:
+                - button "remove" [ref=e75]
+                - button "skip" [ref=e76]
+                - button "schedule" [ref=e77]
+                - button "post" [ref=e78]
+  - button "Open Next.js Dev Tools" [ref=e84] [cursor=pointer]:
+    - img [ref=e85]

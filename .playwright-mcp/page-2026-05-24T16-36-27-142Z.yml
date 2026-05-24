@@ -1,0 +1,80 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - navigation [ref=e4]:
+        - generic [ref=e5]:
+          - link "nfactz" [ref=e6] [cursor=pointer]:
+            - /url: /queue
+          - paragraph [ref=e7]: x content engine
+        - generic [ref=e8]:
+          - link "Queue" [ref=e9] [cursor=pointer]:
+            - /url: /queue
+          - link "Compose" [ref=e10] [cursor=pointer]:
+            - /url: /compose
+          - link "Discover" [ref=e11] [cursor=pointer]:
+            - /url: /discover
+        - generic [ref=e13]:
+          - link "Voice" [ref=e14] [cursor=pointer]:
+            - /url: /voice
+          - link "Automation" [ref=e15] [cursor=pointer]:
+            - /url: /automation
+          - link "Traces" [ref=e16] [cursor=pointer]:
+            - /url: /traces
+          - link "Schedule" [ref=e17] [cursor=pointer]:
+            - /url: /schedule
+          - link "History" [ref=e18] [cursor=pointer]:
+            - /url: /history
+    - main [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: 2 posted last 7d
+        - generic [ref=e22]: ·
+        - generic [ref=e23]: 2 in queue
+        - generic [ref=e24]: ·
+        - generic [ref=e25]: nothing scheduled
+        - generic [ref=e26]: ·
+        - 'generic "today: OpenAI 4¢ · X est 10¢ 6 gens · 1 posts · 1 discover runs · 11 tweets fetched" [ref=e27]':
+          - generic [ref=e28]: "today:"
+          - text: 14¢
+        - generic [ref=e29]: ·
+        - 'generic "7d: OpenAI 12¢ · X est 79¢ 21 gens · 2 posts · 3 discover runs · 101 tweets fetched" [ref=e30]':
+          - generic [ref=e31]: "7d:"
+          - text: 91¢
+        - generic [ref=e32]: ·
+        - 'generic "month: OpenAI 12¢ · X est 79¢ 21 gens · 2 posts · 3 discover runs · 101 tweets fetched" [ref=e33]':
+          - generic [ref=e34]: "month:"
+          - text: 91¢
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - heading "Compose" [level=1] [ref=e38]
+            - paragraph [ref=e39]: Paste an idea, get a draft. Drafts land in the queue — nothing posts to X until you approve.
+          - generic [ref=e40]: slice 1
+        - generic [ref=e42]:
+          - generic [ref=e44]:
+            - generic [ref=e45]: Idea / topic
+            - generic [ref=e46]:
+              - button "ai draft" [ref=e47]
+              - button "bulk" [ref=e48]
+              - button "manual" [ref=e49]
+              - generic [ref=e50]: ·
+              - button "single" [ref=e51]
+              - button "thread" [ref=e52]
+              - generic [ref=e53]: ·
+              - generic [ref=e54]: "variants:"
+              - button "1" [ref=e55]
+              - button "2" [ref=e56]
+              - button "3" [ref=e57]
+          - generic [ref=e58]:
+            - textbox "Idea / topic" [ref=e59]:
+              - /placeholder: "Paste a thought, a link, a rough idea. Anything.\n\nExample: small models are getting weirdly close to frontier on narrow tasks. write a take."
+            - generic [ref=e60]:
+              - paragraph [ref=e61]:
+                - generic [ref=e62]:
+                  - text: Writer → editor → evaluator. 1 variant. Voice from
+                  - link "Voice" [ref=e63] [cursor=pointer]:
+                    - /url: /voice
+                  - text: .
+              - generic [ref=e64]:
+                - button "draft" [disabled]
+  - button "Open Next.js Dev Tools" [ref=e70] [cursor=pointer]:
+    - img [ref=e71]
