@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { z } from "zod";
 
 // env.ts runs its schema validation at import time, so we can't test it via
@@ -92,8 +92,13 @@ describe("env schema validation", () => {
   });
 
   it("rejects missing DATABASE_URL", () => {
-    const { DATABASE_URL, ...rest } = VALID_ENV;
-    const result = schema.safeParse(normalize(rest));
+    const result = schema.safeParse(
+      normalize({
+        NEXT_PUBLIC_SUPABASE_URL: VALID_ENV.NEXT_PUBLIC_SUPABASE_URL,
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+          VALID_ENV.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+      }),
+    );
     expect(result.success).toBe(false);
   });
 
@@ -105,8 +110,12 @@ describe("env schema validation", () => {
   });
 
   it("rejects missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", () => {
-    const { NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, ...rest } = VALID_ENV;
-    const result = schema.safeParse(normalize(rest));
+    const result = schema.safeParse(
+      normalize({
+        DATABASE_URL: VALID_ENV.DATABASE_URL,
+        NEXT_PUBLIC_SUPABASE_URL: VALID_ENV.NEXT_PUBLIC_SUPABASE_URL,
+      }),
+    );
     expect(result.success).toBe(false);
   });
 

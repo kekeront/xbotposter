@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { CompletionResult } from "@/lib/llm";
+import type { CompletionOptions, CompletionResult } from "@/lib/llm";
 
-const mockComplete = vi.fn<() => Promise<CompletionResult>>();
+const mockComplete =
+  vi.fn<(opts: CompletionOptions) => Promise<CompletionResult>>();
 
 vi.mock("@/lib/llm", () => ({
-  complete: (...args: unknown[]) => mockComplete(...args as []),
+  complete: (opts: CompletionOptions) => mockComplete(opts),
 }));
 
 import { evaluate, type EvalInput } from "./evaluator";
@@ -35,6 +36,12 @@ const BASE_INPUT: EvalInput = {
   seed: "small models closing the gap",
   draft: ["маленькие модели закрывают разрыв на узких задачах"],
 };
+
+function firstCompleteOptions(): CompletionOptions {
+  const call = mockComplete.mock.calls[0];
+  if (!call) throw new Error("complete was not called");
+  return call[0];
+}
 
 describe("evaluate()", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -164,8 +171,8 @@ describe("evaluate()", () => {
       referenceTweets: ["пост номер один", "пост номер два"],
     });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const fpMsg = messages?.find((m) =>
       m.content.includes("EXTRACTED FINGERPRINT"),
     );
@@ -186,8 +193,8 @@ describe("evaluate()", () => {
       contentType: "thread",
     });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const userMsg = messages?.find((m) => m.content.includes("thread, 3 posts"));
     expect(userMsg).toBeDefined();
   });

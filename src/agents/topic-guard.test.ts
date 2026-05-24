@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { CompletionResult } from "@/lib/llm";
+import type { CompletionOptions, CompletionResult } from "@/lib/llm";
 
-const mockComplete = vi.fn<() => Promise<CompletionResult>>();
+const mockComplete =
+  vi.fn<(opts: CompletionOptions) => Promise<CompletionResult>>();
 
 vi.mock("@/lib/llm", () => ({
-  complete: (...args: unknown[]) => mockComplete(...args as []),
+  complete: (opts: CompletionOptions) => mockComplete(opts),
 }));
 
-import { check, type GuardInput } from "./topic-guard";
+import { check } from "./topic-guard";
 
 const BASE_RESULT: CompletionResult = {
   text: "",
@@ -17,6 +18,12 @@ const BASE_RESULT: CompletionResult = {
   cachedTokensIn: 0,
   costUsd: 0.00003,
 };
+
+function firstCompleteOptions(): CompletionOptions {
+  const call = mockComplete.mock.calls[0];
+  if (!call) throw new Error("complete was not called");
+  return call[0];
+}
 
 describe("topic-guard check()", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -110,8 +117,8 @@ describe("topic-guard check()", () => {
     });
 
     await check({ text: "new paper from DeepMind", author: "karpathy" });
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const userMsg = messages?.find((m) => m.content.includes("@karpathy"));
     expect(userMsg).toBeDefined();
   });
@@ -127,8 +134,8 @@ describe("topic-guard check()", () => {
     });
 
     await check({ text: "some tweet" });
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const userMsg = messages?.find((m) => m.content.includes("@?"));
     expect(userMsg).toBeDefined();
   });

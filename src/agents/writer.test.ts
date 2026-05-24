@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { CompletionResult } from "@/lib/llm";
+import type { CompletionOptions, CompletionResult } from "@/lib/llm";
 
-const mockComplete = vi.fn<() => Promise<CompletionResult>>();
+const mockComplete =
+  vi.fn<(opts: CompletionOptions) => Promise<CompletionResult>>();
 
 vi.mock("@/lib/llm", () => ({
-  complete: (...args: unknown[]) => mockComplete(...args as []),
+  complete: (opts: CompletionOptions) => mockComplete(opts),
 }));
 
-import { draft, type WriterInput } from "./writer";
+import { draft } from "./writer";
 
 const BASE_RESULT: CompletionResult = {
   text: "",
@@ -17,6 +18,12 @@ const BASE_RESULT: CompletionResult = {
   cachedTokensIn: 0,
   costUsd: 0.001,
 };
+
+function firstCompleteOptions(): CompletionOptions {
+  const call = mockComplete.mock.calls[0];
+  if (!call) throw new Error("complete was not called");
+  return call[0];
+}
 
 describe("writer draft()", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -89,8 +96,8 @@ describe("writer draft()", () => {
       outlineBeats: ["intro hook", "main argument", "conclusion"],
     });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const userMsg = messages?.find((m) => m.content.includes("Follow this outline"));
     expect(userMsg).toBeDefined();
     expect(userMsg?.content).toContain("1. intro hook");
@@ -109,8 +116,8 @@ describe("writer draft()", () => {
       memoryBlock: "Last tweet was about Cursor vs Copilot",
     });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const memMsg = messages?.find((m) => m.content.includes("MEMORY"));
     expect(memMsg).toBeDefined();
     expect(memMsg?.content).toContain("Cursor vs Copilot");
@@ -127,8 +134,8 @@ describe("writer draft()", () => {
       researchBlock: "GPT-5 was released on May 2026 with 10T parameters",
     });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const resMsg = messages?.find((m) => m.content.includes("RESEARCH"));
     expect(resMsg).toBeDefined();
   });
@@ -144,8 +151,8 @@ describe("writer draft()", () => {
       referenceTweets: ["пора ботать", "чалить код"],
     });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const voiceMsg = messages?.find(
       (m) => m.content.includes("VOICE ANCHOR") && m.content.includes("[1]"),
     );
@@ -164,8 +171,8 @@ describe("writer draft()", () => {
     const refs = Array.from({ length: 30 }, (_, i) => `ref tweet ${i}`);
     await draft({ topic: "test", referenceTweets: refs });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
-    const messages = callArgs?.messages as Array<{ content: string }>;
+    const callArgs = firstCompleteOptions();
+    const messages = callArgs.messages;
     const voiceMsg = messages?.find(
       (m) => m.content.includes("VOICE ANCHOR") && m.content.includes("[1]"),
     );
@@ -182,7 +189,7 @@ describe("writer draft()", () => {
 
     await draft({ topic: "long form", contentType: "essay" });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
+    const callArgs = firstCompleteOptions();
     expect(callArgs?.maxTokens).toBe(3000);
   });
 
@@ -194,7 +201,7 @@ describe("writer draft()", () => {
 
     await draft({ topic: "quick thought" });
 
-    const callArgs = mockComplete.mock.calls[0]?.[0] as Record<string, unknown>;
+    const callArgs = firstCompleteOptions();
     expect(callArgs?.maxTokens).toBe(1500);
   });
 

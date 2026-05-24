@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 vi.mock("@/lib/env", () => ({
   env: { CRON_SECRET: "test-secret-token-12345678" },
