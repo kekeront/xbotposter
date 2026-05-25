@@ -103,42 +103,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Load voice + memory + research before the stream so the first SSE event flushes.
-  const voice = await loadDefaultVoice();
-  const memoryContext = await recallMemoryBlock(topic);
-  let researchBlock = "";
-  let sourceUrlToId = new Map<string, string>();
-  let searchCost = 0;
-  try {
-    const searchResult = await searchWeb({ topic });
-    researchBlock = searchResult.researchBlock;
-    searchCost = searchResult.costUsd;
-    if (researchBlock) {
-      const persisted = await persistSearchSources(searchResult.sources);
-      sourceUrlToId = buildSourceUrlToIdMap(persisted);
-    }
-  } catch {
-    // search is best-effort
-  }
-  try {
-    const uploaded = await fetchRecentUploadedSources({ limit: 5 });
-    const uploadedBlock = buildSourceContextBlock(uploaded);
-    if (uploadedBlock) {
-      researchBlock = researchBlock
-        ? `${researchBlock}\n\n${uploadedBlock}`
-        : uploadedBlock;
-      for (const s of uploaded) {
-        if (s.url) sourceUrlToId.set(s.url, s.id);
-      }
-    }
-  } catch {
-    // uploaded context is best-effort
-  }
-
   const stream = new ReadableStream({
     async start(controller) {
-      // Flush a 2KB padding comment to push past HTTP/gzip buffering.
-      controller.enqueue(sseEncode("progress", { step: "angles", detail: "generating angles" }));
+      controller.enqueue(sseEncode("progress", { step: "research", detail: "researching topic" }));
       controller.enqueue(encoder.encode(`: ${" ".repeat(2048)}\n\n`));
 
       const emit = (step: string, detail?: string) => {
@@ -148,6 +115,38 @@ export async function POST(request: Request) {
           // client disconnected
         }
       };
+
+      let researchBlock = "";
+      let sourceUrlToId = new Map<string, string>();
+      let searchCost = 0;
+
+      // Parallelize all pre-work: voice, memory, search, uploads, angles prep
+      const [voice, memoryContext, searchResult, uploaded] = await Promise.all([
+        loadDefaultVoice(),
+        recallMemoryBlock(topic),
+        searchWeb({ topic }).catch(() => null),
+        fetchRecentUploadedSources({ limit: 5 }).catch(() => []),
+      ]);
+
+      if (searchResult) {
+        researchBlock = searchResult.researchBlock;
+        searchCost = searchResult.costUsd;
+        if (researchBlock) {
+          const persisted = await persistSearchSources(searchResult.sources);
+          sourceUrlToId = buildSourceUrlToIdMap(persisted);
+        }
+      }
+      const uploadedBlock = buildSourceContextBlock(uploaded);
+      if (uploadedBlock) {
+        researchBlock = researchBlock
+          ? `${researchBlock}\n\n${uploadedBlock}`
+          : uploadedBlock;
+        for (const s of uploaded) {
+          if (s.url) sourceUrlToId.set(s.url, s.id);
+        }
+      }
+
+      emit("angles", "generating angles");
 
       let totalCostUsd = searchCost;
 

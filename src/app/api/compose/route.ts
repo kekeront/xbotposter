@@ -358,10 +358,11 @@ export async function POST(request: Request) {
     );
   }
 
-  // AI mode: load voice + memory before the stream so the first SSE event
-  // flushes immediately once the response starts.
-  const voice = await loadDefaultVoice();
-  const memoryContext = await recallMemoryBlock(topic);
+  // AI mode: load voice + memory in parallel before the stream.
+  const [voice, memoryContext] = await Promise.all([
+    loadDefaultVoice(),
+    recallMemoryBlock(topic),
+  ]);
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -396,8 +397,21 @@ export async function POST(request: Request) {
         let researchBlock = "";
         let sourceUrlToId = new Map<string, string>();
         let searchCost = 0;
-        try {
-          const searchResult = await searchWeb({ topic });
+
+        const [searchResult, uploaded] = await Promise.all([
+          searchWeb({ topic }).catch((err) => {
+            writeTrace({
+              generationId: generation.id,
+              agent: "searcher",
+              eventType: "error",
+              payload: { message: err instanceof Error ? err.message : String(err) },
+            });
+            return null;
+          }),
+          fetchRecentUploadedSources({ limit: 5 }).catch(() => []),
+        ]);
+
+        if (searchResult) {
           researchBlock = searchResult.researchBlock;
           searchCost = searchResult.costUsd;
           if (researchBlock) {
@@ -418,28 +432,16 @@ export async function POST(request: Request) {
               costUsd: searchResult.costUsd.toString(),
             });
           }
-        } catch (err) {
-          await writeTrace({
-            generationId: generation.id,
-            agent: "searcher",
-            eventType: "error",
-            payload: { message: err instanceof Error ? err.message : String(err) },
-          });
         }
 
-        try {
-          const uploaded = await fetchRecentUploadedSources({ limit: 5 });
-          const uploadedBlock = buildSourceContextBlock(uploaded);
-          if (uploadedBlock) {
-            researchBlock = researchBlock
-              ? `${researchBlock}\n\n${uploadedBlock}`
-              : uploadedBlock;
-            for (const s of uploaded) {
-              if (s.url) sourceUrlToId.set(s.url, s.id);
-            }
+        const uploadedBlock = buildSourceContextBlock(uploaded);
+        if (uploadedBlock) {
+          researchBlock = researchBlock
+            ? `${researchBlock}\n\n${uploadedBlock}`
+            : uploadedBlock;
+          for (const s of uploaded) {
+            if (s.url) sourceUrlToId.set(s.url, s.id);
           }
-        } catch {
-          // uploaded context is best-effort
         }
 
         emit("writer", "starting pipeline");

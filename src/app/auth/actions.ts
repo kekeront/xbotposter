@@ -65,11 +65,9 @@ export async function signup(
     await ensureProfile(data.user.id, email);
   }
 
-  if (data.user && !data.user.confirmed_at) {
-    return { message: "Check your email to confirm your account." };
-  }
-
-  redirect("/queue");
+  // Sign out so the user explicitly logs in after signup.
+  await supabase.auth.signOut();
+  redirect("/auth/login?registered=true");
 }
 
 export async function signOut() {

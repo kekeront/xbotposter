@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,6 +94,8 @@ function MagicLinkForm() {
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"password" | "magic">("password");
+  const searchParams = useSearchParams();
+  const justRegistered = searchParams.get("registered") === "true";
 
   return (
     <Card>
@@ -101,6 +104,11 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
+          {justRegistered && (
+            <p className="text-sm text-green-600">
+              Account created. Sign in to continue.
+            </p>
+          )}
           {mode === "password" ? <PasswordForm /> : <MagicLinkForm />}
 
           <button
