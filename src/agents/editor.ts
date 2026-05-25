@@ -1,5 +1,10 @@
 import "server-only";
-import { complete, type CompletionMessage } from "@/lib/llm";
+import {
+  complete,
+  completeWithTrace,
+  type CompletionMessage,
+  type TraceContext,
+} from "@/lib/llm";
 
 export type EditorInput = {
   topic: string;
@@ -7,6 +12,7 @@ export type EditorInput = {
   contentType: "single" | "thread" | "essay";
   referenceTweets?: string[];
   fingerprintBlock?: string;
+  traceContext?: TraceContext;
 };
 
 export type EditorOutput = {
@@ -89,12 +95,16 @@ export async function review(input: EditorInput): Promise<EditorOutput> {
     };
   }
 
-  const result = await complete({
-    tier: "mid",
-    messages: buildMessages(input),
+  const messages = buildMessages(input);
+  const opts = {
+    tier: "mid" as const,
+    messages,
     maxTokens: 3000,
-    responseFormat: "json_object",
-  });
+    responseFormat: "json_object" as const,
+  };
+  const result = input.traceContext
+    ? await completeWithTrace(opts, input.traceContext)
+    : await complete(opts);
 
   let parsed: { issues?: string[]; revised?: string[] };
   try {

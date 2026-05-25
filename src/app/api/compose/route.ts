@@ -94,6 +94,7 @@ async function runVariant(
       memoryBytes: memoryBlock?.length ?? 0,
     },
   });
+  const traceCtx = { generationId, agent: "writer" };
   const writerResult = await draft({
     topic,
     contentType,
@@ -103,6 +104,7 @@ async function runVariant(
     memoryBlock,
     researchBlock,
     preferences,
+    traceContext: traceCtx,
   });
   await writeTrace({
     generationId,
@@ -122,6 +124,7 @@ async function runVariant(
     contentType,
     referenceTweets: voice.referenceTweets,
     fingerprintBlock: voice.fingerprintBlock,
+    traceContext: { generationId, agent: "editor" },
   });
   await writeTrace({
     generationId,
@@ -148,8 +151,14 @@ async function runVariant(
       contentType,
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
+      traceContext: { generationId, agent: "evaluator" },
     }),
-    check({ seed: topic, draft: editorResult.texts, researchBlock }),
+    check({
+      seed: topic,
+      draft: editorResult.texts,
+      researchBlock,
+      traceContext: { generationId, agent: "fact-checker" },
+    }),
   ]);
 
   await writeTrace({

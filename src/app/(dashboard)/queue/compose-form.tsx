@@ -210,8 +210,8 @@ const LANGUAGE_OPTIONS = [
 const PREFS_STORAGE_KEY = "nfactz.compose.prefs";
 
 type SavedPrefs = {
-  tone?: string;
-  audience?: string;
+  tones?: string[];
+  audiences?: string[];
   language?: string;
   negatives?: string[];
   customInstruction?: string;
@@ -234,8 +234,8 @@ export function ComposeForm() {
   const [variants, setVariants] = useState<1 | 2 | 3>(1);
   const [angleCount, setAngleCount] = useState<2 | 3 | 4 | 5 | 6>(3);
 
-  const [tone, setTone] = useState<string | null>(null);
-  const [audience, setAudience] = useState<string | null>(null);
+  const [tones, setTones] = useState<string[]>([]);
+  const [audiences, setAudiences] = useState<string[]>([]);
   const [language, setLanguage] = useState<string | null>(null);
   const [negatives, setNegatives] = useState<string[]>([]);
   const [customInstruction, setCustomInstruction] = useState("");
@@ -262,12 +262,12 @@ export function ComposeForm() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMode(readStoredMode());
     const saved = readStoredPrefs();
-    if (saved.tone) setTone(saved.tone);
-    if (saved.audience) setAudience(saved.audience);
+    if (saved.tones?.length) setTones(saved.tones);
+    if (saved.audiences?.length) setAudiences(saved.audiences);
     if (saved.language) setLanguage(saved.language);
-    if (saved.negatives) setNegatives(saved.negatives);
+    if (saved.negatives?.length) setNegatives(saved.negatives);
     if (saved.customInstruction) setCustomInstruction(saved.customInstruction);
-    if (saved.tone || saved.audience || saved.language || (saved.negatives && saved.negatives.length > 0) || saved.customInstruction) {
+    if (saved.tones?.length || saved.audiences?.length || saved.language || saved.negatives?.length || saved.customInstruction) {
       setShowPrefs(true);
     }
   }, []);
@@ -280,31 +280,29 @@ export function ComposeForm() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const prefs: SavedPrefs = {};
-    if (tone) prefs.tone = tone;
-    if (audience) prefs.audience = audience;
+    if (tones.length > 0) prefs.tones = tones;
+    if (audiences.length > 0) prefs.audiences = audiences;
     if (language) prefs.language = language;
     if (negatives.length > 0) prefs.negatives = negatives;
     if (customInstruction) prefs.customInstruction = customInstruction;
     window.localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(prefs));
-  }, [tone, audience, language, negatives, customInstruction]);
+  }, [tones, audiences, language, negatives, customInstruction]);
 
   function buildPreferences() {
     if (isManual) return undefined;
-    const hasAny = tone || audience || language || negatives.length > 0 || customInstruction;
+    const hasAny = tones.length > 0 || audiences.length > 0 || language || negatives.length > 0 || customInstruction;
     if (!hasAny) return undefined;
     return {
-      tone: tone ?? undefined,
-      audience: audience ?? undefined,
+      tone: tones.length > 0 ? tones.join(", ") : undefined,
+      audience: audiences.length > 0 ? audiences.join(", ") : undefined,
       language: language ?? undefined,
       negatives: negatives.length > 0 ? negatives : undefined,
       customInstruction: customInstruction || undefined,
     };
   }
 
-  function toggleNegative(neg: string) {
-    setNegatives((prev) =>
-      prev.includes(neg) ? prev.filter((n) => n !== neg) : [...prev, neg],
-    );
+  function toggleList(list: string[], item: string, setter: (v: string[]) => void) {
+    setter(list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
   }
 
   const isManual = mode === "manual";
@@ -656,9 +654,9 @@ export function ComposeForm() {
                 className="flex items-center gap-2 self-start text-xs text-muted-foreground hover:text-foreground"
               >
                 <span>{showPrefs ? "▾" : "▸"} preferences</span>
-                {(tone || audience || negatives.length > 0) && !showPrefs && (
+                {(tones.length > 0 || audiences.length > 0 || negatives.length > 0) && !showPrefs && (
                   <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">
-                    {[tone, audience, ...negatives].filter(Boolean).join(" · ")}
+                    {[...tones, ...audiences, ...negatives].join(" · ")}
                   </span>
                 )}
               </button>
@@ -673,8 +671,8 @@ export function ComposeForm() {
                       {TONE_OPTIONS.map((t) => (
                         <ToggleButton
                           key={t}
-                          active={tone === t}
-                          onClick={() => setTone(tone === t ? null : t)}
+                          active={tones.includes(t)}
+                          onClick={() => toggleList(tones, t, setTones)}
                         >
                           {t}
                         </ToggleButton>
@@ -690,8 +688,8 @@ export function ComposeForm() {
                       {AUDIENCE_OPTIONS.map((a) => (
                         <ToggleButton
                           key={a}
-                          active={audience === a}
-                          onClick={() => setAudience(audience === a ? null : a)}
+                          active={audiences.includes(a)}
+                          onClick={() => toggleList(audiences, a, setAudiences)}
                         >
                           {a}
                         </ToggleButton>
@@ -725,7 +723,7 @@ export function ComposeForm() {
                         <ToggleButton
                           key={n}
                           active={negatives.includes(n)}
-                          onClick={() => toggleNegative(n)}
+                          onClick={() => toggleList(negatives, n, setNegatives)}
                         >
                           {n}
                         </ToggleButton>

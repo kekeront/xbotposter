@@ -1,10 +1,16 @@
 import "server-only";
-import { complete, type CompletionMessage } from "@/lib/llm";
+import {
+  complete,
+  completeWithTrace,
+  type CompletionMessage,
+  type TraceContext,
+} from "@/lib/llm";
 
 export type FactCheckInput = {
   seed: string;
   draft: string[];
   researchBlock?: string;
+  traceContext?: TraceContext;
 };
 
 export type ClaimVerdict = "supported" | "invented" | "uncertain";
@@ -71,12 +77,16 @@ function buildMessages(input: FactCheckInput): CompletionMessage[] {
 }
 
 export async function check(input: FactCheckInput): Promise<FactCheckOutput> {
-  const result = await complete({
-    tier: "mid",
-    messages: buildMessages(input),
+  const messages = buildMessages(input);
+  const opts = {
+    tier: "mid" as const,
+    messages,
     maxTokens: 3000,
-    responseFormat: "json_object",
-  });
+    responseFormat: "json_object" as const,
+  };
+  const result = input.traceContext
+    ? await completeWithTrace(opts, input.traceContext)
+    : await complete(opts);
 
   let parsed: { claims?: Array<{ text?: unknown; verdict?: unknown; reason?: unknown; sourceUrl?: unknown }> };
   try {

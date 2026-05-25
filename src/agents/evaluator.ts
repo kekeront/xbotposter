@@ -1,5 +1,10 @@
 import "server-only";
-import { complete, type CompletionMessage } from "@/lib/llm";
+import {
+  complete,
+  completeWithTrace,
+  type CompletionMessage,
+  type TraceContext,
+} from "@/lib/llm";
 
 export type EvalInput = {
   seed: string;
@@ -7,6 +12,7 @@ export type EvalInput = {
   contentType?: "single" | "thread" | "essay";
   referenceTweets?: string[];
   fingerprintBlock?: string;
+  traceContext?: TraceContext;
 };
 
 export type EvalScores = {
@@ -98,14 +104,16 @@ function clampScore(v: unknown): number {
 }
 
 export async function evaluate(input: EvalInput): Promise<EvalOutput> {
-  const result = await complete({
-    tier: "mid",
-    messages: buildMessages(input),
-    // gpt-5 family uses reasoning tokens that eat into max_completion_tokens
-    // before the JSON is produced. Be generous so the final JSON isn't cut off.
+  const messages = buildMessages(input);
+  const opts = {
+    tier: "mid" as const,
+    messages,
     maxTokens: 3000,
-    responseFormat: "json_object",
-  });
+    responseFormat: "json_object" as const,
+  };
+  const result = input.traceContext
+    ? await completeWithTrace(opts, input.traceContext)
+    : await complete(opts);
 
   let parsed: {
     scores?: Partial<EvalScores>;

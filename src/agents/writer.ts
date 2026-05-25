@@ -1,5 +1,10 @@
 import "server-only";
-import { complete, type CompletionMessage } from "@/lib/llm";
+import {
+  complete,
+  completeWithTrace,
+  type CompletionMessage,
+  type TraceContext,
+} from "@/lib/llm";
 
 export type ComposePreferences = {
   tone?: string;
@@ -18,6 +23,7 @@ export type WriterInput = {
   memoryBlock?: string;
   researchBlock?: string;
   preferences?: ComposePreferences;
+  traceContext?: TraceContext;
 };
 
 export type WriterOutput = {
@@ -206,11 +212,15 @@ function splitThread(raw: string): string[] {
 }
 
 export async function draft(input: WriterInput): Promise<WriterOutput> {
-  const result = await complete({
-    tier: "writer",
-    messages: buildMessages(input),
+  const messages = buildMessages(input);
+  const opts = {
+    tier: "writer" as const,
+    messages,
     maxTokens: input.contentType === "essay" ? 3000 : 1500,
-  });
+  };
+  const result = input.traceContext
+    ? await completeWithTrace(opts, input.traceContext)
+    : await complete(opts);
 
   const texts =
     input.contentType === "thread"

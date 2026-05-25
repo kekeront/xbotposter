@@ -107,6 +107,37 @@ export async function complete(
   return { text, model, tokensIn, tokensOut, cachedTokensIn, costUsd };
 }
 
+export type TraceContext = {
+  generationId: string | null;
+  agent: string;
+  userId?: string;
+};
+
+export async function completeWithTrace(
+  opts: CompletionOptions,
+  ctx: TraceContext,
+): Promise<CompletionResult> {
+  const result = await complete(opts);
+
+  // Fire-and-forget — don't block the pipeline on trace writes.
+  import("./trace").then(({ writeTrace }) =>
+    writeTrace({
+      generationId: ctx.generationId,
+      userId: ctx.userId ?? null,
+      agent: ctx.agent,
+      eventType: "llm_call",
+      messages: opts.messages,
+      outputText: result.text,
+      model: result.model,
+      tokensIn: result.tokensIn,
+      tokensOut: result.tokensOut,
+      costUsd: result.costUsd.toString(),
+    }).catch(() => {}),
+  );
+
+  return result;
+}
+
 export type EmbedResult = {
   vectors: number[][];
   model: string;

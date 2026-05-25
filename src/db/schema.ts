@@ -280,6 +280,10 @@ export const traces = pgTable(
     agent: text("agent").notNull(),
     eventType: text("event_type").notNull(),
     payload: jsonb("payload").$type<Record<string, unknown>>(),
+    messages: jsonb("messages").$type<
+      Array<{ role: "system" | "user" | "assistant"; content: string }>
+    >(),
+    outputText: text("output_text"),
     model: text("model"),
     tokensIn: integer("tokens_in"),
     tokensOut: integer("tokens_out"),
