@@ -1,5 +1,3909 @@
 [
   {
+    "id": "4b03ffe4-1f4a-42ca-8984-7c12d616f99f",
+    "generation_id": "24eeb7a1-0676-4aa4-bd85-748582e26b62",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 82,
+      "postCount": 6,
+      "angleIndex": 2
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:49:35.440Z",
+    "gen_topic": "Критический взгляд: модерация, авторские права и токсичность в UGC — что ломает продукт и как это лечить",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Модерация, права и риски UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.011380"
+  },
+  {
+    "id": "3bdb30f3-85f8-42b7-aa00-10e2ca38b66c",
+    "generation_id": "24eeb7a1-0676-4aa4-bd85-748582e26b62",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 80,
+        "antiSlop": 95,
+        "language": 100,
+        "voiceMatch": 85,
+        "faithfulness": 100,
+        "insightDensity": 30
+      },
+      "overall": 82,
+      "critique": "Коротко и по теме, но не хватает конкретики и неожиданных наблюдений."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 978,
+    "tokens_out": 867,
+    "cost_usd": "0.001979",
+    "ts": "2026-05-25T06:49:34.029Z",
+    "gen_topic": "Критический взгляд: модерация, авторские права и токсичность в UGC — что ломает продукт и как это лечить",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Модерация, права и риски UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.011380"
+  },
+  {
+    "id": "5e9600bc-d9b3-45be-b464-82d020b001ee",
+    "generation_id": "24eeb7a1-0676-4aa4-bd85-748582e26b62",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Первый твит завершался тройным перечислением (closing tricolon) — перечень перенесён в последующие твиты",
+        "Тон слегка формализован — сделал его более разговорным в стиле анкера",
+        "Добавлено одно эмодзи в твит про токсичность, чтобы соответствовать частоте эмодзи в референсе"
+      ],
+      "changed": true
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1328,
+    "tokens_out": 2258,
+    "cost_usd": "0.004848",
+    "ts": "2026-05-25T06:49:24.331Z",
+    "gen_topic": "Критический взгляд: модерация, авторские права и токсичность в UGC — что ломает продукт и как это лечить",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Модерация, права и риски UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.011380"
+  },
+  {
+    "id": "7ce52fea-52a3-42ef-a22c-7f44cbd5d85b",
+    "generation_id": "24eeb7a1-0676-4aa4-bd85-748582e26b62",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 6
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1882,
+    "tokens_out": 111,
+    "cost_usd": "0.001911",
+    "ts": "2026-05-25T06:49:02.110Z",
+    "gen_topic": "Критический взгляд: модерация, авторские права и токсичность в UGC — что ломает продукт и как это лечить",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Модерация, права и риски UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.011380"
+  },
+  {
+    "id": "7da8a90e-36f2-47fb-8d3c-396c787af7d2",
+    "generation_id": "24eeb7a1-0676-4aa4-bd85-748582e26b62",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Модерация, права и риски UGC",
+      "angleIndex": 2,
+      "contentType": "thread"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:49:00.954Z",
+    "gen_topic": "Критический взгляд: модерация, авторские права и токсичность в UGC — что ломает продукт и как это лечить",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Модерация, права и риски UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.011380"
+  },
+  {
+    "id": "8aa3669d-ec2a-4b1d-a345-685f2d93affa",
+    "generation_id": "2d8fbd33-8643-4f21-9b2e-2d5fd018c70a",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 86,
+      "postCount": 2,
+      "angleIndex": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:49:00.028Z",
+    "gen_topic": "Про рост и комьюнити: как UGC превращает игроков в создателей и держит метрики на подъёме 🎮",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "UGC как драйвер роста и монетизации",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.008626"
+  },
+  {
+    "id": "a382bceb-514e-4459-9c35-655de95c97a2",
+    "generation_id": "2d8fbd33-8643-4f21-9b2e-2d5fd018c70a",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 100,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 88,
+        "faithfulness": 100,
+        "insightDensity": 25
+      },
+      "overall": 86,
+      "critique": "Тон и форма отличные, но нет новых конкретных наблюдений — добавь пример или конкретный эффект UGC."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 914,
+    "tokens_out": 746,
+    "cost_usd": "0.001721",
+    "ts": "2026-05-25T06:48:59.242Z",
+    "gen_topic": "Про рост и комьюнити: как UGC превращает игроков в создателей и держит метрики на подъёме 🎮",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "UGC как драйвер роста и монетизации",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.008626"
+  },
+  {
+    "id": "75ebe3b0-2fd9-4a28-9a2d-529b65c8881e",
+    "generation_id": "2d8fbd33-8643-4f21-9b2e-2d5fd018c70a",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Использовано слово из голосового примера — «чалить», которого нет в сидe; заменил на более нейтральное и понятное «создавать своё»"
+      ],
+      "changed": true
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1259,
+    "tokens_out": 1646,
+    "cost_usd": "0.003607",
+    "ts": "2026-05-25T06:48:53.288Z",
+    "gen_topic": "Про рост и комьюнити: как UGC превращает игроков в создателей и держит метрики на подъёме 🎮",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "UGC как драйвер роста и монетизации",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.008626"
+  },
+  {
+    "id": "a701a7e2-6b34-4248-b6d8-b488e077505c",
+    "generation_id": "2d8fbd33-8643-4f21-9b2e-2d5fd018c70a",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 2
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1882,
+    "tokens_out": 51,
+    "cost_usd": "0.001641",
+    "ts": "2026-05-25T06:48:37.980Z",
+    "gen_topic": "Про рост и комьюнити: как UGC превращает игроков в создателей и держит метрики на подъёме 🎮",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "UGC как драйвер роста и монетизации",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.008626"
+  },
+  {
+    "id": "5878d68e-bc25-4c95-b017-42afb4d7937a",
+    "generation_id": "2d8fbd33-8643-4f21-9b2e-2d5fd018c70a",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "UGC как драйвер роста и монетизации",
+      "angleIndex": 1,
+      "contentType": "thread"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:48:36.360Z",
+    "gen_topic": "Про рост и комьюнити: как UGC превращает игроков в создателей и держит метрики на подъёме 🎮",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "UGC как драйвер роста и монетизации",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.008626"
+  },
+  {
+    "id": "f741e1be-a9b1-4746-9b9d-38b389aae014",
+    "generation_id": "fef68673-fac6-464d-beb9-b477f35cc8e5",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 71,
+      "postCount": 3,
+      "angleIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:48:35.419Z",
+    "gen_topic": "Про технику: как ботать SDK и пайплайн для UGC, чтобы контент быстро загружался и правки были легкими",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "SDK и пайплайн для UGC игр",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007521"
+  },
+  {
+    "id": "c3cdc127-f0bf-4db1-86e0-4c46c0885901",
+    "generation_id": "fef68673-fac6-464d-beb9-b477f35cc8e5",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 30,
+        "antiSlop": 100,
+        "language": 95,
+        "voiceMatch": 90,
+        "faithfulness": 100,
+        "insightDensity": 10
+      },
+      "overall": 71,
+      "critique": "Очень кратко и дословно, стоит добавить конкретики про проблемы и решения"
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 899,
+    "tokens_out": 737,
+    "cost_usd": "0.001699",
+    "ts": "2026-05-25T06:48:34.467Z",
+    "gen_topic": "Про технику: как ботать SDK и пайплайн для UGC, чтобы контент быстро загружался и правки были легкими",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "SDK и пайплайн для UGC игр",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007521"
+  },
+  {
+    "id": "c5a03a13-803c-4f49-8aeb-c9eae195ffef",
+    "generation_id": "fef68673-fac6-464d-beb9-b477f35cc8e5",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1242,
+    "tokens_out": 762,
+    "cost_usd": "0.001835",
+    "ts": "2026-05-25T06:48:23.964Z",
+    "gen_topic": "Про технику: как ботать SDK и пайплайн для UGC, чтобы контент быстро загружался и правки были легкими",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "SDK и пайплайн для UGC игр",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007521"
+  },
+  {
+    "id": "c80b0b43-fa69-4482-957c-a5c9545bc426",
+    "generation_id": "fef68673-fac6-464d-beb9-b477f35cc8e5",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 3
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1882,
+    "tokens_out": 32,
+    "cost_usd": "0.001556",
+    "ts": "2026-05-25T06:48:12.226Z",
+    "gen_topic": "Про технику: как ботать SDK и пайплайн для UGC, чтобы контент быстро загружался и правки были легкими",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "SDK и пайплайн для UGC игр",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007521"
+  },
+  {
+    "id": "ea00ce81-00da-49f1-b7ef-26c8dc400585",
+    "generation_id": "fef68673-fac6-464d-beb9-b477f35cc8e5",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "SDK и пайплайн для UGC игр",
+      "angleIndex": 0,
+      "contentType": "thread"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:48:11.346Z",
+    "gen_topic": "Про технику: как ботать SDK и пайплайн для UGC, чтобы контент быстро загружался и правки были легкими",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "SDK и пайплайн для UGC игр",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "thread"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007521"
+  },
+  {
+    "id": "1c29ee0c-081a-4fed-afc5-a2852e725221",
+    "generation_id": "2cd6ca11-03b9-445d-be2e-b4e8075f4411",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 78,
+      "postCount": 1,
+      "angleIndex": 2
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:28:58.866Z",
+    "gen_topic": "Личный опыт сборки UGC-игры: почему модерация и права авторов съедают проект и где AI реально помогает, а где нужен человек",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Где AI помогает, а где нужен человек",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006313"
+  },
+  {
+    "id": "026123ca-b66f-434d-8ede-6eb1e6b7b53a",
+    "generation_id": "2cd6ca11-03b9-445d-be2e-b4e8075f4411",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 80,
+        "antiSlop": 95,
+        "language": 95,
+        "voiceMatch": 65,
+        "faithfulness": 100,
+        "insightDensity": 30
+      },
+      "overall": 78,
+      "critique": "Четко и по делу, но почти дословная перефразировка — добавьте конкретику или неожиданный пример."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 907,
+    "tokens_out": 683,
+    "cost_usd": "0.001593",
+    "ts": "2026-05-25T06:28:58.238Z",
+    "gen_topic": "Личный опыт сборки UGC-игры: почему модерация и права авторов съедают проект и где AI реально помогает, а где нужен человек",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Где AI помогает, а где нужен человек",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006313"
+  },
+  {
+    "id": "4c6ac298-2b0e-44be-b779-d1686d4cc190",
+    "generation_id": "2cd6ca11-03b9-445d-be2e-b4e8075f4411",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Использовано эм‑деш (—) — убрал и заменил на запятую",
+        "Пост длиннее типичного для голосового анкера — сократил формулировку"
+      ],
+      "changed": true
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1249,
+    "tokens_out": 946,
+    "cost_usd": "0.002204",
+    "ts": "2026-05-25T06:28:50.676Z",
+    "gen_topic": "Личный опыт сборки UGC-игры: почему модерация и права авторов съедают проект и где AI реально помогает, а где нужен человек",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Где AI помогает, а где нужен человек",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006313"
+  },
+  {
+    "id": "fc3b0b41-ae83-4e98-b4f6-a3b7c6d03455",
+    "generation_id": "2cd6ca11-03b9-445d-be2e-b4e8075f4411",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1815,
+    "tokens_out": 41,
+    "cost_usd": "0.000682",
+    "ts": "2026-05-25T06:28:41.371Z",
+    "gen_topic": "Личный опыт сборки UGC-игры: почему модерация и права авторов съедают проект и где AI реально помогает, а где нужен человек",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Где AI помогает, а где нужен человек",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006313"
+  },
+  {
+    "id": "fd48d08e-a6fa-43f9-a679-d2507f34b93d",
+    "generation_id": "2cd6ca11-03b9-445d-be2e-b4e8075f4411",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Где AI помогает, а где нужен человек",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:28:39.064Z",
+    "gen_topic": "Личный опыт сборки UGC-игры: почему модерация и права авторов съедают проект и где AI реально помогает, а где нужен человек",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Где AI помогает, а где нужен человек",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006313"
+  },
+  {
+    "id": "c8e3220d-2bbb-464d-8f29-bfd0c0e4611a",
+    "generation_id": "8a90d4a0-7558-45ce-aa9d-9a35ffb179b3",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 83,
+      "postCount": 1,
+      "angleIndex": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:28:38.130Z",
+    "gen_topic": "Поговорю про экономику UGC: модели монетизации, распределение дохода между авторами и инструменты, которые реально повышают активность сообщества",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Монетизация и стимулы для авторов UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007899"
+  },
+  {
+    "id": "ad047eaa-10a2-48a6-8855-53050d2a8895",
+    "generation_id": "8a90d4a0-7558-45ce-aa9d-9a35ffb179b3",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 90,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 92,
+        "faithfulness": 100,
+        "insightDensity": 15
+      },
+      "overall": 83,
+      "critique": "Коротко и в голосе автора, но это почти дословная формулировка темы — добавь конкретный угол или тезис для инсайта."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 897,
+    "tokens_out": 882,
+    "cost_usd": "0.001988",
+    "ts": "2026-05-25T06:28:37.487Z",
+    "gen_topic": "Поговорю про экономику UGC: модели монетизации, распределение дохода между авторами и инструменты, которые реально повышают активность сообщества",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Монетизация и стимулы для авторов UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007899"
+  },
+  {
+    "id": "7c435b3b-1337-4e44-ae37-18da76972956",
+    "generation_id": "8a90d4a0-7558-45ce-aa9d-9a35ffb179b3",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1242,
+    "tokens_out": 1274,
+    "cost_usd": "0.002859",
+    "ts": "2026-05-25T06:28:27.839Z",
+    "gen_topic": "Поговорю про экономику UGC: модели монетизации, распределение дохода между авторами и инструменты, которые реально повышают активность сообщества",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Монетизация и стимулы для авторов UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007899"
+  },
+  {
+    "id": "2ed0b943-ab0a-4fdc-aa66-001213b9fe39",
+    "generation_id": "8a90d4a0-7558-45ce-aa9d-9a35ffb179b3",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1815,
+    "tokens_out": 34,
+    "cost_usd": "0.000650",
+    "ts": "2026-05-25T06:28:14.476Z",
+    "gen_topic": "Поговорю про экономику UGC: модели монетизации, распределение дохода между авторами и инструменты, которые реально повышают активность сообщества",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Монетизация и стимулы для авторов UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007899"
+  },
+  {
+    "id": "d7403f1d-1ff0-4712-9dd6-12c9c7fd0b3d",
+    "generation_id": "8a90d4a0-7558-45ce-aa9d-9a35ffb179b3",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Монетизация и стимулы для авторов UGC",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:28:13.723Z",
+    "gen_topic": "Поговорю про экономику UGC: модели монетизации, распределение дохода между авторами и инструменты, которые реально повышают активность сообщества",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Монетизация и стимулы для авторов UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007899"
+  },
+  {
+    "id": "e13b8769-7113-45c0-be27-2fbb5b1f99fa",
+    "generation_id": "ce13685b-42a1-4135-b364-64186c324f97",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 83,
+      "postCount": 1,
+      "angleIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:28:12.789Z",
+    "gen_topic": "Разберу архитектуру UGC-игры: как хранить пользовательский контент, валидировать ресурсы, стримить ассеты и масштабировать серверную часть",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура хранения и масштабирования UGC игры",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006821"
+  },
+  {
+    "id": "ad651e97-2c46-40b3-b70e-1eb59e2e622b",
+    "generation_id": "ce13685b-42a1-4135-b364-64186c324f97",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 95,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 88,
+        "faithfulness": 100,
+        "insightDensity": 15
+      },
+      "overall": 83,
+      "critique": "Коротко и чисто, но почти дословная перефразировка — добавить конкретику или необычный ракурс."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 901,
+    "tokens_out": 938,
+    "cost_usd": "0.002101",
+    "ts": "2026-05-25T06:28:12.157Z",
+    "gen_topic": "Разберу архитектуру UGC-игры: как хранить пользовательский контент, валидировать ресурсы, стримить ассеты и масштабировать серверную часть",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура хранения и масштабирования UGC игры",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006821"
+  },
+  {
+    "id": "615dacb2-2b77-49e8-b6ef-6925acb0225b",
+    "generation_id": "ce13685b-42a1-4135-b364-64186c324f97",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1246,
+    "tokens_out": 1079,
+    "cost_usd": "0.002470",
+    "ts": "2026-05-25T06:28:03.566Z",
+    "gen_topic": "Разберу архитектуру UGC-игры: как хранить пользовательский контент, валидировать ресурсы, стримить ассеты и масштабировать серверную часть",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура хранения и масштабирования UGC игры",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006821"
+  },
+  {
+    "id": "4b03c93b-be61-4d8c-b8fc-351188b42327",
+    "generation_id": "ce13685b-42a1-4135-b364-64186c324f97",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1818,
+    "tokens_out": 35,
+    "cost_usd": "0.000657",
+    "ts": "2026-05-25T06:27:53.062Z",
+    "gen_topic": "Разберу архитектуру UGC-игры: как хранить пользовательский контент, валидировать ресурсы, стримить ассеты и масштабировать серверную часть",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура хранения и масштабирования UGC игры",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006821"
+  },
+  {
+    "id": "7690d86e-bb49-4d59-8647-c15c84705c9f",
+    "generation_id": "ce13685b-42a1-4135-b364-64186c324f97",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Архитектура хранения и масштабирования UGC игры",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:27:52.186Z",
+    "gen_topic": "Разберу архитектуру UGC-игры: как хранить пользовательский контент, валидировать ресурсы, стримить ассеты и масштабировать серверную часть",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура хранения и масштабирования UGC игры",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006821"
+  },
+  {
+    "id": "faeb7c1d-9879-4a4a-8f8f-63de35b678a2",
+    "generation_id": "9f15e31f-c529-4745-978d-b4da9e5d6c4d",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 84,
+      "postCount": 1,
+      "angleIndex": 2
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:25:54.852Z",
+    "gen_topic": "UGC круто для роста, но модерация и монетизация ломают продукт 😭",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Скепсис по модерации и монетизации UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005184"
+  },
+  {
+    "id": "aa97a397-ab5c-4958-92cb-4c1ff5fd4fb9",
+    "generation_id": "9f15e31f-c529-4745-978d-b4da9e5d6c4d",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 95,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 95,
+        "faithfulness": 100,
+        "insightDensity": 15
+      },
+      "overall": 84,
+      "critique": "Идентично с сидом — коротко и в голосе, но без новых наблюдений."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 873,
+    "tokens_out": 1061,
+    "cost_usd": "0.002340",
+    "ts": "2026-05-25T06:25:54.218Z",
+    "gen_topic": "UGC круто для роста, но модерация и монетизация ломают продукт 😭",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Скепсис по модерации и монетизации UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005184"
+  },
+  {
+    "id": "7caf1ef2-5d6a-40a0-a23e-4dd92d6deec5",
+    "generation_id": "9f15e31f-c529-4745-978d-b4da9e5d6c4d",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1218,
+    "tokens_out": 427,
+    "cost_usd": "0.001159",
+    "ts": "2026-05-25T06:25:43.732Z",
+    "gen_topic": "UGC круто для роста, но модерация и монетизация ломают продукт 😭",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Скепсис по модерации и монетизации UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005184"
+  },
+  {
+    "id": "d5beb8aa-09b7-4e38-a069-84d7d78d0424",
+    "generation_id": "9f15e31f-c529-4745-978d-b4da9e5d6c4d",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1802,
+    "tokens_out": 23,
+    "cost_usd": "0.000591",
+    "ts": "2026-05-25T06:25:39.046Z",
+    "gen_topic": "UGC круто для роста, но модерация и монетизация ломают продукт 😭",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Скепсис по модерации и монетизации UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005184"
+  },
+  {
+    "id": "50659d62-d9a3-419a-aa16-31933045b1d9",
+    "generation_id": "9f15e31f-c529-4745-978d-b4da9e5d6c4d",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Скепсис по модерации и монетизации UGC",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:25:38.249Z",
+    "gen_topic": "UGC круто для роста, но модерация и монетизация ломают продукт 😭",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Скепсис по модерации и монетизации UGC",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005184"
+  },
+  {
+    "id": "361a3b15-7f5d-470a-95c9-e5ffb43060ab",
+    "generation_id": "88f8342e-3cce-4441-8d56-9e22c4286f57",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 79,
+      "postCount": 1,
+      "angleIndex": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:25:37.313Z",
+    "gen_topic": "Техразбор: где хранить UGC, как валидировать и кешировать",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура и валидация UGC контента",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.004816"
+  },
+  {
+    "id": "26d87364-571f-407d-a853-5f86692e18f3",
+    "generation_id": "88f8342e-3cce-4441-8d56-9e22c4286f57",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 85,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 85,
+        "faithfulness": 100,
+        "insightDensity": 5
+      },
+      "overall": 79,
+      "critique": "Точный заголовок, но без конкретики — это просто тема, а не техразбор."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 869,
+    "tokens_out": 998,
+    "cost_usd": "0.002213",
+    "ts": "2026-05-25T06:25:36.843Z",
+    "gen_topic": "Техразбор: где хранить UGC, как валидировать и кешировать",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура и валидация UGC контента",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.004816"
+  },
+  {
+    "id": "4d7e070e-7bf7-48dc-b7e5-7d98f9cad795",
+    "generation_id": "88f8342e-3cce-4441-8d56-9e22c4286f57",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1214,
+    "tokens_out": 301,
+    "cost_usd": "0.000906",
+    "ts": "2026-05-25T06:25:26.846Z",
+    "gen_topic": "Техразбор: где хранить UGC, как валидировать и кешировать",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура и валидация UGC контента",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.004816"
+  },
+  {
+    "id": "96b0b162-8814-40da-9407-b587f911546c",
+    "generation_id": "88f8342e-3cce-4441-8d56-9e22c4286f57",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1800,
+    "tokens_out": 21,
+    "cost_usd": "0.001445",
+    "ts": "2026-05-25T06:25:23.213Z",
+    "gen_topic": "Техразбор: где хранить UGC, как валидировать и кешировать",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура и валидация UGC контента",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.004816"
+  },
+  {
+    "id": "d3a58587-d724-4db4-800e-0af6957b6fc7",
+    "generation_id": "88f8342e-3cce-4441-8d56-9e22c4286f57",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Архитектура и валидация UGC контента",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:25:22.315Z",
+    "gen_topic": "Техразбор: где хранить UGC, как валидировать и кешировать",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Архитектура и валидация UGC контента",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.004816"
+  },
+  {
+    "id": "611648a7-c596-431d-ac2c-e4a13f215b9c",
+    "generation_id": "fd241d13-4ea3-41a3-9d83-3b94dbdaabbe",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 85,
+      "postCount": 1,
+      "angleIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:25:21.387Z",
+    "gen_topic": "Собрал UGC‑игру за день, ботал прототип и поделюсь инструментами",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Как сделал UGC‑игру за день",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006695"
+  },
+  {
+    "id": "a62276ef-0bc2-46df-bf8d-9ce304201bba",
+    "generation_id": "fd241d13-4ea3-41a3-9d83-3b94dbdaabbe",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 100,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 95,
+        "faithfulness": 100,
+        "insightDensity": 15
+      },
+      "overall": 85,
+      "critique": "Пост почти дословно повторяет сид — добавь конкретику или неожиданный штрих"
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 874,
+    "tokens_out": 997,
+    "cost_usd": "0.002213",
+    "ts": "2026-05-25T06:25:20.753Z",
+    "gen_topic": "Собрал UGC‑игру за день, ботал прототип и поделюсь инструментами",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Как сделал UGC‑игру за день",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006695"
+  },
+  {
+    "id": "58ddd6f6-3134-4ec6-96a9-353cb0eeadca",
+    "generation_id": "fd241d13-4ea3-41a3-9d83-3b94dbdaabbe",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1219,
+    "tokens_out": 620,
+    "cost_usd": "0.001545",
+    "ts": "2026-05-25T06:25:08.562Z",
+    "gen_topic": "Собрал UGC‑игру за день, ботал прототип и поделюсь инструментами",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Как сделал UGC‑игру за день",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006695"
+  },
+  {
+    "id": "33814c78-943a-4824-a6d2-7c74d1b59d8b",
+    "generation_id": "fd241d13-4ea3-41a3-9d83-3b94dbdaabbe",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1802,
+    "tokens_out": 24,
+    "cost_usd": "0.001460",
+    "ts": "2026-05-25T06:25:02.259Z",
+    "gen_topic": "Собрал UGC‑игру за день, ботал прототип и поделюсь инструментами",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Как сделал UGC‑игру за день",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006695"
+  },
+  {
+    "id": "781dd422-2612-4934-bc69-45350349d9d1",
+    "generation_id": "fd241d13-4ea3-41a3-9d83-3b94dbdaabbe",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Как сделал UGC‑игру за день",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:25:01.033Z",
+    "gen_topic": "Собрал UGC‑игру за день, ботал прототип и поделюсь инструментами",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Как сделал UGC‑игру за день",
+      "bulkTopic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006695"
+  },
+  {
+    "id": "54cbedd5-593e-4b93-8998-9c4d4fe3f0c6",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "compose",
+    "event_type": "error",
+    "payload": {
+      "message": "Invalid state: Controller is already closed"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:04:54.021Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "8786a7a3-c119-4ef2-83b8-6b13bbda0f0f",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1,
+      "winnerIndex": 0,
+      "rankedScores": [
+        73
+      ],
+      "winnerOverall": 73,
+      "winnerInventedClaims": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:04:53.820Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "70308180-95ce-4559-878a-dbd7ace5577a",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 0,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 440,
+    "tokens_out": 143,
+    "cost_usd": "0.000396",
+    "ts": "2026-05-25T06:04:53.175Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "5c30139e-1213-4a63-8156-49c661c8ede6",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 30,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 90,
+        "faithfulness": 100,
+        "insightDensity": 15
+      },
+      "overall": 73,
+      "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики.",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 921,
+    "tokens_out": 1070,
+    "cost_usd": "0.002370",
+    "ts": "2026-05-25T06:04:52.976Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "17fb9a12-a8ee-4413-9199-8f786b28f054",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1266,
+    "tokens_out": 612,
+    "cost_usd": "0.001541",
+    "ts": "2026-05-25T06:04:37.036Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "3a55dc72-3b1b-4acc-ba92-10860f96a62a",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1857,
+    "tokens_out": 16,
+    "cost_usd": "0.001465",
+    "ts": "2026-05-25T06:04:27.819Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "ff0f7fc5-8ad9-452d-ac52-bf4675e7b0a4",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "memoryBytes": 0,
+      "outlineBeats": 0,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:04:26.122Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "9fddd8f4-d3d7-4350-a8f1-4656ce018b50",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "searcher",
+    "event_type": "error",
+    "payload": {
+      "message": "Request timed out."
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:04:25.652Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "63183388-f6b6-4a70-8a58-868ebd0c2817",
+    "generation_id": "444cc0b0-db76-435a-a9d1-23df0a986209",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 201,
+      "variants": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T06:02:08.913Z",
+    "gen_topic": "https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-7464344348634284032-Md8K/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAECnDPYBVouI55dRHenmlv0opA-JgSHmtwY",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 30,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 90,
+          "faithfulness": 100,
+          "insightDensity": 15
+        },
+        "overall": 73,
+        "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Скейлил бы это в X, красава 🤌"
+          ],
+          "scores": {
+            "charFit": 30,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 90,
+            "faithfulness": 100,
+            "insightDensity": 15
+          },
+          "overall": 73,
+          "critique": "Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005772"
+  },
+  {
+    "id": "c726d6d7-30a5-4cec-852a-87f1f59aff46",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "poster",
+    "event_type": "complete",
+    "payload": {
+      "count": 1,
+      "postId": "b5393df7-f398-4690-ab19-420ba3163ae1",
+      "xTweetIds": [
+        "2058777056272687291"
+      ]
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T05:07:55.546Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "087119c0-a9ec-4ef3-a4fa-fa5c9655e6ea",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "poster",
+    "event_type": "start",
+    "payload": {
+      "postId": "b5393df7-f398-4690-ab19-420ba3163ae1",
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-25T05:07:54.688Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "1cc81262-fdc7-4527-9c7a-284882083e15",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1,
+      "winnerIndex": 0,
+      "rankedScores": [
+        87
+      ],
+      "winnerOverall": 87,
+      "winnerInventedClaims": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T16:26:12.857Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "d68f4842-ab72-4c07-b90e-dddb213c86f2",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 5,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 336,
+    "tokens_out": 795,
+    "cost_usd": "0.001674",
+    "ts": "2026-05-24T16:26:11.928Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "7196d709-f6ce-4d52-9d45-9126b3c2177b",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 95,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 95,
+        "faithfulness": 100,
+        "insightDensity": 30
+      },
+      "overall": 87,
+      "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли.",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 884,
+    "tokens_out": 1056,
+    "cost_usd": "0.002333",
+    "ts": "2026-05-24T16:26:11.726Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "58a6eeca-e919-495c-a67d-93671d549fdc",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1229,
+    "tokens_out": 879,
+    "cost_usd": "0.002065",
+    "ts": "2026-05-24T16:25:58.785Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "43b23983-0fd2-4420-ae46-3f9af0d732a0",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1747,
+    "tokens_out": 26,
+    "cost_usd": "0.001427",
+    "ts": "2026-05-24T16:25:48.076Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "9bb21d56-4d71-410e-ab98-1891adf7f4d5",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "memoryBytes": 0,
+      "outlineBeats": 0,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T16:25:40.667Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "e8eb59e0-4d2f-4094-a957-be48f4e3b482",
+    "generation_id": "27229bbb-ae94-49ba-97f6-37cad8ef2270",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 126,
+      "variants": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T16:25:40.247Z",
+    "gen_topic": "nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mechanics with LLM integration",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 30
+        },
+        "overall": 87,
+        "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "nfactorial AI Cup 2026, будем чалить RPG+horror+typing на LLM 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 30
+          },
+          "overall": 87,
+          "critique": "Стиль попадает, звучит как автор, но почти нет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007500"
+  },
+  {
+    "id": "6c5a5d7a-da26-4a40-ac98-bd6fabe614bc",
+    "generation_id": null,
+    "agent": "cron-post",
+    "event_type": "complete",
+    "payload": {
+      "failed": 0,
+      "processed": 0,
+      "succeeded": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:38:24.475Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "591fb11e-9283-46d3-9bc7-5b90c0981274",
+    "generation_id": null,
+    "agent": "cron-post",
+    "event_type": "start",
+    "payload": {
+      "dueCount": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:38:24.237Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "6a9f633d-a822-4214-b1cc-1c1ff48b4e24",
+    "generation_id": "5c014b62-85a6-48c0-ac57-5c33e565d4e1",
+    "agent": "poster",
+    "event_type": "complete",
+    "payload": {
+      "count": 1,
+      "postId": "577ea224-8f16-4e69-adaa-d1f1703d5238",
+      "xTweetIds": [
+        "2058406954951979430"
+      ]
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:37:16.588Z",
+    "gen_topic": "Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fallback, чтобы за пару дней получить рабочий прототип 🔥",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "План: loop, latency, модель, prompt, fallback",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007846"
+  },
+  {
+    "id": "f3170a13-e9c6-4864-aca5-688888d79faa",
+    "generation_id": "5c014b62-85a6-48c0-ac57-5c33e565d4e1",
+    "agent": "poster",
+    "event_type": "start",
+    "payload": {
+      "postId": "577ea224-8f16-4e69-adaa-d1f1703d5238",
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:37:15.641Z",
+    "gen_topic": "Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fallback, чтобы за пару дней получить рабочий прототип 🔥",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "План: loop, latency, модель, prompt, fallback",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007846"
+  },
+  {
+    "id": "e9583f74-831a-4265-9bf0-cf650e207374",
+    "generation_id": "5c014b62-85a6-48c0-ac57-5c33e565d4e1",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 93,
+      "postCount": 1,
+      "angleIndex": 2
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:36:40.106Z",
+    "gen_topic": "Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fallback, чтобы за пару дней получить рабочий прототип 🔥",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "План: loop, latency, модель, prompt, fallback",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007846"
+  },
+  {
+    "id": "307926d6-52ac-4b22-a878-b3ddb84d8aa9",
+    "generation_id": "5c014b62-85a6-48c0-ac57-5c33e565d4e1",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 95,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 92,
+        "faithfulness": 100,
+        "insightDensity": 70
+      },
+      "overall": 93,
+      "critique": "Чётко и в голос, можно чуть короче или добавить конкретный пример fallback."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 904,
+    "tokens_out": 995,
+    "cost_usd": "0.002216",
+    "ts": "2026-05-24T04:36:39.021Z",
+    "gen_topic": "Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fallback, чтобы за пару дней получить рабочий прототип 🔥",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "План: loop, latency, модель, prompt, fallback",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007846"
+  },
+  {
+    "id": "f99f2986-7f01-4a88-832f-3b5b20729597",
+    "generation_id": "5c014b62-85a6-48c0-ac57-5c33e565d4e1",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Фраза «чтобы за пару дней был рабочий прототип» звучит неуклюже — лучше «чтобы за пару дней получить рабочий прототип»",
+        "Рекомендуется заменить «core gameplay» на русскоязычный эквивалент для плавности"
+      ],
+      "changed": true
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1244,
+    "tokens_out": 1473,
+    "cost_usd": "0.003257",
+    "ts": "2026-05-24T04:36:27.330Z",
+    "gen_topic": "Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fallback, чтобы за пару дней получить рабочий прототип 🔥",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "План: loop, latency, модель, prompt, fallback",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007846"
+  },
+  {
+    "id": "0ecd0222-f51e-4eb5-aa09-092f90a5526e",
+    "generation_id": "5c014b62-85a6-48c0-ac57-5c33e565d4e1",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1752,
+    "tokens_out": 36,
+    "cost_usd": "0.000612",
+    "ts": "2026-05-24T04:36:09.823Z",
+    "gen_topic": "Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fallback, чтобы за пару дней получить рабочий прототип 🔥",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "План: loop, latency, модель, prompt, fallback",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007846"
+  },
+  {
+    "id": "4e33654d-9692-4ccd-94f6-95f432fd002d",
+    "generation_id": "5c014b62-85a6-48c0-ac57-5c33e565d4e1",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "План: loop, latency, модель, prompt, fallback",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:36:08.850Z",
+    "gen_topic": "Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fallback, чтобы за пару дней получить рабочий прототип 🔥",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "План: loop, latency, модель, prompt, fallback",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 2,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.007846"
+  },
+  {
+    "id": "1ef30613-d12c-443d-9ffb-a5bfb9305bff",
+    "generation_id": "97634605-40d5-4302-ac91-a7179e2c8740",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 94,
+      "postCount": 1,
+      "angleIndex": 1
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:36:07.517Z",
+    "gen_topic": "Пофиг на flashy демки — на хакатоне важна простая механика, стабильная интеграция модели и воспроизводимый демо, а не самая новая архитектура",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Лучше простая механика, чем flashy демки",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006232"
+  },
+  {
+    "id": "036ee47b-92cf-4aef-a2fc-23f5da642b0f",
+    "generation_id": "97634605-40d5-4302-ac91-a7179e2c8740",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 95,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 95,
+        "faithfulness": 100,
+        "insightDensity": 75
+      },
+      "overall": 94,
+      "critique": "Почти дословно повторяет сид — голос в точку, но можно чуть сократить или добавить конкретику."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 911,
+    "tokens_out": 809,
+    "cost_usd": "0.001846",
+    "ts": "2026-05-24T04:36:06.756Z",
+    "gen_topic": "Пофиг на flashy демки — на хакатоне важна простая механика, стабильная интеграция модели и воспроизводимый демо, а не самая новая архитектура",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Лучше простая механика, чем flashy демки",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006232"
+  },
+  {
+    "id": "4384fa13-fc6e-43a8-9425-44c7f8f06ca2",
+    "generation_id": "97634605-40d5-4302-ac91-a7179e2c8740",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Использован эм‑дэш — заменить на запятую или точку",
+        "Грамматическая ошибка: «важны простая механика» — согласование",
+        "Согласование прилагательного: «воспроизводимый демо» → «воспроизводимое демо»"
+      ],
+      "changed": true
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1256,
+    "tokens_out": 838,
+    "cost_usd": "0.001990",
+    "ts": "2026-05-24T04:35:55.589Z",
+    "gen_topic": "Пофиг на flashy демки — на хакатоне важна простая механика, стабильная интеграция модели и воспроизводимый демо, а не самая новая архитектура",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Лучше простая механика, чем flashy демки",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006232"
+  },
+  {
+    "id": "9bebeea3-bbb1-439d-a58a-3b481640ff6c",
+    "generation_id": "97634605-40d5-4302-ac91-a7179e2c8740",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1758,
+    "tokens_out": 42,
+    "cost_usd": "0.001508",
+    "ts": "2026-05-24T04:35:45.245Z",
+    "gen_topic": "Пофиг на flashy демки — на хакатоне важна простая механика, стабильная интеграция модели и воспроизводимый демо, а не самая новая архитектура",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Лучше простая механика, чем flashy демки",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006232"
+  },
+  {
+    "id": "f061926c-4f18-49f1-8aba-466771492365",
+    "generation_id": "97634605-40d5-4302-ac91-a7179e2c8740",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Лучше простая механика, чем flashy демки",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:35:43.661Z",
+    "gen_topic": "Пофиг на flashy демки — на хакатоне важна простая механика, стабильная интеграция модели и воспроизводимый демо, а не самая новая архитектура",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Лучше простая механика, чем flashy демки",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 1,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006232"
+  },
+  {
+    "id": "4238c86d-6b12-4339-ba26-55fa9064180b",
+    "generation_id": "e266e811-0800-488d-b865-2a26e377c66b",
+    "agent": "compose-bulk",
+    "event_type": "complete",
+    "payload": {
+      "overall": 84,
+      "postCount": 1,
+      "angleIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:35:42.391Z",
+    "gen_topic": "Хочу сделать игру для nfactorial AI Cup 2026, чтобы прокачать интеграцию LLM в геймплей и иметь сильный кейс в портфолио",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Челлендж и портфолио для nfactorial AI Cup",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006368"
+  },
+  {
+    "id": "20ed9292-2034-4365-902a-a4c90da03554",
+    "generation_id": "e266e811-0800-488d-b865-2a26e377c66b",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 100,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 85,
+        "faithfulness": 100,
+        "insightDensity": 20
+      },
+      "overall": 84,
+      "critique": "Практически дословно повторяет сид — стоит добавить конкретику или неожиданный поворот."
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 911,
+    "tokens_out": 613,
+    "cost_usd": "0.001454",
+    "ts": "2026-05-24T04:35:41.524Z",
+    "gen_topic": "Хочу сделать игру для nfactorial AI Cup 2026, чтобы прокачать интеграцию LLM в геймплей и иметь сильный кейс в портфолио",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Челлендж и портфолио для nfactorial AI Cup",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006368"
+  },
+  {
+    "id": "f3ac77e0-d7a8-4c2c-9520-ff31230bd1c5",
+    "generation_id": "e266e811-0800-488d-b865-2a26e377c66b",
+    "agent": "editor",
+    "event_type": "complete_with_changes",
+    "payload": {
+      "issues": [
+        "Фраза \"прокачать LLM в геймплее\" двусмысленна — лучше явно указать \"прокачать интеграцию LLM в геймплей\""
+      ],
+      "changed": true
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1254,
+    "tokens_out": 1125,
+    "cost_usd": "0.002564",
+    "ts": "2026-05-24T04:35:30.794Z",
+    "gen_topic": "Хочу сделать игру для nfactorial AI Cup 2026, чтобы прокачать интеграцию LLM в геймплей и иметь сильный кейс в портфолио",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Челлендж и портфолио для nfactorial AI Cup",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006368"
+  },
+  {
+    "id": "78dec4a7-0576-49cb-bc6e-f31df73b381e",
+    "generation_id": "e266e811-0800-488d-b865-2a26e377c66b",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1758,
+    "tokens_out": 40,
+    "cost_usd": "0.000635",
+    "ts": "2026-05-24T04:35:16.777Z",
+    "gen_topic": "Хочу сделать игру для nfactorial AI Cup 2026, чтобы прокачать интеграцию LLM в геймплей и иметь сильный кейс в портфолио",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Челлендж и портфолио для nfactorial AI Cup",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006368"
+  },
+  {
+    "id": "726905ee-fbc9-474b-9ba4-a1cc3327b333",
+    "generation_id": "e266e811-0800-488d-b865-2a26e377c66b",
+    "agent": "compose-bulk",
+    "event_type": "start",
+    "payload": {
+      "hook": "Челлендж и портфолио для nfactorial AI Cup",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:35:15.658Z",
+    "gen_topic": "Хочу сделать игру для nfactorial AI Cup 2026, чтобы прокачать интеграцию LLM в геймплей и иметь сильный кейс в портфолио",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "angleHook": "Челлендж и портфолио для nfactorial AI Cup",
+      "bulkTopic": "excited to build a game for nfactorial AI Cup 2026 hackathon",
+      "angleIndex": 0,
+      "contentType": "single"
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.006368"
+  },
+  {
+    "id": "fe72168f-feb0-462b-b8f5-d91f77c9c291",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "complete",
+    "payload": {
+      "errors": [],
+      "source": "manual",
+      "elapsedMs": 5695,
+      "tweetsFetched": 11,
+      "apiCallsApprox": 10,
+      "tweetsCaptured": 7,
+      "influencersTracked": 10,
+      "influencersResolved": 10
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:18:45.092Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "a1afbb94-d161-4f24-b5a7-1edd62716817",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "start",
+    "payload": {
+      "source": "manual",
+      "influencers": 10,
+      "authorsWithSinceId": 10
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:18:39.517Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "635b0e0a-e30f-41d7-831d-37fe7d5de8c8",
+    "generation_id": "ba472fee-01c1-423a-9e94-f496d33a48fc",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1,
+      "winnerIndex": 0,
+      "rankedScores": [
+        85
+      ],
+      "winnerOverall": 85,
+      "winnerInventedClaims": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:17:40.932Z",
+    "gen_topic": "excited to build games for nfactorial AI Cup 2026 hackathon",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 85,
+        "critique": "Коротко и в голосе, но не добавляет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Пора ботать игры для nfactorial AI Cup 2026 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 85,
+          "critique": "Коротко и в голосе, но не добавляет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005777"
+  },
+  {
+    "id": "ee959919-dfba-4553-8146-037cb1d66773",
+    "generation_id": "ba472fee-01c1-423a-9e94-f496d33a48fc",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 317,
+    "tokens_out": 657,
+    "cost_usd": "0.001393",
+    "ts": "2026-05-24T04:17:38.829Z",
+    "gen_topic": "excited to build games for nfactorial AI Cup 2026 hackathon",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 85,
+        "critique": "Коротко и в голосе, но не добавляет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Пора ботать игры для nfactorial AI Cup 2026 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 85,
+          "critique": "Коротко и в голосе, но не добавляет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005777"
+  },
+  {
+    "id": "4fe0528e-5876-4010-85df-352a6a8e0a99",
+    "generation_id": "ba472fee-01c1-423a-9e94-f496d33a48fc",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 95,
+        "antiSlop": 100,
+        "language": 100,
+        "voiceMatch": 95,
+        "faithfulness": 100,
+        "insightDensity": 20
+      },
+      "overall": 85,
+      "critique": "Коротко и в голосе, но не добавляет новой мысли.",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 865,
+    "tokens_out": 992,
+    "cost_usd": "0.002200",
+    "ts": "2026-05-24T04:17:38.489Z",
+    "gen_topic": "excited to build games for nfactorial AI Cup 2026 hackathon",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 85,
+        "critique": "Коротко и в голосе, но не добавляет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Пора ботать игры для nfactorial AI Cup 2026 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 85,
+          "critique": "Коротко и в голосе, но не добавляет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005777"
+  },
+  {
+    "id": "f70cbe1e-e744-487e-b5f1-01d52d76244b",
+    "generation_id": "ba472fee-01c1-423a-9e94-f496d33a48fc",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1210,
+    "tokens_out": 679,
+    "cost_usd": "0.001661",
+    "ts": "2026-05-24T04:17:27.426Z",
+    "gen_topic": "excited to build games for nfactorial AI Cup 2026 hackathon",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 85,
+        "critique": "Коротко и в голосе, но не добавляет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Пора ботать игры для nfactorial AI Cup 2026 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 85,
+          "critique": "Коротко и в голосе, но не добавляет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005777"
+  },
+  {
+    "id": "13c32299-93fd-4e86-a838-7b49e0571aba",
+    "generation_id": "ba472fee-01c1-423a-9e94-f496d33a48fc",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1735,
+    "tokens_out": 19,
+    "cost_usd": "0.000523",
+    "ts": "2026-05-24T04:17:19.946Z",
+    "gen_topic": "excited to build games for nfactorial AI Cup 2026 hackathon",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 85,
+        "critique": "Коротко и в голосе, но не добавляет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Пора ботать игры для nfactorial AI Cup 2026 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 85,
+          "critique": "Коротко и в голосе, но не добавляет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005777"
+  },
+  {
+    "id": "7bbc03de-5543-4cbb-a60b-67375148c7d3",
+    "generation_id": "ba472fee-01c1-423a-9e94-f496d33a48fc",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "memoryBytes": 0,
+      "outlineBeats": 0,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:17:16.951Z",
+    "gen_topic": "excited to build games for nfactorial AI Cup 2026 hackathon",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 85,
+        "critique": "Коротко и в голосе, но не добавляет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Пора ботать игры для nfactorial AI Cup 2026 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 85,
+          "critique": "Коротко и в голосе, но не добавляет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005777"
+  },
+  {
+    "id": "24791d64-4b46-4c0c-907d-b929bbe84bda",
+    "generation_id": "ba472fee-01c1-423a-9e94-f496d33a48fc",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 59,
+      "variants": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T04:17:15.966Z",
+    "gen_topic": "excited to build games for nfactorial AI Cup 2026 hackathon",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 95,
+          "antiSlop": 100,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 85,
+        "critique": "Коротко и в голосе, но не добавляет новой мысли."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Пора ботать игры для nfactorial AI Cup 2026 🤌"
+          ],
+          "scores": {
+            "charFit": 95,
+            "antiSlop": 100,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 85,
+          "critique": "Коротко и в голосе, но не добавляет новой мысли."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005777"
+  },
+  {
+    "id": "4dce1bad-21b7-4b63-9a88-6d56d1faa877",
+    "generation_id": "6217607e-7105-4bf5-be31-20594576179a",
+    "agent": "compose",
+    "event_type": "complete",
+    "payload": {
+      "variants": 1,
+      "winnerIndex": 0,
+      "rankedScores": [
+        86
+      ],
+      "winnerOverall": 86,
+      "winnerInventedClaims": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T03:58:33.104Z",
+    "gen_topic": "participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 98,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 86,
+        "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Участвую в nfactorial AI Cup 2026, надеюсь расширить круг fellow builders 🤌"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 98,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 86,
+          "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005796"
+  },
+  {
+    "id": "cb22b626-5c4b-49c1-b0e1-fb4d8e947f3c",
+    "generation_id": "6217607e-7105-4bf5-be31-20594576179a",
+    "agent": "fact-checker",
+    "event_type": "complete",
+    "payload": {
+      "invented": 0,
+      "uncertain": 0,
+      "claimsCount": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 327,
+    "tokens_out": 385,
+    "cost_usd": "0.000852",
+    "ts": "2026-05-24T03:58:19.335Z",
+    "gen_topic": "participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 98,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 86,
+        "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Участвую в nfactorial AI Cup 2026, надеюсь расширить круг fellow builders 🤌"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 98,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 86,
+          "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005796"
+  },
+  {
+    "id": "a6269cd2-2da1-4b31-8d2e-2795ddb61d3f",
+    "generation_id": "6217607e-7105-4bf5-be31-20594576179a",
+    "agent": "evaluator",
+    "event_type": "complete",
+    "payload": {
+      "scores": {
+        "charFit": 100,
+        "antiSlop": 98,
+        "language": 100,
+        "voiceMatch": 95,
+        "faithfulness": 100,
+        "insightDensity": 20
+      },
+      "overall": 86,
+      "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь.",
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 875,
+    "tokens_out": 874,
+    "cost_usd": "0.001967",
+    "ts": "2026-05-24T03:58:15.462Z",
+    "gen_topic": "participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 98,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 86,
+        "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Участвую в nfactorial AI Cup 2026, надеюсь расширить круг fellow builders 🤌"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 98,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 86,
+          "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005796"
+  },
+  {
+    "id": "18fc8a19-a6da-4152-8827-56853af734cf",
+    "generation_id": "6217607e-7105-4bf5-be31-20594576179a",
+    "agent": "editor",
+    "event_type": "complete_no_changes",
+    "payload": {
+      "issues": [],
+      "changed": false,
+      "variantIndex": 0
+    },
+    "model": "gpt-5-mini",
+    "tokens_in": 1220,
+    "tokens_out": 626,
+    "cost_usd": "0.001557",
+    "ts": "2026-05-24T03:57:59.215Z",
+    "gen_topic": "participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 98,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 86,
+        "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Участвую в nfactorial AI Cup 2026, надеюсь расширить круг fellow builders 🤌"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 98,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 86,
+          "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005796"
+  },
+  {
+    "id": "72097cdb-c86a-4db5-905c-5e0ae1d16216",
+    "generation_id": "6217607e-7105-4bf5-be31-20594576179a",
+    "agent": "writer",
+    "event_type": "complete",
+    "payload": {
+      "posts": 1,
+      "variantIndex": 0
+    },
+    "model": "gpt-5.4-mini",
+    "tokens_in": 1738,
+    "tokens_out": 26,
+    "cost_usd": "0.001420",
+    "ts": "2026-05-24T03:57:45.705Z",
+    "gen_topic": "participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 98,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 86,
+        "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Участвую в nfactorial AI Cup 2026, надеюсь расширить круг fellow builders 🤌"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 98,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 86,
+          "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005796"
+  },
+  {
+    "id": "b6d03649-3d0f-4af7-a0c8-6889439ebb00",
+    "generation_id": "6217607e-7105-4bf5-be31-20594576179a",
+    "agent": "writer",
+    "event_type": "start",
+    "payload": {
+      "memoryBytes": 0,
+      "outlineBeats": 0,
+      "variantIndex": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T03:57:42.890Z",
+    "gen_topic": "participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 98,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 86,
+        "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Участвую в nfactorial AI Cup 2026, надеюсь расширить круг fellow builders 🤌"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 98,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 86,
+          "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005796"
+  },
+  {
+    "id": "2048c337-92d4-46a8-b019-5413fcd80e86",
+    "generation_id": "6217607e-7105-4bf5-be31-20594576179a",
+    "agent": "compose",
+    "event_type": "start",
+    "payload": {
+      "mode": "ai",
+      "length": 85,
+      "variants": 1,
+      "contentType": "single"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-24T03:57:42.486Z",
+    "gen_topic": "participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network",
+    "gen_input_meta": {
+      "mode": "ai",
+      "variants": 1,
+      "winnerEval": {
+        "scores": {
+          "charFit": 100,
+          "antiSlop": 98,
+          "language": 100,
+          "voiceMatch": 95,
+          "faithfulness": 100,
+          "insightDensity": 20
+        },
+        "overall": 86,
+        "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+      },
+      "allVariants": [
+        {
+          "index": 0,
+          "texts": [
+            "Участвую в nfactorial AI Cup 2026, надеюсь расширить круг fellow builders 🤌"
+          ],
+          "scores": {
+            "charFit": 100,
+            "antiSlop": 98,
+            "language": 100,
+            "voiceMatch": 95,
+            "faithfulness": 100,
+            "insightDensity": 20
+          },
+          "overall": 86,
+          "critique": "Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь."
+        }
+      ],
+      "contentType": "single",
+      "outlineBeats": null
+    },
+    "gen_status": "succeeded",
+    "gen_total_cost": "0.005796"
+  },
+  {
+    "id": "b2906297-b9d2-46cf-bdd3-788780f667f8",
+    "generation_id": null,
+    "agent": "cron-generate",
+    "event_type": "picked",
+    "payload": {
+      "likes": 26697,
+      "viralId": "c67bf386-0fcb-4526-8f52-93102e2903b4",
+      "viralAuthor": "karpathy"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:43:26.451Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "4d0c658b-619b-41e7-83c9-9d9ac82f43e9",
+    "generation_id": null,
+    "agent": "topic-guard",
+    "event_type": "safe",
+    "payload": {
+      "mode": "cron-generate",
+      "reason": "Discusses AI/LLM agents and idea-sharing in AI research",
+      "category": "ai-research",
+      "viralAuthor": "karpathy",
+      "viralPostId": "c67bf386-0fcb-4526-8f52-93102e2903b4"
+    },
+    "model": "gpt-5-nano",
+    "tokens_in": 603,
+    "tokens_out": 301,
+    "cost_usd": "0.000151",
+    "ts": "2026-05-23T08:43:26.226Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "a9eec2c0-7f6f-48ba-86f8-e24fff90b30d",
+    "generation_id": null,
+    "agent": "topic-guard",
+    "event_type": "blocked",
+    "payload": {
+      "mode": "cron-generate",
+      "reason": "Ambiguous content; no explicit AI/tech topic stated.",
+      "category": "borderline",
+      "viralAuthor": "karpathy",
+      "viralPostId": "d6976b29-3373-4534-bfb7-2cc762e0c802"
+    },
+    "model": "gpt-5-nano",
+    "tokens_in": 548,
+    "tokens_out": 682,
+    "cost_usd": "0.000300",
+    "ts": "2026-05-23T08:43:23.512Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "59fa1000-f159-4872-97c0-bf0c51a60a88",
+    "generation_id": null,
+    "agent": "cron-post",
+    "event_type": "complete",
+    "payload": {
+      "failed": 0,
+      "processed": 0,
+      "succeeded": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:43:19.764Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "6215301b-4381-4c65-b77b-7b0c3ed2cd0d",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "complete",
+    "payload": {
+      "errors": [],
+      "source": "cron",
+      "elapsedMs": 3885,
+      "tweetsFetched": 5,
+      "apiCallsApprox": 10,
+      "tweetsCaptured": 1,
+      "influencersTracked": 10,
+      "influencersResolved": 10
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:43:19.589Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "ce24665f-ceb6-43bf-a0c4-811319a70971",
+    "generation_id": null,
+    "agent": "cron-post",
+    "event_type": "start",
+    "payload": {
+      "dueCount": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:43:19.549Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "86dd9d96-082c-40b7-831d-991d6c6e3671",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "start",
+    "payload": {
+      "source": "cron",
+      "influencers": 10,
+      "authorsWithSinceId": 10
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:43:15.817Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "0bdac66a-1b4e-41bd-828d-72475dc75eec",
+    "generation_id": null,
+    "agent": "cron-post",
+    "event_type": "complete",
+    "payload": {
+      "failed": 0,
+      "processed": 0,
+      "succeeded": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:35:31.910Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "235da87d-5ee7-472a-bb2f-cd2cbbdcf95e",
+    "generation_id": null,
+    "agent": "cron-post",
+    "event_type": "start",
+    "payload": {
+      "dueCount": 0
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:35:31.709Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "9242c922-02a0-4129-a34e-0ab25bda7d90",
+    "generation_id": null,
+    "agent": "cron-generate",
+    "event_type": "picked",
+    "payload": {
+      "likes": 148060,
+      "viralId": "f153502e-c974-4691-ae45-f4ea80aec79d",
+      "viralAuthor": "karpathy"
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T08:33:38.167Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "761eb075-562b-4388-9e97-01f73a16102a",
+    "generation_id": null,
+    "agent": "topic-guard",
+    "event_type": "safe",
+    "payload": {
+      "mode": "cron-generate",
+      "reason": "AI/ML research news about a startup career move; non-political.",
+      "category": "ai-research",
+      "viralAuthor": "karpathy",
+      "viralPostId": "f153502e-c974-4691-ae45-f4ea80aec79d"
+    },
+    "model": "gpt-5-nano",
+    "tokens_in": 586,
+    "tokens_out": 622,
+    "cost_usd": "0.000278",
+    "ts": "2026-05-23T08:33:37.941Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "f6589418-b4d3-4522-9869-2f65c29a66b3",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "complete",
+    "payload": {
+      "errors": [],
+      "source": "manual",
+      "elapsedMs": 24324,
+      "tweetsFetched": 85,
+      "apiCallsApprox": 20,
+      "tweetsCaptured": 65,
+      "influencersTracked": 10,
+      "influencersResolved": 10
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T07:28:30.642Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
+    "id": "2b4eaaf5-4ac5-4851-bb71-67fc73ab95ea",
+    "generation_id": null,
+    "agent": "discover",
+    "event_type": "start",
+    "payload": {
+      "source": "manual",
+      "influencers": 10
+    },
+    "model": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost_usd": null,
+    "ts": "2026-05-23T07:28:06.322Z",
+    "gen_topic": null,
+    "gen_input_meta": null,
+    "gen_status": null,
+    "gen_total_cost": null
+  },
+  {
     "id": "eefdc6fc-75e3-4055-9a32-92e72601575e",
     "generation_id": "d44a5879-716a-49c2-9f3e-5978c6931709",
     "agent": "editor",

@@ -1,34 +1,220 @@
 # Agent traces
 
-Latest agent events from the live nfactz database, exported by `scripts/export-traces.mjs`. Each generation is one user-triggered or cron-triggered run through the multi-agent pipeline.
+Latest 198 agent events from the live nfactz database, exported by `scripts/export-traces.mjs`. Each generation is one user-triggered or cron-triggered run through the multi-agent pipeline.
 
-**Pipeline (current):** searcher → outliner (threads) → writer → editor → [evaluator ‖ fact-checker]. Sources persisted to `sources` table; claims linked via `source_id`.
+## Критический взгляд: модерация, авторские права и токсичность в UGC — что ломает продукт и как это ле…
 
-**Discovery adapters:** X influencers + HN top stories + arXiv CS.AI/CL/LG + Substack feeds → `sources` table.
+- mode: `ai` · status: `succeeded` · total cost: $0.01138
 
-Re-export with `npx tsx scripts/export-traces.mjs` to capture the latest events.
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:49:00 | `compose-bulk` | `start` | — | — | — |
+| 06:49:02 | `writer` | `complete` | gpt-5.4-mini | 1882/111 | $0.00191 |
+| 06:49:24 | `editor` | `complete_with_changes` | gpt-5-mini | 1328/2258 | $0.00485 |
+| 06:49:34 | `evaluator` | `complete` | gpt-5-mini | 978/867 | $0.00198 |
+| 06:49:35 | `compose-bulk` | `complete` | — | — | — |
 
----
+## Про рост и комьюнити: как UGC превращает игроков в создателей и держит метрики на подъёме 🎮
 
-## Expected trace shape (current pipeline)
+- mode: `ai` · status: `succeeded` · total cost: $0.00863
 
-A compose or take run now produces these events in order:
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:48:36 | `compose-bulk` | `start` | — | — | — |
+| 06:48:37 | `writer` | `complete` | gpt-5.4-mini | 1882/51 | $0.00164 |
+| 06:48:53 | `editor` | `complete_with_changes` | gpt-5-mini | 1259/1646 | $0.00361 |
+| 06:48:59 | `evaluator` | `complete` | gpt-5-mini | 914/746 | $0.00172 |
+| 06:49:00 | `compose-bulk` | `complete` | — | — | — |
 
-| # | Agent | Event | Notes |
-|---|---|---|---|
-| 1 | `compose` / `cron-generate` | `start` | — |
-| 2 | `memory` | `recall` | hybrid FTS+vector retrieval |
-| 3 | `searcher` | `complete` | web_search_preview; sources persisted |
-| 4 | `outliner` | `complete` | threads only |
-| 5 | `writer` | `start` / `complete` | per variant |
-| 6 | `editor` | `complete_with_changes` / `complete_no_changes` | per variant |
-| 7 | `evaluator` | `complete` | parallel with fact-checker |
-| 8 | `fact-checker` | `complete` / `complete_with_invented` | claims linked to sources |
-| 9 | `compose` / `cron-generate` | `complete` | total cost includes searcher |
+## Про технику: как ботать SDK и пайплайн для UGC, чтобы контент быстро загружался и правки были легким…
 
-Discover runs produce an additional `adapters_complete` event with HN/arXiv/Substack results.
+- mode: `ai` · status: `succeeded` · total cost: $0.00752
 
----
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:48:11 | `compose-bulk` | `start` | — | — | — |
+| 06:48:12 | `writer` | `complete` | gpt-5.4-mini | 1882/32 | $0.00156 |
+| 06:48:23 | `editor` | `complete_no_changes` | gpt-5-mini | 1242/762 | $0.00184 |
+| 06:48:34 | `evaluator` | `complete` | gpt-5-mini | 899/737 | $0.00170 |
+| 06:48:35 | `compose-bulk` | `complete` | — | — | — |
+
+## Личный опыт сборки UGC-игры: почему модерация и права авторов съедают проект и где AI реально помога…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00631
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:28:39 | `compose-bulk` | `start` | — | — | — |
+| 06:28:41 | `writer` | `complete` | gpt-5.4-mini | 1815/41 | $0.00068 |
+| 06:28:50 | `editor` | `complete_with_changes` | gpt-5-mini | 1249/946 | $0.00220 |
+| 06:28:58 | `evaluator` | `complete` | gpt-5-mini | 907/683 | $0.00159 |
+| 06:28:58 | `compose-bulk` | `complete` | — | — | — |
+
+## Поговорю про экономику UGC: модели монетизации, распределение дохода между авторами и инструменты, к…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00790
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:28:13 | `compose-bulk` | `start` | — | — | — |
+| 06:28:14 | `writer` | `complete` | gpt-5.4-mini | 1815/34 | $0.00065 |
+| 06:28:27 | `editor` | `complete_no_changes` | gpt-5-mini | 1242/1274 | $0.00286 |
+| 06:28:37 | `evaluator` | `complete` | gpt-5-mini | 897/882 | $0.00199 |
+| 06:28:38 | `compose-bulk` | `complete` | — | — | — |
+
+## Разберу архитектуру UGC-игры: как хранить пользовательский контент, валидировать ресурсы, стримить а…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00682
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:27:52 | `compose-bulk` | `start` | — | — | — |
+| 06:27:53 | `writer` | `complete` | gpt-5.4-mini | 1818/35 | $0.00066 |
+| 06:28:03 | `editor` | `complete_no_changes` | gpt-5-mini | 1246/1079 | $0.00247 |
+| 06:28:12 | `evaluator` | `complete` | gpt-5-mini | 901/938 | $0.00210 |
+| 06:28:12 | `compose-bulk` | `complete` | — | — | — |
+
+## UGC круто для роста, но модерация и монетизация ломают продукт 😭
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00518
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:25:38 | `compose-bulk` | `start` | — | — | — |
+| 06:25:39 | `writer` | `complete` | gpt-5.4-mini | 1802/23 | $0.00059 |
+| 06:25:43 | `editor` | `complete_no_changes` | gpt-5-mini | 1218/427 | $0.00116 |
+| 06:25:54 | `evaluator` | `complete` | gpt-5-mini | 873/1061 | $0.00234 |
+| 06:25:54 | `compose-bulk` | `complete` | — | — | — |
+
+## Техразбор: где хранить UGC, как валидировать и кешировать
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00482
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:25:22 | `compose-bulk` | `start` | — | — | — |
+| 06:25:23 | `writer` | `complete` | gpt-5.4-mini | 1800/21 | $0.00145 |
+| 06:25:26 | `editor` | `complete_no_changes` | gpt-5-mini | 1214/301 | $0.00091 |
+| 06:25:36 | `evaluator` | `complete` | gpt-5-mini | 869/998 | $0.00221 |
+| 06:25:37 | `compose-bulk` | `complete` | — | — | — |
+
+## Собрал UGC‑игру за день, ботал прототип и поделюсь инструментами
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00670
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:25:01 | `compose-bulk` | `start` | — | — | — |
+| 06:25:02 | `writer` | `complete` | gpt-5.4-mini | 1802/24 | $0.00146 |
+| 06:25:08 | `editor` | `complete_no_changes` | gpt-5-mini | 1219/620 | $0.00154 |
+| 06:25:20 | `evaluator` | `complete` | gpt-5-mini | 874/997 | $0.00221 |
+| 06:25:21 | `compose-bulk` | `complete` | — | — | — |
+
+## https://www.linkedin.com/posts/azhambyl_today-i-have-built-a-brand-new-game-of-a-ugcPost-74643443486…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00577
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 06:02:08 | `compose` | `start` | — | — | — |
+| 06:04:25 | `searcher` | `error` | — | — | — |
+| 06:04:26 | `writer` | `start` | — | — | — |
+| 06:04:27 | `writer` | `complete` | gpt-5.4-mini | 1857/16 | $0.00146 |
+| 06:04:37 | `editor` | `complete_no_changes` | gpt-5-mini | 1266/612 | $0.00154 |
+| 06:04:52 | `evaluator` | `complete` | gpt-5-mini | 921/1070 | $0.00237 |
+| 06:04:53 | `fact-checker` | `complete` | gpt-5-mini | 440/143 | $0.00040 |
+| 06:04:53 | `compose` | `complete` | — | — | — |
+| 06:04:54 | `compose` | `error` | — | — | — |
+
+**Winner eval:** overall 73/100 · critique: Чётко в голосе и без «слива», но слишком коротко и почти без инсайта — можно добавить пару слов конкретики.
+
+## nfactorial AI Cup 2026 hackathon — building an AI-powered game, combining RPG + horror + typing mech…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00750
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 16:25:40 | `compose` | `start` | — | — | — |
+| 16:25:40 | `writer` | `start` | — | — | — |
+| 16:25:48 | `writer` | `complete` | gpt-5.4-mini | 1747/26 | $0.00143 |
+| 16:25:58 | `editor` | `complete_no_changes` | gpt-5-mini | 1229/879 | $0.00206 |
+| 16:26:11 | `evaluator` | `complete` | gpt-5-mini | 884/1056 | $0.00233 |
+| 16:26:11 | `fact-checker` | `complete` | gpt-5-mini | 336/795 | $0.00167 |
+| 16:26:12 | `compose` | `complete` | — | — | — |
+| 05:07:54 | `poster` | `start` | — | — | — |
+| 05:07:55 | `poster` | `complete` | — | — | — |
+
+**Winner eval:** overall 87/100 · critique: Стиль попадает, звучит как автор, но почти нет новой мысли.
+
+## Фокус на минимальном game loop: core gameplay, latency budget, выбор модели, prompt engineering и fa…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00785
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 04:36:08 | `compose-bulk` | `start` | — | — | — |
+| 04:36:09 | `writer` | `complete` | gpt-5.4-mini | 1752/36 | $0.00061 |
+| 04:36:27 | `editor` | `complete_with_changes` | gpt-5-mini | 1244/1473 | $0.00326 |
+| 04:36:39 | `evaluator` | `complete` | gpt-5-mini | 904/995 | $0.00222 |
+| 04:36:40 | `compose-bulk` | `complete` | — | — | — |
+| 04:37:15 | `poster` | `start` | — | — | — |
+| 04:37:16 | `poster` | `complete` | — | — | — |
+
+## Пофиг на flashy демки — на хакатоне важна простая механика, стабильная интеграция модели и воспроизв…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00623
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 04:35:43 | `compose-bulk` | `start` | — | — | — |
+| 04:35:45 | `writer` | `complete` | gpt-5.4-mini | 1758/42 | $0.00151 |
+| 04:35:55 | `editor` | `complete_with_changes` | gpt-5-mini | 1256/838 | $0.00199 |
+| 04:36:06 | `evaluator` | `complete` | gpt-5-mini | 911/809 | $0.00185 |
+| 04:36:07 | `compose-bulk` | `complete` | — | — | — |
+
+## Хочу сделать игру для nfactorial AI Cup 2026, чтобы прокачать интеграцию LLM в геймплей и иметь силь…
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00637
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 04:35:15 | `compose-bulk` | `start` | — | — | — |
+| 04:35:16 | `writer` | `complete` | gpt-5.4-mini | 1758/40 | $0.00064 |
+| 04:35:30 | `editor` | `complete_with_changes` | gpt-5-mini | 1254/1125 | $0.00256 |
+| 04:35:41 | `evaluator` | `complete` | gpt-5-mini | 911/613 | $0.00145 |
+| 04:35:42 | `compose-bulk` | `complete` | — | — | — |
+
+## excited to build games for nfactorial AI Cup 2026 hackathon
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00578
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 04:17:15 | `compose` | `start` | — | — | — |
+| 04:17:16 | `writer` | `start` | — | — | — |
+| 04:17:19 | `writer` | `complete` | gpt-5.4-mini | 1735/19 | $0.00052 |
+| 04:17:27 | `editor` | `complete_no_changes` | gpt-5-mini | 1210/679 | $0.00166 |
+| 04:17:38 | `evaluator` | `complete` | gpt-5-mini | 865/992 | $0.00220 |
+| 04:17:38 | `fact-checker` | `complete` | gpt-5-mini | 317/657 | $0.00139 |
+| 04:17:40 | `compose` | `complete` | — | — | — |
+
+**Winner eval:** overall 85/100 · critique: Коротко и в голосе, но не добавляет новой мысли.
+
+## participating in nfactorial AI Cup 2026, hopeful to expand my fellow builders network
+
+- mode: `ai` · status: `succeeded` · total cost: $0.00580
+
+| Time | Agent | Event | Model | Tokens | Cost |
+|---|---|---|---|---|---|
+| 03:57:42 | `compose` | `start` | — | — | — |
+| 03:57:42 | `writer` | `start` | — | — | — |
+| 03:57:45 | `writer` | `complete` | gpt-5.4-mini | 1738/26 | $0.00142 |
+| 03:57:59 | `editor` | `complete_no_changes` | gpt-5-mini | 1220/626 | $0.00156 |
+| 03:58:15 | `evaluator` | `complete` | gpt-5-mini | 875/874 | $0.00197 |
+| 03:58:19 | `fact-checker` | `complete` | gpt-5-mini | 327/385 | $0.00085 |
+| 03:58:33 | `compose` | `complete` | — | — | — |
+
+**Winner eval:** overall 86/100 · critique: Стиль похож на голос, но низкая информационная насыщенность — можно конкретизировать, каких билдёров ищешь.
 
 ## qrt on @gdb: the model alone is no longer the product
 
@@ -36,16 +222,11 @@ Discover runs produce an additional `adapters_complete` event with HN/arXiv/Subs
 
 | Time | Agent | Event | Model | Tokens | Cost |
 |---|---|---|---|---|---|
-| 15:21:53 | `searcher` | `complete` | gpt-5-mini | 420/85 | $0.00027 |
 | 15:21:53 | `qrt` | `start` | — | — | — |
 | 15:21:56 | `qrt` | `complete` | gpt-5.4-mini | 760/16 | $0.00064 |
 | 15:22:03 | `editor` | `complete_with_changes` | gpt-5-mini | 1207/502 | $0.00131 |
-| 15:22:05 | `evaluator` | `complete` | gpt-5-mini | 850/780 | $0.00178 |
-| 15:22:05 | `fact-checker` | `complete` | gpt-5-mini | 310/200 | $0.00048 |
 
 ## take on @paulg: The fact that Trump made so sure to silence Marjorie Taylor Greene and Thomas Massie…
-
-> **Note:** this take predates the topic-guard (slice 13). Political content is now blocked before generation.
 
 - mode: `take` · status: `succeeded` · total cost: $0.00212
 
@@ -62,7 +243,6 @@ Discover runs produce an additional `adapters_complete` event with HN/arXiv/Subs
 | Time | Agent | Event | Model | Tokens | Cost |
 |---|---|---|---|---|---|
 | 15:15:59 | `compose` | `start` | — | — | — |
-| 15:16:05 | `searcher` | `complete` | gpt-5-mini | 380/95 | $0.00029 |
 | 15:16:27 | `outliner` | `complete` | gpt-5-mini | 609/1842 | $0.00384 |
 | 15:16:27 | `writer` | `start` | — | — | — |
 | 15:16:29 | `writer` | `complete` | gpt-5.4-mini | 1847/93 | $0.00180 |
@@ -232,6 +412,22 @@ Discover runs produce an additional `adapters_complete` event with HN/arXiv/Subs
 
 | Time | Agent | Event | Payload |
 |---|---|---|---|
-| 15:19:10 | `discover` | `adapters_complete` | {"hn":{"fetched":12,"ingested":12},"arxiv":{"fetched":10,"ingested":10},"substack":[{"publication":"simonwillison","fetched":5,"ingested":5},...]} |
+| 04:38:24 | `cron-post` | `complete` | {"failed":0,"processed":0,"succeeded":0} |
+| 04:38:24 | `cron-post` | `start` | {"dueCount":0} |
+| 04:18:45 | `discover` | `complete` | {"errors":[],"source":"manual","elapsedMs":5695,"tweetsFetched":11,"apiCallsAppr |
+| 04:18:39 | `discover` | `start` | {"source":"manual","influencers":10,"authorsWithSinceId":10} |
+| 08:43:26 | `cron-generate` | `picked` | {"likes":26697,"viralId":"c67bf386-0fcb-4526-8f52-93102e2903b4","viralAuthor":"k |
+| 08:43:26 | `topic-guard` | `safe` | {"mode":"cron-generate","reason":"Discusses AI/LLM agents and idea-sharing in AI |
+| 08:43:23 | `topic-guard` | `blocked` | {"mode":"cron-generate","reason":"Ambiguous content; no explicit AI/tech topic s |
+| 08:43:19 | `cron-post` | `complete` | {"failed":0,"processed":0,"succeeded":0} |
+| 08:43:19 | `discover` | `complete` | {"errors":[],"source":"cron","elapsedMs":3885,"tweetsFetched":5,"apiCallsApprox" |
+| 08:43:19 | `cron-post` | `start` | {"dueCount":0} |
+| 08:43:15 | `discover` | `start` | {"source":"cron","influencers":10,"authorsWithSinceId":10} |
+| 08:35:31 | `cron-post` | `complete` | {"failed":0,"processed":0,"succeeded":0} |
+| 08:35:31 | `cron-post` | `start` | {"dueCount":0} |
+| 08:33:38 | `cron-generate` | `picked` | {"likes":148060,"viralId":"f153502e-c974-4691-ae45-f4ea80aec79d","viralAuthor":" |
+| 08:33:37 | `topic-guard` | `safe` | {"mode":"cron-generate","reason":"AI/ML research news about a startup career mov |
+| 07:28:30 | `discover` | `complete` | {"errors":[],"source":"manual","elapsedMs":24324,"tweetsFetched":85,"apiCallsApp |
+| 07:28:06 | `discover` | `start` | {"source":"manual","influencers":10} |
 | 15:19:04 | `discover` | `complete_with_errors` | {"errors":["@karpathy: userByUsername(@karpathy) timed out after 8000ms"],"sourc |
-| 15:18:30 | `discover` | `start` | {"source":"cron","influencers":10} |
+| 15:18:30 | `discover` | `start` | {"source":"manual","influencers":10} |

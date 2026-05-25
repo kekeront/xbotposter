@@ -58,6 +58,8 @@ async function loadTraces(agentFilter: string | null): Promise<Loaded> {
       agent: r.agent,
       eventType: r.eventType,
       payload: r.payload,
+      messages: null,
+      outputText: null,
       model: r.model,
       tokensIn: r.tokensIn,
       tokensOut: r.tokensOut,
