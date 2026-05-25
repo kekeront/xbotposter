@@ -1,6 +1,14 @@
 import "server-only";
 import { complete, type CompletionMessage } from "@/lib/llm";
 
+export type ComposePreferences = {
+  tone?: string;
+  audience?: string;
+  language?: string;
+  negatives?: string[];
+  customInstruction?: string;
+};
+
 export type WriterInput = {
   topic: string;
   contentType?: "single" | "thread" | "essay";
@@ -9,6 +17,7 @@ export type WriterInput = {
   outlineBeats?: string[];
   memoryBlock?: string;
   researchBlock?: string;
+  preferences?: ComposePreferences;
 };
 
 export type WriterOutput = {
@@ -146,6 +155,26 @@ The user's seed defines the topic and substance. The anchor only defines the voi
 
 ${block}`,
     });
+  }
+
+  if (input.preferences) {
+    const pref = input.preferences;
+    const parts: string[] = [];
+    if (pref.tone) parts.push(`TONE: ${pref.tone}`);
+    if (pref.audience) parts.push(`TARGET AUDIENCE: ${pref.audience}`);
+    if (pref.language) parts.push(`OUTPUT LANGUAGE: ${pref.language}`);
+    if (pref.negatives && pref.negatives.length > 0) {
+      parts.push(`MUST AVOID:\n${pref.negatives.map((n) => `- ${n}`).join("\n")}`);
+    }
+    if (pref.customInstruction) {
+      parts.push(`ADDITIONAL INSTRUCTION: ${pref.customInstruction}`);
+    }
+    if (parts.length > 0) {
+      messages.push({
+        role: "system",
+        content: `USER PREFERENCES — override default style where they conflict with defaults.\n\n${parts.join("\n\n")}`,
+      });
+    }
   }
 
   const contentType = input.contentType ?? "single";

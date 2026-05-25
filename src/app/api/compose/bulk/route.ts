@@ -28,10 +28,19 @@ import { loadDefaultVoice } from "@/lib/voice-load";
 
 export const maxDuration = 300;
 
+const PreferencesSchema = z.object({
+  tone: z.string().max(100).optional(),
+  audience: z.string().max(100).optional(),
+  language: z.string().max(50).optional(),
+  negatives: z.array(z.string().max(200)).max(20).optional(),
+  customInstruction: z.string().max(500).optional(),
+}).optional();
+
 const BulkRequest = z.object({
   topic: z.string().min(1).max(2000),
   contentType: z.enum(["single", "thread"]).default("single"),
   angles: z.number().int().min(2).max(6).default(3),
+  preferences: PreferencesSchema,
 });
 
 const encoder = new TextEncoder();
@@ -88,7 +97,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { topic, contentType, angles: angleCount } = parsed.data;
+  const { topic, contentType, angles: angleCount, preferences } = parsed.data;
 
   const verdict = await checkSpendCap();
   if (!verdict.allow) {
@@ -241,6 +250,7 @@ export async function POST(request: Request) {
               fingerprintBlock: voice.fingerprintBlock,
               memoryBlock: memoryContext.block,
               researchBlock,
+              preferences,
             });
             await writeTrace({
               generationId: generation.id,

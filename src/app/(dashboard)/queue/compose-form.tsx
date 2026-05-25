@@ -185,12 +185,62 @@ function consumeSSE(
   return pump();
 }
 
+const TONE_OPTIONS = [
+  "hot take", "educational", "personal story", "contrarian",
+  "observational", "motivational", "sarcastic", "analytical",
+] as const;
+
+const AUDIENCE_OPTIONS = [
+  "developers", "founders", "AI researchers", "general tech",
+  "product managers", "students", "investors",
+] as const;
+
+const NEGATIVE_PRESETS = [
+  "no hashtags", "no emojis", "no clickbait", "no cringe",
+  "no hedging", "no English", "no rhetorical questions",
+  "no lists/bullets", "no self-promo", "no threadbait",
+] as const;
+
+const LANGUAGE_OPTIONS = [
+  { value: "russian", label: "RU" },
+  { value: "english", label: "EN" },
+  { value: "mixed-ru-en", label: "RU+EN" },
+] as const;
+
+const PREFS_STORAGE_KEY = "nfactz.compose.prefs";
+
+type SavedPrefs = {
+  tone?: string;
+  audience?: string;
+  language?: string;
+  negatives?: string[];
+  customInstruction?: string;
+};
+
+function readStoredPrefs(): SavedPrefs {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(PREFS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
 export function ComposeForm() {
   const [topic, setTopic] = useState("");
   const [contentType, setContentType] = useState<ContentType>("single");
   const [mode, setMode] = useState<Mode>("ai");
   const [variants, setVariants] = useState<1 | 2 | 3>(1);
   const [angleCount, setAngleCount] = useState<2 | 3 | 4 | 5 | 6>(3);
+
+  const [tone, setTone] = useState<string | null>(null);
+  const [audience, setAudience] = useState<string | null>(null);
+  const [language, setLanguage] = useState<string | null>(null);
+  const [negatives, setNegatives] = useState<string[]>([]);
+  const [customInstruction, setCustomInstruction] = useState("");
+  const [showPrefs, setShowPrefs] = useState(false);
+
   const [status, setStatus] = useState<
     "idle" | "generating" | "done" | "error"
   >("idle");
@@ -211,12 +261,51 @@ export function ComposeForm() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMode(readStoredMode());
+    const saved = readStoredPrefs();
+    if (saved.tone) setTone(saved.tone);
+    if (saved.audience) setAudience(saved.audience);
+    if (saved.language) setLanguage(saved.language);
+    if (saved.negatives) setNegatives(saved.negatives);
+    if (saved.customInstruction) setCustomInstruction(saved.customInstruction);
+    if (saved.tone || saved.audience || saved.language || (saved.negatives && saved.negatives.length > 0) || saved.customInstruction) {
+      setShowPrefs(true);
+    }
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(MODE_STORAGE_KEY, mode);
   }, [mode]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prefs: SavedPrefs = {};
+    if (tone) prefs.tone = tone;
+    if (audience) prefs.audience = audience;
+    if (language) prefs.language = language;
+    if (negatives.length > 0) prefs.negatives = negatives;
+    if (customInstruction) prefs.customInstruction = customInstruction;
+    window.localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(prefs));
+  }, [tone, audience, language, negatives, customInstruction]);
+
+  function buildPreferences() {
+    if (isManual) return undefined;
+    const hasAny = tone || audience || language || negatives.length > 0 || customInstruction;
+    if (!hasAny) return undefined;
+    return {
+      tone: tone ?? undefined,
+      audience: audience ?? undefined,
+      language: language ?? undefined,
+      negatives: negatives.length > 0 ? negatives : undefined,
+      customInstruction: customInstruction || undefined,
+    };
+  }
+
+  function toggleNegative(neg: string) {
+    setNegatives((prev) =>
+      prev.includes(neg) ? prev.filter((n) => n !== neg) : [...prev, neg],
+    );
+  }
 
   const isManual = mode === "manual";
   const isBulk = mode === "bulk";
@@ -269,6 +358,7 @@ export function ComposeForm() {
           contentType,
           mode,
           variants: isManual ? 1 : variants,
+          preferences: buildPreferences(),
         }),
         signal: controller.signal,
       });
@@ -340,7 +430,7 @@ export function ComposeForm() {
       const res = await fetch("/api/compose/bulk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, contentType, angles: angleCount }),
+        body: JSON.stringify({ topic, contentType, angles: angleCount, preferences: buildPreferences() }),
         signal: controller.signal,
       });
 
@@ -557,6 +647,103 @@ export function ComposeForm() {
               the link if you can post it as a reply or QRT instead.
             </div>
           ) : null}
+
+          {!isManual && (
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setShowPrefs(!showPrefs)}
+                className="flex items-center gap-2 self-start text-xs text-muted-foreground hover:text-foreground"
+              >
+                <span>{showPrefs ? "▾" : "▸"} preferences</span>
+                {(tone || audience || negatives.length > 0) && !showPrefs && (
+                  <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">
+                    {[tone, audience, ...negatives].filter(Boolean).join(" · ")}
+                  </span>
+                )}
+              </button>
+
+              {showPrefs && (
+                <div className="flex flex-col gap-3 rounded-md border bg-muted/20 p-3">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      Tone
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {TONE_OPTIONS.map((t) => (
+                        <ToggleButton
+                          key={t}
+                          active={tone === t}
+                          onClick={() => setTone(tone === t ? null : t)}
+                        >
+                          {t}
+                        </ToggleButton>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      Audience
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {AUDIENCE_OPTIONS.map((a) => (
+                        <ToggleButton
+                          key={a}
+                          active={audience === a}
+                          onClick={() => setAudience(audience === a ? null : a)}
+                        >
+                          {a}
+                        </ToggleButton>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      Language
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {LANGUAGE_OPTIONS.map((l) => (
+                        <ToggleButton
+                          key={l.value}
+                          active={language === l.value}
+                          onClick={() => setLanguage(language === l.value ? null : l.value)}
+                        >
+                          {l.label}
+                        </ToggleButton>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      Don&apos;t
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {NEGATIVE_PRESETS.map((n) => (
+                        <ToggleButton
+                          key={n}
+                          active={negatives.includes(n)}
+                          onClick={() => toggleNegative(n)}
+                        >
+                          {n}
+                        </ToggleButton>
+                      ))}
+                    </div>
+                  </div>
+
+                  <input
+                    type="text"
+                    value={customInstruction}
+                    onChange={(e) => setCustomInstruction(e.target.value)}
+                    placeholder="custom instruction (e.g. 'write like you just woke up')"
+                    className="rounded-md border bg-transparent px-2 py-1.5 font-mono text-xs placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {status === "generating" ? (
             <ProgressBar

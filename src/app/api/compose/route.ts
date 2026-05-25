@@ -28,11 +28,20 @@ import { loadDefaultVoice, type LoadedVoice } from "@/lib/voice-load";
 
 export const maxDuration = 120;
 
+const PreferencesSchema = z.object({
+  tone: z.string().max(100).optional(),
+  audience: z.string().max(100).optional(),
+  language: z.string().max(50).optional(),
+  negatives: z.array(z.string().max(200)).max(20).optional(),
+  customInstruction: z.string().max(500).optional(),
+}).optional();
+
 const ComposeRequest = z.object({
   topic: z.string().min(1).max(2000),
   contentType: z.enum(["single", "thread", "essay"]).default("single"),
   mode: z.enum(["ai", "manual"]).default("ai"),
   variants: z.number().int().min(1).max(3).default(1),
+  preferences: PreferencesSchema,
 });
 
 type VariantResult = {
@@ -70,6 +79,7 @@ async function runVariant(
   sharedOutlineBeats?: string[],
   memoryBlock?: string,
   researchBlock?: string,
+  preferences?: z.infer<typeof PreferencesSchema>,
 ): Promise<VariantResult> {
   const tag = `variant ${index + 1}`;
 
@@ -92,6 +102,7 @@ async function runVariant(
     outlineBeats: sharedOutlineBeats,
     memoryBlock,
     researchBlock,
+    preferences,
   });
   await writeTrace({
     generationId,
@@ -265,7 +276,7 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  const { topic, contentType, mode, variants } = parsed.data;
+  const { topic, contentType, mode, variants, preferences } = parsed.data;
 
   if (mode === "ai") {
     const verdict = await checkSpendCap();
@@ -487,6 +498,7 @@ export async function POST(request: Request) {
               outlineBeats,
               memoryContext.block,
               researchBlock,
+              preferences,
             ),
           ),
         );
