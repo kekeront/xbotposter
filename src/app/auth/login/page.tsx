@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -92,10 +93,18 @@ function MagicLinkForm() {
   );
 }
 
+function RegisteredBanner() {
+  const searchParams = useSearchParams();
+  if (searchParams.get("registered") !== "true") return null;
+  return (
+    <p className="text-sm text-green-600">
+      Account created. Sign in to continue.
+    </p>
+  );
+}
+
 export default function LoginPage() {
   const [mode, setMode] = useState<"password" | "magic">("password");
-  const searchParams = useSearchParams();
-  const justRegistered = searchParams.get("registered") === "true";
 
   return (
     <Card>
@@ -104,11 +113,9 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
-          {justRegistered && (
-            <p className="text-sm text-green-600">
-              Account created. Sign in to continue.
-            </p>
-          )}
+          <Suspense>
+            <RegisteredBanner />
+          </Suspense>
           {mode === "password" ? <PasswordForm /> : <MagicLinkForm />}
 
           <button

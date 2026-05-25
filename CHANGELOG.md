@@ -442,6 +442,178 @@ home timeline). Daily spend digest в Telegram/Slack (cap на $2 → push
 
 ---
 
+## 2026-05-25 — Supabase Auth: email/password + magic link (slice 16)
+
+**Проблема.** Приложение было single-user: все данные принадлежали одному
+«скрытому» пользователю, X-токены лежали в env как глобальные credentials.
+Для SaaS-модели (и для демо с несколькими аккаунтами) нужна нормальная auth.
+
+**Ход мыслей.** Supabase Auth уже в проекте как managed сервис — не нужен
+отдельный JWT-стек. `@supabase/ssr` даёт cookie-based sessions без клиентского
+хранилища. Next.js middleware (`proxy.ts` / `middleware.ts`) перехватывает все
+app-роуты и редиректит на `/login` при отсутствии сессии.
+
+**Рассмотренные варианты.**
+1. NextAuth.js — хорошо для OAuth провайдеров, но избыточен когда Supabase Auth
+   уже поднят. Дублирование session-логики.
+2. Custom JWT в edge middleware — полный контроль, но нужно хранить и
+   ротировать ключи самостоятельно.
+3. Supabase Auth + `@supabase/ssr` — нативная интеграция, cookie-сессии,
+   встроенные magic links, reset-flow из коробки.
+
+**Причина выбора.** №3. Supabase уже в деплое; `@supabase/ssr` даёт
+`createServerClient` / `createBrowserClient` с единой точкой истины. Middleware
+автообновляет сессию на каждом запросе (refresh tokens прозрачны).
+
+**Результат.** `/login`, `/signup`, `/forgot-password`, `/update-password`.
+Все API-роуты возвращают 401 без сессии. Magic-link + email/password
+параллельно поддерживаются через одну форму.
+
+**Дальше.** Добавить OAuth провайдеры (GitHub, Google) — Supabase Auth
+поддерживает из коробки, нужно только включить в Dashboard.
+
+---
+
+## 2026-05-25 — Multi-tenant schema: userId на всех таблицах (slice 17)
+
+**Проблема.** 7 существующих таблиц (`generations`, `posts`, `sources`,
+`viral_posts`, `fingerprints`, `traces`, `claims`) не имели `userId`. Первый
+второй пользователь увидел бы чужие черновики и трейсы.
+
+**Ход мыслей.** Самый простой вариант изоляции — `userId` FK на каждой таблице
++ фильтр `.where(eq(table.userId, session.userId))` в каждом query. Альтернатива
+— Supabase RLS — требует перекладывать всю логику запросов из Drizzle в
+Postgres-политики, что ломает типизацию.
+
+**Рассмотренные варианты.**
+1. Supabase Row-Level Security — изоляция на уровне БД, нельзя случайно
+   забыть. Но тогда Drizzle-клиент должен передавать JWT на каждый запрос, и
+   мы теряем service-role queries для cron-jobs.
+2. `userId` колонка + фильтр в каждом query через Drizzle — явный, типизированный,
+   cron-jobs используют service role и могут делать cross-user queries законно.
+3. Отдельные схемы/БД per user — явный overkill при текущем масштабе.
+
+**Причина выбора.** №2. Drizzle-фильтр виден в коде рядом с запросом,
+type-safe, не требует отдельного JWT-прохода. Cron-job видит всех
+пользователей — это intended behavior (один воркер дренирует scheduled posts
+всех юзеров).
+
+**Результат.** Drizzle-миграция добавила `userId text NOT NULL` на все 7 таблиц.
+Новые таблицы: `profiles` (trackedAccounts per user), `social_connections`
+(X/Telegram токены per user). Все query-функции получили `userId` параметр.
+
+**Дальше.** Рассмотреть RLS как второй слой защиты поверх app-level фильтра —
+defence in depth для публичных экзамплеров.
+
+---
+
+## 2026-05-25 — X OAuth 2.0 PKCE: per-user X connection (slice 18)
+
+**Проблема.** Раньше X-credentials лежали в env (`X_ACCESS_TOKEN`,
+`X_ACCESS_TOKEN_SECRET`) — один аккаунт, OAuth 1.0a. При multi-tenant модели
+нужно, чтобы каждый пользователь постил как сам себя.
+
+**Ход мыслей.** X поддерживает OAuth 2.0 + PKCE для confidential clients.
+Access token и refresh token хранятся per-user в `social_connections`. Poster
+загружает токены пользователя перед каждым шипом, рефрешит если expired.
+
+**Рассмотренные варианты.**
+1. Оставить OAuth 1.0a с shared credentials — не масштабируется, юзер постит
+   от имени бота, а не своего аккаунта.
+2. OAuth 2.0 PKCE без хранения refresh token — юзер реконнектится каждые
+   2 часа. Плохой UX.
+3. OAuth 2.0 PKCE + refresh token в БД + auto-refresh в poster — seamless UX,
+   стандартная практика.
+
+**Причина выбора.** №3. PKCE обязателен для confidential web clients согласно
+X Developer docs (2025+). Refresh token живёт 6 месяцев; poster.ts рефрешит
+при 401.
+
+**Результат.** `/api/auth/x/connect` → PKCE challenge → X authorization page →
+`/api/auth/x/callback` → upsert в `social_connections`. `/settings/connections`
+показывает статус, кнопка disconnect. Cron-post и manual post используют токены
+из `social_connections` конкретного пользователя.
+
+**Дальше.** Webhook от X при revoke токена — сейчас ловим только при следующем
+шипе. Можно добавить уведомление в Telegram при disconnect.
+
+---
+
+## 2026-05-25 — UX consolidation: 9 nav items → 3 (slice 21)
+
+**Проблема.** Navigation содержала 9 пунктов: Queue, Compose, Discover, Voice,
+Automation, Schedule, History, Traces + Settings. Пользователю нужно было
+переключаться между несколькими страницами для одного рабочего цикла
+(compose → discover → queue). «Schedule» и «History» были заглушками.
+
+**Ход мыслей.** Реальный workflow пользователя — это три режима: (1) работа с
+очередью (включая composing и discovering), (2) просмотр агентных событий,
+(3) конфигурация. Всё остальное — subview одного из трёх.
+
+**Рассмотренные варианты.**
+1. Оставить 9 items, убрать заглушки — чище, но всё ещё много переключений.
+2. Свернуть в 5: Queue, Compose, Discover, Traces, Settings.
+3. Свернуть в 3: Queue (все рабочие инструменты) / Traces / Settings.
+
+**Причина выбора.** №3. Queue — это рабочий hub; compose и discover — это
+панели внутри него (collapsible), не отдельные страницы. Automation status
+тоже живёт внутри Queue (была отдельная страница `/automation`). Traces и
+Settings — принципиально другие режимы.
+
+**Результат.** Queue: collapsible Compose + collapsible Discover + collapsible
+Automation + post list с фильтрами. Settings: hub → `/settings/connections` +
+`/settings/voice`. Удалены страницы: `/compose`, `/discover`, `/voice`,
+`/automation`, `/schedule`, `/history`. Nav: 3 items.
+
+**Дальше.** Keyboard shortcuts для переключения collapsible секций — сейчас
+нет hotkeys.
+
+---
+
+## 2026-05-25 — Editable influencer channels per user (slice 22)
+
+**Проблема.** `INFLUENCERS` в `src/config/influencers.ts` был hardcoded списком
+10 tech-голосов. Разные пользователи хотят следить за разными аккаунтами.
+Изменение конфига требовало редактирования кода.
+
+**Ход мыслей.** `profiles.trackedAccounts` — nullable JSON-массив. Если null —
+fallback на default INFLUENCERS. Если заполнен — использовать его. UI в
+`/settings/connections` (или inline в Queue Discover-панели) позволяет добавить
+/ удалить аккаунты.
+
+**Причина выбора.** Nullable override — минимальный schema change без потери
+default behavior для новых пользователей.
+
+**Результат.** `profiles.trackedAccounts text[]`. Discover-панель в Queue
+показывает текущий список с кнопками удаления и инпутом добавления.
+`/api/settings/tracked-accounts` GET/POST. `runDiscoverFetch()` принимает
+`trackedAccounts` параметр.
+
+---
+
+## 2026-05-25 — Security hardening после code review (slice 24)
+
+**Проблема.** Code review выявил несколько уязвимостей: (1) `/api/queue/reset`
+сбрасывал посты всех пользователей, а не только текущего; (2) redirect после
+логина не валидировал URL — открытый редирект; (3) несколько API-роутов не
+проверяли сессию; (4) X OAuth callback не обрабатывал error-параметр от X.
+
+**Ход мыслей.** Для каждой проблемы — минимальный targeted фикс, не
+перекройка:
+1. Добавить `userId` фильтр в queue reset query.
+2. Валидировать redirect URL через `new URL()` + whitelist схем (`/` prefix
+   only) — отклонять абсолютные URLs в redirect param.
+3. Добавить `getSession()` check в каждый незащищённый роут.
+4. Читать `?error` и `?error_description` в callback, логировать + возвращать
+   понятный UI error.
+
+**Результат.** Все 4 фикса применены. Expired token в `social_connections`
+теперь ловится в poster.ts — юзер получает actionable error «reconnect your X
+account» вместо 500. `checkSpendCap()` возвращает 429 с JSON телом для
+корректной обработки на клиенте.
+
+---
+
 ## История слайсов
 
 ```
@@ -466,6 +638,15 @@ home timeline). Daily spend digest в Telegram/Slack (cap на $2 → push
 13 topic-guard agent (fail-closed safety gate)
 14 billing tracker + cadence pills + X cost opts (cached IDs, max_results=5) + PD UX polish
 15 since_id (pay only for new) + spend cap + URL warning + cached pricing
+16 Supabase Auth (email/password + magic link) + middleware
+17 multi-tenant schema — userId на всех таблицах + profiles + social_connections
+18 X OAuth 2.0 PKCE — per-user X connection + token refresh
+19 Telegram connection per user (Login Widget + verify)
+20 Settings hub (/settings/connections + /settings/voice)
+21 UX consolidation — 9 nav items → 3 (Queue / Traces / Settings)
+22 editable influencer channels per user (profiles.trackedAccounts)
+23 forgot-password / update-password flow
+24 security hardening (user-scoped resets, open redirect, auth checks, X callback errors)
 ```
 
 Полный лог — `git log --oneline`. Cost-per-pipeline и live evidence — в
