@@ -14,10 +14,15 @@ const schema = z.object({
   LLM_WRITER_MODEL: z.string().default("gpt-5.4-mini"),
   EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
 
+  // Legacy OAuth 1.0a (fallback for system-level/cron operations)
   X_CONSUMER_KEY: z.string().optional(),
   X_CONSUMER_SECRET: z.string().optional(),
   X_ACCESS_TOKEN: z.string().optional(),
   X_ACCESS_TOKEN_SECRET: z.string().optional(),
+
+  // OAuth 2.0 PKCE (per-user X connection)
+  X_OAUTH2_CLIENT_ID: z.string().optional(),
+  X_OAUTH2_CLIENT_SECRET: z.string().optional(),
 
   CRON_SECRET: z.string().min(8).optional(),
 
@@ -31,6 +36,9 @@ const schema = z.object({
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_CHAT_ID: z.string().optional(),
   TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
+
+  // Public-facing Telegram bot username (for Login Widget). No @.
+  NEXT_PUBLIC_TELEGRAM_BOT_NAME: z.string().optional(),
 
   // Public URL of this deployment, used to deep-link from Telegram messages
   // to the /queue page. Defaults to localhost in dev.

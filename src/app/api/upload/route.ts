@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "@/db/client";
 import { sources } from "@/db/schema";
+import { requireUser } from "@/lib/auth";
 
 const UploadRequest = z.object({
   title: z.string().min(1).max(500),
@@ -10,6 +11,7 @@ const UploadRequest = z.object({
 });
 
 export async function POST(request: Request) {
+  const user = await requireUser();
   let body: unknown;
   try {
     body = await request.json();
@@ -31,6 +33,7 @@ export async function POST(request: Request) {
   const [row] = await db
     .insert(sources)
     .values({
+      userId: user.id,
       type,
       externalId,
       url: url ?? null,
@@ -50,6 +53,8 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  const user = await requireUser();
+  const { eq } = await import("drizzle-orm");
   const rows = await db
     .select({
       id: sources.id,
@@ -59,6 +64,7 @@ export async function GET() {
       ingestedAt: sources.ingestedAt,
     })
     .from(sources)
+    .where(eq(sources.userId, user.id))
     .orderBy(sources.ingestedAt)
     .limit(50);
 

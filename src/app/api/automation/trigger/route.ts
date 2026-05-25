@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { requireUser } from "@/lib/auth";
 import { env, requireEnv } from "@/lib/env";
 
 const TriggerRequest = z.object({
@@ -16,6 +17,7 @@ const TriggerRequest = z.object({
  * this on schedule.
  */
 export async function POST(request: Request) {
+  await requireUser();
   let body: unknown;
   try {
     body = await request.json();

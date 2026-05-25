@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { CadenceStrip } from "@/components/shell/cadence-strip";
-import { SidebarNav } from "@/components/shell/nav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "nfactz · admin",
-  description: "Agentic X content engine — admin panel",
+  title: "nfactz",
+  description: "Agentic X content engine",
 };
 
 export default function RootLayout({
@@ -29,17 +27,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
-        <div className="grid min-h-screen grid-cols-[220px_1fr]">
-          <aside className="border-r bg-sidebar text-sidebar-foreground">
-            <SidebarNav />
-          </aside>
-          <main className="flex flex-col">
-            <CadenceStrip />
-            {children}
-          </main>
-        </div>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

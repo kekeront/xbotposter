@@ -1,14 +1,24 @@
-import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { db } from "@/db/client";
 import {
   generations,
   POST_STATUS,
   posts,
+  profiles,
+  viralPosts,
   type Post,
   type PostStatus,
+  type TrackedAccount,
 } from "@/db/schema";
+import { requireUser } from "@/lib/auth";
+import { INFLUENCERS } from "@/config/influencers";
+import { env } from "@/lib/env";
+import { loadAllCronStatus, loadAutonomyStats } from "@/lib/automation";
+import { loadBilling } from "@/lib/billing";
+import { AutomationPanel } from "./automation-panel";
+import { ComposePanel } from "./compose-panel";
+import { DiscoverPanel } from "./discover-panel";
 import { PostRow, type PostSource } from "./post-row";
 import { ResetQueueButton } from "./reset-queue-button";
 
@@ -42,28 +52,35 @@ function metaToSource(meta: GenerationMeta | null): PostSource | null {
   return { kind: meta.mode };
 }
 
-type Filter = "active" | "all" | PostStatus;
+type Filter = "active" | "all" | "scheduled" | PostStatus;
 
 const ACTIVE_STATUSES: PostStatus[] = ["draft", "approved", "scheduled", "failed"];
 
 function parseFilter(raw: string | undefined): Filter {
   if (raw === "all") return "all";
+  if (raw === "scheduled") return "scheduled";
   if (raw && (POST_STATUS as readonly string[]).includes(raw)) {
     return raw as PostStatus;
   }
   return "active";
 }
 
-async function loadPosts(filter: Filter): Promise<Loaded> {
+async function loadPosts(filter: Filter, userId: string): Promise<Loaded> {
   try {
     const parentNull = isNull(posts.parentPostId);
+    const userFilter = eq(posts.userId, userId);
+
+    if (filter === "scheduled") {
+      return loadScheduledPosts(userId);
+    }
+
     let whereClause;
     if (filter === "all") {
-      whereClause = parentNull;
+      whereClause = and(parentNull, userFilter);
     } else if (filter === "active") {
-      whereClause = and(parentNull, inArray(posts.status, ACTIVE_STATUSES));
+      whereClause = and(parentNull, userFilter, inArray(posts.status, ACTIVE_STATUSES));
     } else {
-      whereClause = and(parentNull, eq(posts.status, filter));
+      whereClause = and(parentNull, userFilter, eq(posts.status, filter));
     }
 
     const rows = await db
@@ -83,7 +100,7 @@ async function loadPosts(filter: Filter): Promise<Loaded> {
         count: sql<number>`count(*)::int`,
       })
       .from(posts)
-      .where(sql`${posts.parentPostId} is not null`)
+      .where(and(sql`${posts.parentPostId} is not null`, userFilter))
       .groupBy(posts.parentPostId);
 
     const byParent = new Map<string, number>();
@@ -110,13 +127,65 @@ async function loadPosts(filter: Filter): Promise<Loaded> {
   }
 }
 
-async function loadCounts(): Promise<Record<Filter, number>> {
-  const counts: Record<Filter, number> = {
+async function loadScheduledPosts(userId: string): Promise<Loaded> {
+  try {
+    const now = new Date();
+    const userFilter = eq(posts.userId, userId);
+
+    const rows = await db
+      .select({ post: posts, generationMeta: generations.inputMeta })
+      .from(posts)
+      .leftJoin(generations, eq(generations.id, posts.generationId))
+      .where(
+        and(
+          eq(posts.status, "approved"),
+          isNull(posts.parentPostId),
+          gt(posts.scheduledFor, now),
+          userFilter,
+        ),
+      )
+      .orderBy(asc(posts.scheduledFor));
+
+    const threadCounts = await db
+      .select({
+        parentId: posts.parentPostId,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(posts)
+      .where(and(sql`${posts.parentPostId} is not null`, userFilter))
+      .groupBy(posts.parentPostId);
+
+    const byParent = new Map<string, number>();
+    for (const row of threadCounts) {
+      if (row.parentId) byParent.set(row.parentId, row.count);
+    }
+
+    return {
+      ok: true,
+      rows: rows.map(({ post, generationMeta }) => ({
+        ...post,
+        threadCount:
+          post.contentType === "thread"
+            ? (byParent.get(post.id) ?? 0) + 1
+            : 0,
+        source: metaToSource(generationMeta as GenerationMeta | null),
+      })),
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "unknown DB error",
+    };
+  }
+}
+
+async function loadCounts(userId: string): Promise<Record<string, number>> {
+  const counts: Record<string, number> = {
     active: 0,
     all: 0,
+    scheduled: 0,
     draft: 0,
     approved: 0,
-    scheduled: 0,
     posted: 0,
     failed: 0,
     skipped: 0,
@@ -128,7 +197,7 @@ async function loadCounts(): Promise<Record<Filter, number>> {
         count: sql<number>`count(*)::int`,
       })
       .from(posts)
-      .where(isNull(posts.parentPostId))
+      .where(and(isNull(posts.parentPostId), eq(posts.userId, userId)))
       .groupBy(posts.status);
 
     for (const row of rows) {
@@ -136,15 +205,97 @@ async function loadCounts(): Promise<Record<Filter, number>> {
       counts.all += row.count;
       if (ACTIVE_STATUSES.includes(row.status)) counts.active += row.count;
     }
+
+    const now = new Date();
+    const [scheduledRow] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(posts)
+      .where(
+        and(
+          eq(posts.status, "approved"),
+          isNull(posts.parentPostId),
+          gt(posts.scheduledFor, now),
+          eq(posts.userId, userId),
+        ),
+      );
+    counts.scheduled = scheduledRow?.count ?? 0;
   } catch {
-    // ignore — counts not critical
+    // counts not critical
   }
   return counts;
+}
+
+async function loadDiscoverData(userId: string) {
+  try {
+    const [viral, profileRow, lastRow] = await Promise.all([
+      db
+        .select()
+        .from(viralPosts)
+        .where(eq(viralPosts.userId, userId))
+        .orderBy(
+          desc(
+            sql<number>`coalesce((${viralPosts.engagement} ->> 'likes')::int, 0)`,
+          ),
+          desc(viralPosts.capturedAt),
+        )
+        .limit(30),
+      db
+        .select({ trackedAccounts: profiles.trackedAccounts })
+        .from(profiles)
+        .where(eq(profiles.id, userId))
+        .limit(1),
+      db
+        .select({ capturedAt: viralPosts.capturedAt })
+        .from(viralPosts)
+        .where(eq(viralPosts.userId, userId))
+        .orderBy(desc(viralPosts.capturedAt))
+        .limit(1),
+    ]);
+
+    const trackedAccounts: TrackedAccount[] =
+      profileRow[0]?.trackedAccounts ?? INFLUENCERS;
+
+    return {
+      viralPosts: viral.map((v) => ({
+        id: v.id,
+        author: v.author,
+        text: v.text,
+        xUrl: v.xUrl,
+        xTweetId: v.xTweetId,
+        engagement: v.engagement as Record<string, number> | null,
+        capturedAt: v.capturedAt.toISOString(),
+      })),
+      trackedAccounts,
+      lastFetch: lastRow[0]?.capturedAt?.toISOString() ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function loadAutomationData() {
+  try {
+    const [jobs, stats, billing] = await Promise.all([
+      loadAllCronStatus(),
+      loadAutonomyStats(),
+      loadBilling(),
+    ]);
+    const todaySpend = billing?.today.totalUsd ?? 0;
+    const cap = env.MAX_DAILY_USD;
+    const serializedJobs = jobs.map((j) => ({
+      ...j,
+      lastRunAt: j.lastRunAt ? j.lastRunAt.toISOString() : null,
+    }));
+    return { jobs: serializedJobs, stats, todaySpend, cap };
+  } catch {
+    return null;
+  }
 }
 
 const FILTER_TABS: Array<{ value: Filter; label: string }> = [
   { value: "active", label: "active" },
   { value: "draft", label: "draft" },
+  { value: "scheduled", label: "scheduled" },
   { value: "posted", label: "posted" },
   { value: "failed", label: "failed" },
   { value: "skipped", label: "skipped" },
@@ -156,9 +307,15 @@ type QueuePageProps = {
 };
 
 export default async function QueuePage({ searchParams }: QueuePageProps) {
+  const user = await requireUser();
   const { filter: filterRaw } = await searchParams;
   const filter = parseFilter(filterRaw);
-  const [result, counts] = await Promise.all([loadPosts(filter), loadCounts()]);
+  const [result, counts, automation, discover] = await Promise.all([
+    loadPosts(filter, user.id),
+    loadCounts(user.id),
+    loadAutomationData(),
+    loadDiscoverData(user.id),
+  ]);
 
   return (
     <div className="flex flex-col gap-6 p-8">
@@ -166,21 +323,35 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Queue</h1>
           <p className="text-sm text-muted-foreground">
-            Review, skip, or ship drafts. Threads post as chained replies.
+            Review, schedule, and ship your drafts.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <ResetQueueButton activeCount={counts.active} />
-          <Badge variant="outline" className="font-mono">
-            slice 3a
-          </Badge>
-        </div>
+        <ResetQueueButton activeCount={counts.active} />
       </header>
+
+      <ComposePanel />
+
+      {discover && (
+        <DiscoverPanel
+          viralPosts={discover.viralPosts}
+          trackedAccounts={discover.trackedAccounts}
+          lastFetch={discover.lastFetch}
+        />
+      )}
+
+      {automation && (
+        <AutomationPanel
+          stats={automation.stats}
+          jobs={automation.jobs}
+          todaySpend={automation.todaySpend}
+          cap={automation.cap}
+        />
+      )}
 
       <nav className="flex flex-wrap gap-1 font-mono text-xs">
         {FILTER_TABS.map((tab) => {
           const isActive = filter === tab.value;
-          const count = counts[tab.value];
+          const count = counts[tab.value] ?? 0;
           const href = tab.value === "active" ? "/queue" : `/queue?filter=${tab.value}`;
           return (
             <Link
@@ -233,6 +404,8 @@ function EmptyState({ filter }: { filter: Filter }) {
             Head to <Link href="/compose" className="underline">Compose</Link>{" "}
             and draft something.
           </>
+        ) : filter === "scheduled" ? (
+          <>Schedule posts from the active queue.</>
         ) : (
           <>Try a different filter above.</>
         )}

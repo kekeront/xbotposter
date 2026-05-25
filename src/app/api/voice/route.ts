@@ -1,7 +1,8 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { fingerprints } from "@/db/schema";
+import { requireUser } from "@/lib/auth";
 import { extractFingerprint, type Fingerprint } from "@/lib/fingerprint";
 
 const DEFAULT_NAME = "default";
@@ -16,10 +17,11 @@ type FingerprintProfile = {
 };
 
 export async function GET() {
+  const user = await requireUser();
   const rows = await db
     .select()
     .from(fingerprints)
-    .where(eq(fingerprints.name, DEFAULT_NAME))
+    .where(and(eq(fingerprints.name, DEFAULT_NAME), eq(fingerprints.userId, user.id)))
     .limit(1);
   const row = rows[0];
   if (!row) {
@@ -38,6 +40,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const user = await requireUser();
   let body: unknown;
   try {
     body = await request.json();
@@ -63,7 +66,7 @@ export async function POST(request: Request) {
   const existing = await db
     .select()
     .from(fingerprints)
-    .where(eq(fingerprints.name, DEFAULT_NAME))
+    .where(and(eq(fingerprints.name, DEFAULT_NAME), eq(fingerprints.userId, user.id)))
     .limit(1);
 
   if (existing[0]) {
@@ -82,6 +85,7 @@ export async function POST(request: Request) {
   const [created] = await db
     .insert(fingerprints)
     .values({
+      userId: user.id,
       name: DEFAULT_NAME,
       profile,
       sampleCount: referenceTweets.length,

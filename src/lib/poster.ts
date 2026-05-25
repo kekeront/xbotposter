@@ -1,5 +1,5 @@
 import "server-only";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { posts, type Post } from "@/db/schema";
 import { recordMemoryTurn } from "./memory-bridge";
@@ -10,8 +10,14 @@ export type ShipPostResult =
   | { ok: true; posts: Post[]; xTweetIds: string[] }
   | { ok: false; status: number; error: string; message?: string };
 
-export async function shipPostById(postId: string): Promise<ShipPostResult> {
-  const rootRows = await db.select().from(posts).where(eq(posts.id, postId)).limit(1);
+export async function shipPostById(
+  postId: string,
+  opts?: { userId?: string },
+): Promise<ShipPostResult> {
+  const whereClause = opts?.userId
+    ? and(eq(posts.id, postId), eq(posts.userId, opts.userId))
+    : eq(posts.id, postId);
+  const rootRows = await db.select().from(posts).where(whereClause).limit(1);
   const root = rootRows[0];
   if (!root) return { ok: false, status: 404, error: "not found" };
 
@@ -52,7 +58,7 @@ export async function shipPostById(postId: string): Promise<ShipPostResult> {
 
       const allRows = [root, ...children];
       const texts = allRows.map((r) => r.text);
-      const results = await postThread(texts);
+      const results = await postThread(texts, { userId: opts?.userId });
 
       for (let i = 0; i < allRows.length; i++) {
         const row = allRows[i];
@@ -74,6 +80,7 @@ export async function shipPostById(postId: string): Promise<ShipPostResult> {
     } else {
       const tweet = await postTweet(root.text, {
         quoteTweetId: root.quoteTweetId ?? undefined,
+        userId: opts?.userId,
       });
       const [updated]: Post[] = await db
         .update(posts)

@@ -1,13 +1,17 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { POST_STATUS, posts } from "@/db/schema";
+import { requireUser } from "@/lib/auth";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, { params }: RouteContext) {
+  const user = await requireUser();
   const { id } = await params;
-  const post = await db.query.posts.findFirst({ where: eq(posts.id, id) });
+  const post = await db.query.posts.findFirst({
+    where: and(eq(posts.id, id), eq(posts.userId, user.id)),
+  });
   if (!post) return Response.json({ error: "not found" }, { status: 404 });
   return Response.json(post);
 }
@@ -19,6 +23,7 @@ const PatchRequest = z.object({
 });
 
 export async function PATCH(request: Request, { params }: RouteContext) {
+  const user = await requireUser();
   const { id } = await params;
   let body: unknown;
   try {
@@ -47,7 +52,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const [updated] = await db
     .update(posts)
     .set(update)
-    .where(eq(posts.id, id))
+    .where(and(eq(posts.id, id), eq(posts.userId, user.id)))
     .returning();
 
   if (!updated) return Response.json({ error: "not found" }, { status: 404 });
@@ -55,12 +60,11 @@ export async function PATCH(request: Request, { params }: RouteContext) {
 }
 
 export async function DELETE(_request: Request, { params }: RouteContext) {
+  const user = await requireUser();
   const { id } = await params;
-  // Hard delete. Cascades to thread children via parent_post_id FK.
-  // Use PATCH with { status: "skipped" } for soft archive.
   const deleted = await db
     .delete(posts)
-    .where(eq(posts.id, id))
+    .where(and(eq(posts.id, id), eq(posts.userId, user.id)))
     .returning({ id: posts.id });
 
   if (deleted.length === 0) {

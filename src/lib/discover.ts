@@ -48,6 +48,7 @@ export type DiscoverFetchResult = {
 
 export async function runDiscoverFetch(opts?: {
   source?: "manual" | "cron";
+  userId?: string;
 }): Promise<DiscoverFetchResult> {
   const startedAt = Date.now();
   const source = opts?.source ?? "manual";
@@ -112,6 +113,7 @@ export async function runDiscoverFetch(opts?: {
           await db
             .insert(viralPosts)
             .values({
+              userId: opts?.userId ?? null,
               xTweetId: t.id,
               xUrl: `https://x.com/${user.username}/status/${t.id}`,
               author: user.username,

@@ -7,6 +7,7 @@ import {
   posts,
   type Post,
 } from "@/db/schema";
+import { requireUser } from "@/lib/auth";
 import { writeTrace } from "@/lib/trace";
 
 const UseVariantRequest = z.object({
@@ -34,6 +35,7 @@ async function insertPostChain(
   generationId: string,
   contentType: ContentType,
   texts: string[],
+  userId: string,
 ): Promise<Post[]> {
   const out: Post[] = [];
   let parentId: string | null = null;
@@ -43,6 +45,7 @@ async function insertPostChain(
     const inserted: Post[] = await db
       .insert(posts)
       .values({
+        userId,
         generationId,
         parentPostId: parentId,
         threadPosition: contentType === "thread" ? i + 1 : null,
@@ -60,6 +63,7 @@ async function insertPostChain(
 }
 
 export async function POST(request: Request) {
+  const user = await requireUser();
   let body: unknown;
   try {
     body = await request.json();
@@ -79,7 +83,7 @@ export async function POST(request: Request) {
   const genRows = await db
     .select()
     .from(generations)
-    .where(eq(generations.id, generationId))
+    .where(and(eq(generations.id, generationId), eq(generations.userId, user.id)))
     .limit(1);
   const gen = genRows[0];
   if (!gen) {
@@ -126,7 +130,7 @@ export async function POST(request: Request) {
       );
   }
 
-  const created = await insertPostChain(generationId, contentType, target.texts);
+  const created = await insertPostChain(generationId, contentType, target.texts, user.id);
 
   await db
     .update(generations)

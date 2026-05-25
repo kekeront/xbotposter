@@ -53,6 +53,7 @@ async function loadTraces(agentFilter: string | null): Promise<Loaded> {
 
     const enriched: EnrichedTrace[] = rows.map((r) => ({
       id: r.id,
+      userId: null,
       generationId: r.generationId,
       agent: r.agent,
       eventType: r.eventType,

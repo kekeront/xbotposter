@@ -6,6 +6,7 @@ import {
   integer,
   jsonb,
   numeric,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -13,6 +14,66 @@ import {
   uuid,
   vector,
 } from "drizzle-orm/pg-core";
+
+// ─── Auth & Profiles ─────────────────────────────────────────────────────────
+
+export type TrackedAccount = {
+  username: string;
+  name: string;
+  topic?: string;
+  id?: string;
+};
+
+export const profiles = pgTable("profiles", {
+  id: uuid("id").primaryKey(), // matches supabase auth.users.id
+  email: text("email"),
+  displayName: text("display_name"),
+  avatarUrl: text("avatar_url"),
+  trackedAccounts: jsonb("tracked_accounts").$type<TrackedAccount[]>(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const SOCIAL_PROVIDER = ["x", "telegram"] as const;
+export type SocialProvider = (typeof SOCIAL_PROVIDER)[number];
+
+export const socialProviderEnum = pgEnum("social_provider", SOCIAL_PROVIDER);
+
+export const socialConnections = pgTable(
+  "social_connections",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .references(() => profiles.id, { onDelete: "cascade" })
+      .notNull(),
+    provider: socialProviderEnum("provider").notNull(),
+    providerUserId: text("provider_user_id").notNull(),
+    providerUsername: text("provider_username"),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
+    scopes: text("scopes"),
+    meta: jsonb("meta").$type<Record<string, unknown>>(),
+    connectedAt: timestamp("connected_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("social_connections_user_provider_uniq").on(
+      table.userId,
+      table.provider,
+    ),
+  ],
+);
+
+// ���── Content Engine ─────────────���────────────────────────────────────────────
 
 export const GENERATION_STATUS = [
   "queued",
@@ -47,6 +108,9 @@ export type SourceType = (typeof SOURCE_TYPE)[number];
 
 export const generations = pgTable("generations", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => profiles.id, {
+    onDelete: "cascade",
+  }),
   topic: text("topic").notNull(),
   inputMeta: jsonb("input_meta").$type<Record<string, unknown>>(),
   model: text("model"),
@@ -70,6 +134,9 @@ export const posts = pgTable(
   "posts",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => profiles.id, {
+      onDelete: "cascade",
+    }),
     generationId: uuid("generation_id").references(() => generations.id, {
       onDelete: "set null",
     }),
@@ -113,6 +180,9 @@ export const sources = pgTable(
   "sources",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => profiles.id, {
+      onDelete: "cascade",
+    }),
     type: text("type", { enum: SOURCE_TYPE }).$type<SourceType>().notNull(),
     externalId: text("external_id"),
     url: text("url"),
@@ -140,6 +210,9 @@ export const viralPosts = pgTable(
   "viral_posts",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => profiles.id, {
+      onDelete: "cascade",
+    }),
     xUrl: text("x_url"),
     xTweetId: text("x_tweet_id"),
     author: text("author"),
@@ -183,6 +256,9 @@ export const claims = pgTable("claims", {
 
 export const fingerprints = pgTable("fingerprints", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => profiles.id, {
+    onDelete: "cascade",
+  }),
   name: text("name").default("default").notNull(),
   profile: jsonb("profile").$type<Record<string, unknown>>().notNull(),
   sampleCount: integer("sample_count").default(0).notNull(),
@@ -195,6 +271,9 @@ export const traces = pgTable(
   "traces",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => profiles.id, {
+      onDelete: "set null",
+    }),
     generationId: uuid("generation_id").references(() => generations.id, {
       onDelete: "cascade",
     }),
@@ -213,6 +292,10 @@ export const traces = pgTable(
   ],
 );
 
+export type Profile = typeof profiles.$inferSelect;
+export type NewProfile = typeof profiles.$inferInsert;
+export type SocialConnection = typeof socialConnections.$inferSelect;
+export type NewSocialConnection = typeof socialConnections.$inferInsert;
 export type Generation = typeof generations.$inferSelect;
 export type NewGeneration = typeof generations.$inferInsert;
 export type Post = typeof posts.$inferSelect;

@@ -14,6 +14,7 @@ import {
   type Post,
 } from "@/db/schema";
 import { search as searchWeb } from "@/agents/searcher";
+import { requireUser } from "@/lib/auth";
 import { recallMemoryBlock } from "@/lib/memory-bridge";
 import {
   persistSearchSources,
@@ -43,6 +44,7 @@ async function insertPostChain(
   generationId: string,
   contentType: ContentType,
   texts: string[],
+  userId: string,
 ): Promise<Post[]> {
   const out: Post[] = [];
   let parentId: string | null = null;
@@ -52,6 +54,7 @@ async function insertPostChain(
     const inserted: Post[] = await db
       .insert(posts)
       .values({
+        userId,
         generationId,
         parentPostId: parentId,
         threadPosition: contentType === "thread" ? i + 1 : null,
@@ -69,6 +72,7 @@ async function insertPostChain(
 }
 
 export async function POST(request: Request) {
+  const user = await requireUser();
   let body: unknown;
   try {
     body = await request.json();
@@ -203,6 +207,7 @@ export async function POST(request: Request) {
           const [generation] = await db
             .insert(generations)
             .values({
+              userId: user.id,
               topic: angle.angle,
               inputMeta: {
                 contentType,
@@ -340,6 +345,7 @@ export async function POST(request: Request) {
               generation.id,
               contentType,
               editorResult.texts,
+              user.id,
             );
 
             if (factResult.claims.length > 0 && createdPosts[0]) {

@@ -1,27 +1,46 @@
 import "server-only";
 import { TwitterApi } from "twitter-api-v2";
-import { requireEnv } from "./env";
+import { env } from "./env";
+import { getXTokensForUser } from "./x-oauth2";
 
-let _client: TwitterApi | undefined;
+let _systemClient: TwitterApi | undefined;
 
-export function getXClient(): TwitterApi {
-  if (_client) return _client;
-  _client = new TwitterApi({
-    appKey: requireEnv("X_CONSUMER_KEY"),
-    appSecret: requireEnv("X_CONSUMER_SECRET"),
-    accessToken: requireEnv("X_ACCESS_TOKEN"),
-    accessSecret: requireEnv("X_ACCESS_TOKEN_SECRET"),
+function getSystemXClient(): TwitterApi {
+  if (_systemClient) return _systemClient;
+  if (!env.X_CONSUMER_KEY || !env.X_CONSUMER_SECRET || !env.X_ACCESS_TOKEN || !env.X_ACCESS_TOKEN_SECRET) {
+    throw new Error("System X credentials not configured");
+  }
+  _systemClient = new TwitterApi({
+    appKey: env.X_CONSUMER_KEY,
+    appSecret: env.X_CONSUMER_SECRET,
+    accessToken: env.X_ACCESS_TOKEN,
+    accessSecret: env.X_ACCESS_TOKEN_SECRET,
   });
-  return _client;
+  return _systemClient;
+}
+
+export async function getXClientForUser(userId: string): Promise<TwitterApi> {
+  const tokens = await getXTokensForUser(userId);
+  if (tokens) {
+    return new TwitterApi(tokens.accessToken);
+  }
+  return getSystemXClient();
+}
+
+/** @deprecated Use getXClientForUser for user-scoped operations */
+export function getXClient(): TwitterApi {
+  return getSystemXClient();
 }
 
 export type PostedTweet = { id: string; text: string };
 
 export async function postTweet(
   text: string,
-  opts?: { replyToTweetId?: string; quoteTweetId?: string },
+  opts?: { replyToTweetId?: string; quoteTweetId?: string; userId?: string },
 ): Promise<PostedTweet> {
-  const client = getXClient();
+  const client = opts?.userId
+    ? await getXClientForUser(opts.userId)
+    : getSystemXClient();
   const res = await client.v2.tweet(text, {
     ...(opts?.replyToTweetId
       ? { reply: { in_reply_to_tweet_id: opts.replyToTweetId } }
@@ -31,11 +50,17 @@ export async function postTweet(
   return { id: res.data.id, text: res.data.text };
 }
 
-export async function postThread(texts: string[]): Promise<PostedTweet[]> {
+export async function postThread(
+  texts: string[],
+  opts?: { userId?: string },
+): Promise<PostedTweet[]> {
   const results: PostedTweet[] = [];
   let replyTo: string | undefined;
   for (const text of texts) {
-    const result = await postTweet(text, { replyToTweetId: replyTo });
+    const result = await postTweet(text, {
+      replyToTweetId: replyTo,
+      userId: opts?.userId,
+    });
     results.push(result);
     replyTo = result.id;
   }
@@ -48,8 +73,13 @@ export type XUserLite = {
   name: string;
 };
 
-export async function userByUsername(username: string): Promise<XUserLite | null> {
-  const client = getXClient();
+export async function userByUsername(
+  username: string,
+  opts?: { userId?: string },
+): Promise<XUserLite | null> {
+  const client = opts?.userId
+    ? await getXClientForUser(opts.userId)
+    : getSystemXClient();
   try {
     const res = await client.v2.userByUsername(username);
     if (!res.data) return null;
@@ -82,12 +112,14 @@ export type XTimelineTweet = {
 };
 
 export async function userTimeline(
-  userId: string,
-  opts?: { max?: number; sinceId?: string },
+  twitterUserId: string,
+  opts?: { max?: number; sinceId?: string; userId?: string },
 ): Promise<XTimelineTweet[]> {
-  const client = getXClient();
+  const client = opts?.userId
+    ? await getXClientForUser(opts.userId)
+    : getSystemXClient();
   const max = opts?.max ?? 10;
-  const res = await client.v2.userTimeline(userId, {
+  const res = await client.v2.userTimeline(twitterUserId, {
     max_results: Math.max(5, Math.min(100, max)),
     "tweet.fields": [
       "public_metrics",
@@ -95,9 +127,6 @@ export async function userTimeline(
       "referenced_tweets",
     ],
     exclude: ["retweets", "replies"],
-    // since_id only returns tweets newer than the most recent we've captured.
-    // X bills per resource returned — paying only for the increment is the
-    // single biggest steady-state cost optimization.
     ...(opts?.sinceId ? { since_id: opts.sinceId } : {}),
   });
 

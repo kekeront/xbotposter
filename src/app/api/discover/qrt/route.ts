@@ -8,6 +8,7 @@ import { draft as qrtDraft } from "@/agents/qrt";
 import { check as guardCheck } from "@/agents/topic-guard";
 import { db } from "@/db/client";
 import { claims, generations, posts, viralPosts, type Post } from "@/db/schema";
+import { requireUser } from "@/lib/auth";
 import { recallMemoryBlock } from "@/lib/memory-bridge";
 import {
   persistSearchSources,
@@ -22,6 +23,7 @@ const QrtRequest = z.object({
 });
 
 export async function POST(request: Request) {
+  const user = await requireUser();
   let body: unknown;
   try {
     body = await request.json();
@@ -90,6 +92,7 @@ export async function POST(request: Request) {
   const [generation] = await db
     .insert(generations)
     .values({
+      userId: user.id,
       topic: `qrt on @${author}: ${viral.text.slice(0, 100)}`,
       inputMeta: {
         contentType: "single",
@@ -306,6 +309,7 @@ export async function POST(request: Request) {
     const inserted: Post[] = await db
       .insert(posts)
       .values({
+        userId: user.id,
         generationId: generation.id,
         contentType: "single",
         text: finalText,
