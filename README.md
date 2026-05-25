@@ -1,4 +1,4 @@
-# nfactz
+# X-bot posting AI agent
 
 nfactz is a private dashboard for drafting, reviewing, scheduling, and posting
 X content. It combines a Next.js UI, Supabase Auth/Postgres, OpenAI-backed
