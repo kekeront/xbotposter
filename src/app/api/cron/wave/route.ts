@@ -18,9 +18,17 @@ export async function GET(request: Request) {
   if (!verdict.allow) return spendCapResponse(verdict);
 
   // Cron has no session; attribute to the primary profile (single-user app).
-  const [profile] = await db.select({ id: profiles.id }).from(profiles).limit(1);
+  const [profile] = await db
+    .select({ id: profiles.id, waveAutonomous: profiles.waveAutonomous })
+    .from(profiles)
+    .limit(1);
   if (!profile) {
     return Response.json({ ok: true, skipped: "no profile" });
+  }
+  // Gated by the full-autonomous toggle — off by default so the wave never
+  // posts to X unattended unless the user explicitly opts in.
+  if (!profile.waveAutonomous) {
+    return Response.json({ ok: true, skipped: "autonomous wave disabled" });
   }
 
   const result = await runWaveShot(profile.id, { count: 2 });
@@ -49,7 +57,8 @@ export async function GET(request: Request) {
       generationId: generation.id,
       contentType: "single",
       text,
-      status: "draft",
+      // Full-autonomous: approved so the post cron ships it without review.
+      status: "approved",
     });
     created += 1;
   }

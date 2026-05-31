@@ -51,11 +51,13 @@ export function AutomationPanel({
   jobs,
   todaySpend,
   cap,
+  waveAutonomous,
 }: {
   stats: Stats;
   jobs: CronJob[];
   todaySpend: number;
   cap: number;
+  waveAutonomous: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const capPct = Math.min(100, Math.round((todaySpend / cap) * 100));
@@ -105,7 +107,7 @@ export function AutomationPanel({
             </p>
           )}
 
-          <WaveShotSection />
+          <WaveShotSection autonomous={waveAutonomous} />
 
           <div className="flex flex-col gap-2">
             <h3 className="font-mono text-xs font-medium text-muted-foreground">
@@ -158,12 +160,34 @@ function Stat({ label, value }: { label: string; value: number }) {
 // Second automation method: recommend topics from the current viral wave and
 // preview a writer-only draft for each (the cron version of this is the "wave"
 // job above). Promoting a preview queues it as a draft.
-function WaveShotSection() {
+function WaveShotSection({ autonomous }: { autonomous: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shots, setShots] = useState<WaveShot[] | null>(null);
   const [queued, setQueued] = useState<Record<number, "queuing" | "done">>({});
+  const [auto, setAuto] = useState(autonomous);
+  const [savingAuto, setSavingAuto] = useState(false);
+
+  async function toggleAuto() {
+    const next = !auto;
+    setSavingAuto(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/settings/automation", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ waveAutonomous: next }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setAuto(next);
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "failed to update autonomy");
+    } finally {
+      setSavingAuto(false);
+    }
+  }
 
   async function runShot() {
     setLoading(true);
@@ -223,16 +247,37 @@ function WaveShotSection() {
         <span className="font-mono text-[10px] text-muted-foreground">
           recommend topics from the wave + preview drafts
         </span>
+        <button
+          onClick={toggleAuto}
+          disabled={savingAuto}
+          title={
+            auto
+              ? "Full-autonomous ON: the daily wave cron auto-generates AND auto-posts to X with no review. Click to disable."
+              : "Enable full-autonomous: the daily wave cron will auto-generate AND auto-post to X unattended."
+          }
+          className={`ml-auto rounded px-2 py-0.5 font-mono text-[10px] transition-colors disabled:opacity-50 ${
+            auto
+              ? "bg-destructive text-white"
+              : "bg-muted text-muted-foreground hover:bg-muted/70"
+          }`}
+        >
+          {savingAuto ? "…" : auto ? "● full-auto ON" : "full-auto OFF"}
+        </button>
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto font-mono"
+          className="font-mono"
           onClick={runShot}
           disabled={loading}
         >
           {loading ? "shooting…" : "viral wave shot"}
         </Button>
       </div>
+      {auto ? (
+        <p className="font-mono text-[10px] text-destructive">
+          ⚠ full-autonomous is ON — the daily wave will post to X without review.
+        </p>
+      ) : null}
 
       {error ? (
         <p className="font-mono text-xs text-destructive">{error}</p>

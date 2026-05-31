@@ -30,6 +30,9 @@ export const profiles = pgTable("profiles", {
   displayName: text("display_name"),
   avatarUrl: text("avatar_url"),
   trackedAccounts: jsonb("tracked_accounts").$type<TrackedAccount[]>(),
+  // Full-autonomous "viral wave shot": when true, the wave cron generates AND
+  // marks posts approved so the post cron ships them to X with no human review.
+  waveAutonomous: boolean("wave_autonomous").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ADD COLUMN "wave_autonomous" boolean DEFAULT false NOT NULL;
