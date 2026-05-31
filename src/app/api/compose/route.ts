@@ -231,6 +231,184 @@ async function runVariant(
   };
 }
 
+// Multi-variant phase 1: draft + score the RAW draft only. Editor and
+// fact-checker are deferred to the winner (see finalizeWinner) so we don't pay
+// to edit and fact-check variants that get discarded. Used only when
+// variants > 1; the single-variant path keeps the full runVariant pipeline.
+async function draftAndScore(
+  index: number,
+  topic: string,
+  contentType: "single" | "thread" | "essay",
+  voice: LoadedVoice,
+  generationId: string,
+  emit: ProgressEmitter,
+  sharedOutlineBeats?: string[],
+  memoryBlock?: string,
+  researchBlock?: string,
+  preferences?: z.infer<typeof PreferencesSchema>,
+): Promise<VariantResult> {
+  const tag = `variant ${index + 1}`;
+
+  emit("writer", tag);
+  await writeTrace({
+    generationId,
+    agent: "writer",
+    eventType: "start",
+    payload: {
+      variantIndex: index,
+      outlineBeats: sharedOutlineBeats?.length ?? 0,
+      memoryBytes: memoryBlock?.length ?? 0,
+    },
+  });
+  const writerResult = await draft({
+    topic,
+    contentType,
+    referenceTweets: voice.referenceTweets,
+    fingerprintBlock: voice.fingerprintBlock,
+    outlineBeats: sharedOutlineBeats,
+    memoryBlock,
+    researchBlock,
+    preferences,
+    traceContext: { generationId, agent: "writer" },
+  });
+  await writeTrace({
+    generationId,
+    agent: "writer",
+    eventType: "complete",
+    payload: { variantIndex: index, posts: writerResult.texts.length },
+    model: writerResult.model,
+    tokensIn: writerResult.tokensIn,
+    tokensOut: writerResult.tokensOut,
+    costUsd: writerResult.costUsd.toString(),
+  });
+
+  emit("eval", tag);
+  const evalResult = await evaluate({
+    seed: topic,
+    draft: writerResult.texts,
+    contentType,
+    referenceTweets: voice.referenceTweets,
+    fingerprintBlock: voice.fingerprintBlock,
+    traceContext: { generationId, agent: "evaluator" },
+  });
+  await writeTrace({
+    generationId,
+    agent: "evaluator",
+    eventType: "complete",
+    payload: {
+      variantIndex: index,
+      overall: evalResult.overall,
+      scores: evalResult.scores,
+      critique: evalResult.critique,
+    },
+    model: evalResult.model,
+    tokensIn: evalResult.tokensIn,
+    tokensOut: evalResult.tokensOut,
+    costUsd: evalResult.costUsd.toString(),
+  });
+
+  return {
+    index,
+    texts: writerResult.texts,
+    writerCost: writerResult.costUsd,
+    editorCost: 0,
+    evalCost: evalResult.costUsd,
+    factCost: 0,
+    totalCost: writerResult.costUsd + evalResult.costUsd,
+    tokensIn: writerResult.tokensIn + evalResult.tokensIn,
+    tokensOut: writerResult.tokensOut + evalResult.tokensOut,
+    editorIssues: [],
+    editorChanged: false,
+    evalScores: evalResult.scores,
+    evalOverall: evalResult.overall,
+    evalCritique: evalResult.critique,
+    factClaims: [],
+    factInventedCount: 0,
+    writerModel: writerResult.model,
+    editorModel: "",
+    evalModel: evalResult.model,
+    factModel: "",
+  };
+}
+
+// Multi-variant phase 2: edit + fact-check the chosen winner only, folding its
+// added cost/tokens back into the VariantResult. Mutates and returns `winner`.
+async function finalizeWinner(
+  winner: VariantResult,
+  topic: string,
+  contentType: "single" | "thread" | "essay",
+  voice: LoadedVoice,
+  generationId: string,
+  emit: ProgressEmitter,
+  researchBlock?: string,
+): Promise<VariantResult> {
+  const tag = `winner (variant ${winner.index + 1})`;
+
+  emit("editor", tag);
+  const editorResult = await review({
+    topic,
+    drafts: winner.texts,
+    contentType,
+    referenceTweets: voice.referenceTweets,
+    fingerprintBlock: voice.fingerprintBlock,
+    traceContext: { generationId, agent: "editor" },
+  });
+  await writeTrace({
+    generationId,
+    agent: "editor",
+    eventType: editorResult.changed
+      ? "complete_with_changes"
+      : "complete_no_changes",
+    payload: {
+      variantIndex: winner.index,
+      issues: editorResult.issuesFound,
+      changed: editorResult.changed,
+    },
+    model: editorResult.model,
+    tokensIn: editorResult.tokensIn,
+    tokensOut: editorResult.tokensOut,
+    costUsd: editorResult.costUsd.toString(),
+  });
+
+  emit("eval", tag);
+  const factResult = await check({
+    seed: topic,
+    draft: editorResult.texts,
+    researchBlock,
+    traceContext: { generationId, agent: "fact-checker" },
+  });
+  await writeTrace({
+    generationId,
+    agent: "fact-checker",
+    eventType: factResult.hasInvented ? "complete_with_invented" : "complete",
+    payload: {
+      variantIndex: winner.index,
+      claimsCount: factResult.claims.length,
+      invented: factResult.inventedCount,
+      uncertain: factResult.uncertainCount,
+    },
+    model: factResult.model,
+    tokensIn: factResult.tokensIn,
+    tokensOut: factResult.tokensOut,
+    costUsd: factResult.costUsd.toString(),
+  });
+
+  winner.texts = editorResult.texts;
+  winner.editorCost = editorResult.costUsd;
+  winner.factCost = factResult.costUsd;
+  winner.editorIssues = editorResult.issuesFound;
+  winner.editorChanged = editorResult.changed;
+  winner.factClaims = factResult.claims;
+  winner.factInventedCount = factResult.inventedCount;
+  winner.editorModel = editorResult.model;
+  winner.factModel = factResult.model;
+  winner.totalCost += editorResult.costUsd + factResult.costUsd;
+  winner.tokensIn += editorResult.tokensIn + factResult.tokensIn;
+  winner.tokensOut += editorResult.tokensOut + factResult.tokensOut;
+
+  return winner;
+}
+
 async function insertPostChain(
   generationId: string,
   contentType: ContentType,
@@ -495,10 +673,12 @@ export async function POST(request: Request) {
           });
         }
 
-        const variantResults = await Promise.all(
-          Array.from({ length: variants }, (_, i) =>
-            runVariant(
-              i,
+        let variantResults: VariantResult[];
+        if (variants === 1) {
+          // Nothing to discard — run the full pipeline on the single variant.
+          variantResults = [
+            await runVariant(
+              0,
               topic,
               contentType,
               voice,
@@ -509,8 +689,38 @@ export async function POST(request: Request) {
               researchBlock,
               preferences,
             ),
-          ),
-        );
+          ];
+        } else {
+          // Draft + score every variant on its raw draft, then edit and
+          // fact-check only the winner — the losing variants are discarded, so
+          // editing/fact-checking them was pure waste.
+          variantResults = await Promise.all(
+            Array.from({ length: variants }, (_, i) =>
+              draftAndScore(
+                i,
+                topic,
+                contentType,
+                voice,
+                generation.id,
+                emit,
+                outlineBeats,
+                memoryContext.block,
+                researchBlock,
+                preferences,
+              ),
+            ),
+          );
+          variantResults.sort((a, b) => b.evalOverall - a.evalOverall);
+          await finalizeWinner(
+            variantResults[0]!,
+            topic,
+            contentType,
+            voice,
+            generation.id,
+            emit,
+            researchBlock,
+          );
+        }
 
         variantResults.sort((a, b) => b.evalOverall - a.evalOverall);
         const winner = variantResults[0]!;
