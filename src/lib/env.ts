@@ -44,6 +44,16 @@ const schema = z.object({
   // Manual UI actions are not gated (user opt-in).
   MAX_DAILY_USD: z.coerce.number().positive().default(2),
 
+  // arXiv adapter — override the default category filter.
+  // Format: arXiv search_query syntax, e.g. "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"
+  ARXIV_CATEGORIES: z
+    .string()
+    .optional()
+    .default("cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG"),
+
+  // HN adapter — minimum score for a story to be ingested.
+  HN_MIN_SCORE: z.coerce.number().int().nonnegative().default(50),
+
   // Telegram bot integration. If all three are set, autonomous cron-generate
   // pushes drafts to your Telegram with approve / skip inline buttons.
   TELEGRAM_BOT_TOKEN: z.string().optional(),

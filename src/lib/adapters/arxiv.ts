@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "@/db/client";
 import { sources } from "@/db/schema";
+import { env } from "@/lib/env";
 
 const ARXIV_API = "https://export.arxiv.org/api/query";
 
@@ -55,10 +56,12 @@ function parseAtomFeed(xml: string): ArxivEntry[] {
 }
 
 export async function fetchArxiv(opts?: {
+  /** Override the arXiv search_query string. Falls back to ARXIV_CATEGORIES env var,
+   *  then to the hardcoded default "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG". */
   query?: string;
   limit?: number;
 }): Promise<ArxivFetchResult> {
-  const query = opts?.query ?? "cat:cs.AI+OR+cat:cs.CL+OR+cat:cs.LG";
+  const query = opts?.query ?? env.ARXIV_CATEGORIES;
   const limit = opts?.limit ?? 15;
   const result: ArxivFetchResult = { fetched: 0, ingested: 0, errors: [] };
 
