@@ -103,6 +103,8 @@ export const SOURCE_TYPE = [
   "x",
   "web",
   "manual",
+  "pdf",
+  "image",
 ] as const;
 export type SourceType = (typeof SOURCE_TYPE)[number];
 

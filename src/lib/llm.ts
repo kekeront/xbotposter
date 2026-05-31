@@ -52,6 +52,11 @@ function getClient(): OpenAI {
   return _client;
 }
 
+/** Expose the shared OpenAI client singleton for callers that need direct API access. */
+export function getOpenAIClient(): OpenAI {
+  return getClient();
+}
+
 export type CompletionMessage = {
   role: "system" | "user" | "assistant";
   content: string;
