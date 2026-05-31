@@ -14,6 +14,19 @@ const schema = z.object({
   LLM_WRITER_MODEL: z.string().default("gpt-5.4-mini"),
   EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
 
+  // Searcher agent (src/agents/searcher.ts) tuning. The searcher uses
+  // OpenAI's built-in web_search tool via the Responses API. Left unbounded
+  // the model fires many searches per topic (one compose ran ~8 for ~$0.50),
+  // so we cap the agentic loop and bill the fee into costUsd.
+  // Max built-in tool calls (web searches) the model may make per topic.
+  SEARCH_MAX_TOOL_CALLS: z.coerce.number().int().positive().default(2),
+  // USD billed per web_search call, folded into the searcher's costUsd so the
+  // daily spend cap accounts for it (~$0.01/call at low search context).
+  OPENAI_WEB_SEARCH_COST_PER_CALL_USD: z
+    .coerce.number()
+    .nonnegative()
+    .default(0.01),
+
   // Legacy OAuth 1.0a (fallback for system-level/cron operations)
   X_CONSUMER_KEY: z.string().optional(),
   X_CONSUMER_SECRET: z.string().optional(),
