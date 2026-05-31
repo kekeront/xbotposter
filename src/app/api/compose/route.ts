@@ -839,6 +839,16 @@ export async function POST(request: Request) {
               claims: winner.factClaims,
               inventedCount: winner.factInventedCount,
             },
+            // What the draft was grounded on (RAG/context transparency).
+            sources: {
+              web: searchResult?.sources ?? [],
+              uploaded: uploaded.map((u) => ({
+                id: u.id,
+                url: u.url,
+                title: u.title,
+                kind: u.type,
+              })),
+            },
             variants: variantResults.map((v) => ({
               index: v.index,
               texts: v.texts,

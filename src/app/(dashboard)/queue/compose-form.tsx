@@ -43,6 +43,24 @@ type ComposeResult = {
     overall: number;
     critique: string;
   };
+  factCheck?: {
+    claims: Array<{
+      text: string;
+      verdict: string;
+      reason: string;
+      sourceUrl: string | null;
+    }>;
+    inventedCount: number;
+  };
+  sources?: {
+    web: Array<{ url: string; title: string; snippet: string }>;
+    uploaded: Array<{
+      id: string;
+      url: string | null;
+      title: string | null;
+      kind: string;
+    }>;
+  };
   variants?: VariantSummary[];
   posts: Array<{
     id: string;
@@ -89,6 +107,10 @@ const STEP_LABELS: Record<string, string> = {
   eval: "scoring + fact-checking",
   saving: "saving to queue",
 };
+
+// Ordered pipeline for the live step indicator (transparency). Steps not in
+// this list (outline/memory/angles) still render via STEP_LABELS as the detail.
+const PIPELINE_STEPS = ["search", "writer", "editor", "eval", "saving"] as const;
 
 const CLIENT_TIMEOUT_MS = 120_000;
 const BULK_CLIENT_TIMEOUT_MS = 300_000;
@@ -843,11 +865,41 @@ function ProgressBar({
   totalAngles?: number;
 }) {
   const stepLabel = step ? (STEP_LABELS[step] ?? step) : "starting";
+  const activeIdx = step
+    ? PIPELINE_STEPS.indexOf(step as (typeof PIPELINE_STEPS)[number])
+    : -1;
   return (
-    <div className="flex items-center gap-3 rounded-md border bg-muted/30 px-3 py-2">
-      <div className="h-2 w-2 animate-pulse rounded-full bg-foreground/60" />
-      <div className="flex flex-1 flex-col gap-0.5">
-        <span className="font-mono text-xs">
+    <div className="flex flex-col gap-2 rounded-md border bg-muted/30 px-3 py-2">
+      <div className="flex flex-wrap items-center gap-1">
+        {PIPELINE_STEPS.map((s, i) => {
+          const state =
+            activeIdx < 0
+              ? "pending"
+              : i < activeIdx
+                ? "done"
+                : i === activeIdx
+                  ? "active"
+                  : "pending";
+          return (
+            <span
+              key={s}
+              className={`rounded px-1.5 py-0.5 font-mono text-[10px] ${
+                state === "done"
+                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                  : state === "active"
+                    ? "bg-foreground/10 font-semibold text-foreground"
+                    : "text-muted-foreground/40"
+              }`}
+            >
+              {state === "done" ? "✓ " : state === "active" ? "● " : ""}
+              {STEP_LABELS[s] ?? s}
+            </span>
+          );
+        })}
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="h-2 w-2 animate-pulse rounded-full bg-foreground/60" />
+        <span className="flex-1 font-mono text-xs">
           {stepLabel}
           {detail ? (
             <span className="ml-1 text-muted-foreground">({detail})</span>
@@ -862,14 +914,14 @@ function ProgressBar({
             </span>
           ) : null}
         </span>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded px-2 py-0.5 font-mono text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          cancel
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={onCancel}
-        className="rounded px-2 py-0.5 font-mono text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
-      >
-        cancel
-      </button>
     </div>
   );
 }
@@ -1060,7 +1112,13 @@ function ResultCard({
           </div>
         ))}
 
+        {result.factCheck ? (
+          <FabricationWarning factCheck={result.factCheck} />
+        ) : null}
+
         {result.eval ? <EvalBreakdown evaluation={result.eval} /> : null}
+
+        {result.sources ? <SourcesCitation sources={result.sources} /> : null}
 
         {result.variants && result.variants.length > 1 ? (
           <VariantsList
@@ -1104,8 +1162,11 @@ function EvalBreakdown({
     <div className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3">
       <div className="flex flex-wrap items-baseline gap-3 text-xs font-mono">
         <span className="font-semibold">eval breakdown</span>
-        <ScorePill label="insight" v={evaluation.scores.insightDensity} />
-        <ScorePill label="voice" v={evaluation.scores.voiceMatch} />
+        {/* Insight + voice are the differentiators — emphasize them; the rest
+            are near-binary hygiene checks shown muted. */}
+        <ScorePill label="insight" v={evaluation.scores.insightDensity} emphasize />
+        <ScorePill label="voice" v={evaluation.scores.voiceMatch} emphasize />
+        <span className="text-muted-foreground/30">|</span>
         <ScorePill label="anti-slop" v={evaluation.scores.antiSlop} />
         <ScorePill label="length" v={evaluation.scores.charFit} />
         <ScorePill label="lang" v={evaluation.scores.language} />
@@ -1120,12 +1181,85 @@ function EvalBreakdown({
   );
 }
 
-function ScorePill({ label, v }: { label: string; v: number }) {
+function ScorePill({
+  label,
+  v,
+  emphasize,
+}: {
+  label: string;
+  v: number;
+  emphasize?: boolean;
+}) {
   return (
-    <span>
-      <span className="text-muted-foreground">{label}:</span>{" "}
+    <span className={emphasize ? "text-[13px]" : "opacity-80"}>
+      <span className={emphasize ? "text-foreground" : "text-muted-foreground"}>
+        {label}:
+      </span>{" "}
       <span className={`font-semibold ${scoreColor(v)}`}>{v}</span>
     </span>
+  );
+}
+
+function FabricationWarning({
+  factCheck,
+}: {
+  factCheck: NonNullable<ComposeResult["factCheck"]>;
+}) {
+  if (factCheck.inventedCount <= 0) return null;
+  const invented = factCheck.claims.filter((c) => c.verdict === "invented");
+  return (
+    <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3">
+      <div className="flex items-center gap-2 font-mono text-xs font-semibold text-destructive">
+        ⚠ {factCheck.inventedCount} invented claim
+        {factCheck.inventedCount !== 1 ? "s" : ""} — review before posting
+      </div>
+      {invented.length > 0 ? (
+        <ul className="mt-2 flex flex-col gap-1">
+          {invented.slice(0, 5).map((c, i) => (
+            <li key={i} className="text-xs text-destructive/90">
+              “{c.text}”{" "}
+              <span className="text-destructive/60">— {c.reason}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+function SourcesCitation({
+  sources,
+}: {
+  sources: NonNullable<ComposeResult["sources"]>;
+}) {
+  const total = sources.web.length + sources.uploaded.length;
+  if (total === 0) return null;
+  return (
+    <details className="rounded-lg border bg-muted/20 px-3 py-2">
+      <summary className="cursor-pointer list-none font-mono text-xs text-muted-foreground [&::-webkit-details-marker]:hidden">
+        ▸ grounded on {total} source{total !== 1 ? "s" : ""} ({sources.web.length}{" "}
+        web · {sources.uploaded.length} uploaded)
+      </summary>
+      <ul className="mt-2 flex flex-col gap-1">
+        {sources.web.map((s, i) => (
+          <li key={`w${i}`} className="truncate text-xs">
+            <a
+              href={s.url}
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted-foreground underline hover:text-foreground"
+            >
+              {s.title || s.url}
+            </a>
+          </li>
+        ))}
+        {sources.uploaded.map((s) => (
+          <li key={s.id} className="truncate text-xs text-muted-foreground">
+            [{s.kind}] {s.title ?? s.url ?? "uploaded"}
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
 
@@ -1204,6 +1338,9 @@ function VariantsList({
               >
                 {v.overall}
               </Badge>
+              <span className="text-muted-foreground">
+                insight {v.scores.insightDensity} · voice {v.scores.voiceMatch}
+              </span>
               {v.isWinner ? (
                 <span className="text-emerald-600 dark:text-emerald-500">
                   ← winner

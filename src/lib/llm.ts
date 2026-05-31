@@ -37,7 +37,14 @@ export function costFor(
   cachedTokensIn = 0,
 ): number {
   const p = PRICING[model];
-  if (!p) return 0;
+  if (!p) {
+    // No pricing row → cost is recorded as $0, which silently undercounts the
+    // daily spend cap. Surface it so a renamed/unlisted model is observable.
+    console.warn(
+      `[costFor] no PRICING entry for model "${model}" — cost recorded as $0; MAX_DAILY_USD may undercount`,
+    );
+    return 0;
+  }
   const uncached = Math.max(0, tokensIn - cachedTokensIn);
   const inputCost = (uncached * p.input) / 1_000_000;
   const cachedCost = (cachedTokensIn * (p.cachedInput ?? p.input)) / 1_000_000;
