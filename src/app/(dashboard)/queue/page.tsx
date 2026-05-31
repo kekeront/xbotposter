@@ -6,7 +6,6 @@ import {
   POST_STATUS,
   posts,
   profiles,
-  viralPosts,
   type Post,
   type PostStatus,
   type TrackedAccount,
@@ -16,6 +15,7 @@ import { INFLUENCERS } from "@/config/influencers";
 import { env } from "@/lib/env";
 import { loadAllCronStatus, loadAutonomyStats } from "@/lib/automation";
 import { loadBilling } from "@/lib/billing";
+import { loadDiscoveryFeed } from "@/lib/discovery-feed";
 import { AutomationPanel } from "./automation-panel";
 import { ComposePanel } from "./compose-panel";
 import { DiscoverPanel } from "./discover-panel";
@@ -227,46 +227,32 @@ async function loadCounts(userId: string): Promise<Record<string, number>> {
 
 async function loadDiscoverData(userId: string) {
   try {
-    const [viral, profileRow, lastRow] = await Promise.all([
-      db
-        .select()
-        .from(viralPosts)
-        .where(eq(viralPosts.userId, userId))
-        .orderBy(
-          desc(
-            sql<number>`coalesce((${viralPosts.engagement} ->> 'likes')::int, 0)`,
-          ),
-          desc(viralPosts.capturedAt),
-        )
-        .limit(30),
+    const [feedResult, profileRow] = await Promise.all([
+      loadDiscoveryFeed(userId, { limit: 20, sort: "recency" }),
       db
         .select({ trackedAccounts: profiles.trackedAccounts })
         .from(profiles)
         .where(eq(profiles.id, userId))
-        .limit(1),
-      db
-        .select({ capturedAt: viralPosts.capturedAt })
-        .from(viralPosts)
-        .where(eq(viralPosts.userId, userId))
-        .orderBy(desc(viralPosts.capturedAt))
         .limit(1),
     ]);
 
     const trackedAccounts: TrackedAccount[] =
       profileRow[0]?.trackedAccounts ?? INFLUENCERS;
 
+    // Use the most-recently-captured item's timestamp for the "fetched X ago" header.
+    const mostRecentItem =
+      feedResult.items.length > 0 ? feedResult.items[0] : null;
+
     return {
-      viralPosts: viral.map((v) => ({
-        id: v.id,
-        author: v.author,
-        text: v.text,
-        xUrl: v.xUrl,
-        xTweetId: v.xTweetId,
-        engagement: v.engagement as Record<string, number> | null,
-        capturedAt: v.capturedAt.toISOString(),
+      initialItems: feedResult.items.map((item) => ({
+        ...item,
+        capturedAt: item.capturedAt.toISOString(),
       })),
+      initialTotal: feedResult.total,
       trackedAccounts,
-      lastFetch: lastRow[0]?.capturedAt?.toISOString() ?? null,
+      lastFetch: mostRecentItem
+        ? mostRecentItem.capturedAt.toISOString()
+        : null,
     };
   } catch {
     return null;
@@ -333,7 +319,8 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
 
       {discover && (
         <DiscoverPanel
-          viralPosts={discover.viralPosts}
+          initialItems={discover.initialItems}
+          initialTotal={discover.initialTotal}
           trackedAccounts={discover.trackedAccounts}
           lastFetch={discover.lastFetch}
         />

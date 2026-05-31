@@ -1,6 +1,7 @@
 import "server-only";
 import { and, isNotNull, sql } from "drizzle-orm";
 import { INFLUENCERS } from "@/config/influencers";
+import type { Influencer } from "@/config/influencers";
 import { db } from "@/db/client";
 import { viralPosts } from "@/db/schema";
 import { writeTrace } from "./trace";
@@ -49,11 +50,20 @@ export type DiscoverFetchResult = {
 export async function runDiscoverFetch(opts?: {
   source?: "manual" | "cron";
   userId?: string;
+  /** Tracked accounts to fetch timelines for. When omitted or empty, falls back
+   *  to the curated INFLUENCERS list from src/config/influencers.ts. */
+  accounts?: Influencer[];
 }): Promise<DiscoverFetchResult> {
   const startedAt = Date.now();
   const source = opts?.source ?? "manual";
+
+  // Use caller-supplied accounts when present and non-empty; fall back to the
+  // curated INFLUENCERS list so existing behavior is preserved.
+  const targets: Influencer[] =
+    opts?.accounts && opts.accounts.length > 0 ? opts.accounts : INFLUENCERS;
+
   const result: DiscoverFetchResult = {
-    influencersTracked: INFLUENCERS.length,
+    influencersTracked: targets.length,
     influencersResolved: 0,
     tweetsFetched: 0,
     tweetsCaptured: 0,
@@ -69,13 +79,14 @@ export async function runDiscoverFetch(opts?: {
     agent: "discover",
     eventType: "start",
     payload: {
-      influencers: INFLUENCERS.length,
+      influencers: targets.length,
       source,
+      usingTrackedAccounts: opts?.accounts != null && opts.accounts.length > 0,
       authorsWithSinceId: lastSeenByAuthor.size,
     },
   });
 
-  for (const inf of INFLUENCERS) {
+  for (const inf of targets) {
     try {
       // Skip userByUsername entirely if id is pre-resolved in config —
       // saves ~$0.005-0.010 per influencer per fetch run.

@@ -14,8 +14,11 @@ import {
   persistSearchSources,
   buildSourceUrlToIdMap,
 } from "@/lib/source-persist";
+import { sseStream } from "@/lib/sse";
 import { writeTrace } from "@/lib/trace";
 import { loadDefaultVoice } from "@/lib/voice-load";
+
+export const maxDuration = 120;
 
 const QrtRequest = z.object({
   viralPostId: z.string().uuid(),
@@ -24,6 +27,7 @@ const QrtRequest = z.object({
 
 export async function POST(request: Request) {
   const user = await requireUser();
+
   let body: unknown;
   try {
     body = await request.json();
@@ -59,6 +63,7 @@ export async function POST(request: Request) {
   const author = viral.author ?? "unknown";
 
   // Topic safety gate — fail-closed on politics / tragedy / conspiracy / etc.
+  // Done before the stream so a blocked request returns a normal JSON response.
   const guard = await guardCheck({ text: viral.text, author });
   await writeTrace({
     generationId: null,
@@ -121,220 +126,228 @@ export async function POST(request: Request) {
     payload: { viralAuthor: author, hasAngle: !!userAngle },
   });
 
-  try {
-    const voice = await loadDefaultVoice();
-    const recallQuery = `${author} ${viral.text} ${userAngle ?? ""}`.trim();
-    const memoryContext = await recallMemoryBlock(recallQuery);
-    if (memoryContext.block) {
-      await writeTrace({
-        generationId: generation.id,
-        agent: "memory",
-        eventType: "recall",
-        payload: {
-          citations: memoryContext.citationCount,
-          bytes: memoryContext.block.length,
-          embedError: memoryContext.embedError,
-        },
-      });
-    }
-
-    let researchBlock = "";
-    let sourceUrlToId = new Map<string, string>();
-    let searchCost = 0;
+  return sseStream(async (emit) => {
     try {
-      const searchResult = await searchWeb({
-        topic: `${viral.text} (by @${author})`,
-      });
-      researchBlock = searchResult.researchBlock;
-      searchCost = searchResult.costUsd;
-      if (researchBlock) {
-        const persisted = await persistSearchSources(searchResult.sources);
-        sourceUrlToId = buildSourceUrlToIdMap(persisted);
+      emit("progress", { step: "search", detail: "loading voice and memory" });
+      const voice = await loadDefaultVoice();
+      const recallQuery = `${author} ${viral.text} ${userAngle ?? ""}`.trim();
+      const memoryContext = await recallMemoryBlock(recallQuery);
+      if (memoryContext.block) {
+        await writeTrace({
+          generationId: generation.id,
+          agent: "memory",
+          eventType: "recall",
+          payload: {
+            citations: memoryContext.citationCount,
+            bytes: memoryContext.block.length,
+            embedError: memoryContext.embedError,
+          },
+        });
+      }
+
+      emit("progress", { step: "search", detail: "researching topic" });
+      let researchBlock = "";
+      let sourceUrlToId = new Map<string, string>();
+      let searchCost = 0;
+      try {
+        const searchResult = await searchWeb({
+          topic: `${viral.text} (by @${author})`,
+        });
+        researchBlock = searchResult.researchBlock;
+        searchCost = searchResult.costUsd;
+        if (researchBlock) {
+          const persisted = await persistSearchSources(searchResult.sources);
+          sourceUrlToId = buildSourceUrlToIdMap(persisted);
+          await writeTrace({
+            generationId: generation.id,
+            agent: "searcher",
+            eventType: "complete",
+            payload: {
+              sources: searchResult.sources.length,
+              persisted: persisted.length,
+              bytes: researchBlock.length,
+            },
+            model: searchResult.model,
+            tokensIn: searchResult.tokensIn,
+            tokensOut: searchResult.tokensOut,
+            costUsd: searchResult.costUsd.toString(),
+          });
+        }
+      } catch (err) {
         await writeTrace({
           generationId: generation.id,
           agent: "searcher",
-          eventType: "complete",
-          payload: {
-            sources: searchResult.sources.length,
-            persisted: persisted.length,
-            bytes: researchBlock.length,
-          },
-          model: searchResult.model,
-          tokensIn: searchResult.tokensIn,
-          tokensOut: searchResult.tokensOut,
-          costUsd: searchResult.costUsd.toString(),
+          eventType: "error",
+          payload: { message: err instanceof Error ? err.message : String(err) },
         });
       }
-    } catch (err) {
+
+      emit("progress", { step: "writer", detail: "drafting QRT" });
+      const writerResult = await qrtDraft({
+        viralText: viral.text,
+        viralAuthor: author,
+        userAngle: userAngle ?? null,
+        referenceTweets: voice.referenceTweets,
+        fingerprintBlock: voice.fingerprintBlock,
+        memoryBlock: memoryContext.block,
+        researchBlock,
+      });
+
       await writeTrace({
         generationId: generation.id,
-        agent: "searcher",
-        eventType: "error",
-        payload: { message: err instanceof Error ? err.message : String(err) },
+        agent: "qrt",
+        eventType: "complete",
+        payload: { length: writerResult.text.length },
+        model: writerResult.model,
+        tokensIn: writerResult.tokensIn,
+        tokensOut: writerResult.tokensOut,
+        costUsd: writerResult.costUsd.toString(),
       });
-    }
 
-    const writerResult = await qrtDraft({
-      viralText: viral.text,
-      viralAuthor: author,
-      userAngle: userAngle ?? null,
-      referenceTweets: voice.referenceTweets,
-      fingerprintBlock: voice.fingerprintBlock,
-      memoryBlock: memoryContext.block,
-      researchBlock,
-    });
+      emit("progress", { step: "editor", detail: "reviewing draft" });
+      const editorTopic = userAngle
+        ? `${userAngle} (qrt on @${author}: ${viral.text})`
+        : `Quote retweeting @${author}: ${viral.text}`;
 
-    await writeTrace({
-      generationId: generation.id,
-      agent: "qrt",
-      eventType: "complete",
-      payload: { length: writerResult.text.length },
-      model: writerResult.model,
-      tokensIn: writerResult.tokensIn,
-      tokensOut: writerResult.tokensOut,
-      costUsd: writerResult.costUsd.toString(),
-    });
-
-    const editorTopic = userAngle
-      ? `${userAngle} (qrt on @${author}: ${viral.text})`
-      : `Quote retweeting @${author}: ${viral.text}`;
-
-    const editorResult = await review({
-      topic: editorTopic,
-      drafts: [writerResult.text],
-      contentType: "single",
-      referenceTweets: voice.referenceTweets,
-      fingerprintBlock: voice.fingerprintBlock,
-    });
-
-    await writeTrace({
-      generationId: generation.id,
-      agent: "editor",
-      eventType: editorResult.changed
-        ? "complete_with_changes"
-        : "complete_no_changes",
-      payload: { issues: editorResult.issuesFound, changed: editorResult.changed },
-      model: editorResult.model,
-      tokensIn: editorResult.tokensIn,
-      tokensOut: editorResult.tokensOut,
-      costUsd: editorResult.costUsd.toString(),
-    });
-
-    const [evalResult, factResult] = await Promise.all([
-      evaluate({
-        seed: editorTopic,
-        draft: editorResult.texts,
+      const editorResult = await review({
+        topic: editorTopic,
+        drafts: [writerResult.text],
         contentType: "single",
         referenceTweets: voice.referenceTweets,
         fingerprintBlock: voice.fingerprintBlock,
-      }),
-      factCheck({
-        seed: editorTopic,
-        draft: editorResult.texts,
-        researchBlock,
-      }),
-    ]);
+      });
 
-    await writeTrace({
-      generationId: generation.id,
-      agent: "evaluator",
-      eventType: "complete",
-      payload: {
-        overall: evalResult.overall,
-        scores: evalResult.scores,
-        critique: evalResult.critique,
-      },
-      model: evalResult.model,
-      tokensIn: evalResult.tokensIn,
-      tokensOut: evalResult.tokensOut,
-      costUsd: evalResult.costUsd.toString(),
-    });
-
-    await writeTrace({
-      generationId: generation.id,
-      agent: "fact-checker",
-      eventType: factResult.hasInvented ? "complete_with_invented" : "complete",
-      payload: {
-        claimsCount: factResult.claims.length,
-        invented: factResult.inventedCount,
-        uncertain: factResult.uncertainCount,
-      },
-      model: factResult.model,
-      tokensIn: factResult.tokensIn,
-      tokensOut: factResult.tokensOut,
-      costUsd: factResult.costUsd.toString(),
-    });
-
-    const totalTokensIn =
-      writerResult.tokensIn + editorResult.tokensIn +
-      evalResult.tokensIn + factResult.tokensIn;
-    const totalTokensOut =
-      writerResult.tokensOut + editorResult.tokensOut +
-      evalResult.tokensOut + factResult.tokensOut;
-    const totalCost =
-      searchCost + writerResult.costUsd + editorResult.costUsd +
-      evalResult.costUsd + factResult.costUsd;
-    const finalText = editorResult.texts[0] ?? writerResult.text;
-
-    await db
-      .update(generations)
-      .set({
-        status: "succeeded",
-        model: `${writerResult.model} + ${editorResult.model} + ${evalResult.model}`,
-        inputMeta: {
-          contentType: "single",
-          mode: "qrt",
-          viralPostId: viral.id,
-          viralAuthor: author,
-          viralXTweetId: viral.xTweetId,
-          viralXUrl: viral.xUrl,
-          userAngle: userAngle ?? null,
-          eval: {
-            overall: evalResult.overall,
-            scores: evalResult.scores,
-            critique: evalResult.critique,
-          },
-          factCheck: {
-            claimsCount: factResult.claims.length,
-            invented: factResult.inventedCount,
-          },
-        },
-        tokensIn: totalTokensIn,
-        tokensOut: totalTokensOut,
-        costUsd: totalCost.toString(),
-        completedAt: new Date(),
-      })
-      .where(eq(generations.id, generation.id));
-
-    const inserted: Post[] = await db
-      .insert(posts)
-      .values({
-        userId: user.id,
+      await writeTrace({
         generationId: generation.id,
-        contentType: "single",
-        text: finalText,
-        status: "draft",
-        quoteTweetId: viral.xTweetId,
-      })
-      .returning();
+        agent: "editor",
+        eventType: editorResult.changed
+          ? "complete_with_changes"
+          : "complete_no_changes",
+        payload: { issues: editorResult.issuesFound, changed: editorResult.changed },
+        model: editorResult.model,
+        tokensIn: editorResult.tokensIn,
+        tokensOut: editorResult.tokensOut,
+        costUsd: editorResult.costUsd.toString(),
+      });
 
-    if (factResult.claims.length > 0 && inserted[0]) {
-      const claimRows = factResult.claims.slice(0, 20).map((c) => ({
-        postId: inserted[0]!.id,
-        claimText: c.text,
-        sourceId: c.sourceUrl ? sourceUrlToId.get(c.sourceUrl) ?? null : null,
-        verified: c.verdict === "supported",
-        notes: `${c.verdict}: ${c.reason}`,
-      }));
-      try {
-        await db.insert(claims).values(claimRows);
-      } catch {
-        // best-effort
+      emit("progress", { step: "eval", detail: "evaluating quality" });
+      emit("progress", { step: "factcheck", detail: "checking facts" });
+      const [evalResult, factResult] = await Promise.all([
+        evaluate({
+          seed: editorTopic,
+          draft: editorResult.texts,
+          contentType: "single",
+          referenceTweets: voice.referenceTweets,
+          fingerprintBlock: voice.fingerprintBlock,
+        }),
+        factCheck({
+          seed: editorTopic,
+          draft: editorResult.texts,
+          researchBlock,
+        }),
+      ]);
+
+      await writeTrace({
+        generationId: generation.id,
+        agent: "evaluator",
+        eventType: "complete",
+        payload: {
+          overall: evalResult.overall,
+          scores: evalResult.scores,
+          critique: evalResult.critique,
+        },
+        model: evalResult.model,
+        tokensIn: evalResult.tokensIn,
+        tokensOut: evalResult.tokensOut,
+        costUsd: evalResult.costUsd.toString(),
+      });
+
+      await writeTrace({
+        generationId: generation.id,
+        agent: "fact-checker",
+        eventType: factResult.hasInvented ? "complete_with_invented" : "complete",
+        payload: {
+          claimsCount: factResult.claims.length,
+          invented: factResult.inventedCount,
+          uncertain: factResult.uncertainCount,
+        },
+        model: factResult.model,
+        tokensIn: factResult.tokensIn,
+        tokensOut: factResult.tokensOut,
+        costUsd: factResult.costUsd.toString(),
+      });
+
+      const totalTokensIn =
+        writerResult.tokensIn + editorResult.tokensIn +
+        evalResult.tokensIn + factResult.tokensIn;
+      const totalTokensOut =
+        writerResult.tokensOut + editorResult.tokensOut +
+        evalResult.tokensOut + factResult.tokensOut;
+      const totalCost =
+        searchCost + writerResult.costUsd + editorResult.costUsd +
+        evalResult.costUsd + factResult.costUsd;
+      const finalText = editorResult.texts[0] ?? writerResult.text;
+
+      emit("progress", { step: "saving", detail: "persisting to queue" });
+
+      await db
+        .update(generations)
+        .set({
+          status: "succeeded",
+          model: `${writerResult.model} + ${editorResult.model} + ${evalResult.model}`,
+          inputMeta: {
+            contentType: "single",
+            mode: "qrt",
+            viralPostId: viral.id,
+            viralAuthor: author,
+            viralXTweetId: viral.xTweetId,
+            viralXUrl: viral.xUrl,
+            userAngle: userAngle ?? null,
+            eval: {
+              overall: evalResult.overall,
+              scores: evalResult.scores,
+              critique: evalResult.critique,
+            },
+            factCheck: {
+              claimsCount: factResult.claims.length,
+              invented: factResult.inventedCount,
+            },
+          },
+          tokensIn: totalTokensIn,
+          tokensOut: totalTokensOut,
+          costUsd: totalCost.toString(),
+          completedAt: new Date(),
+        })
+        .where(eq(generations.id, generation.id));
+
+      const inserted: Post[] = await db
+        .insert(posts)
+        .values({
+          userId: user.id,
+          generationId: generation.id,
+          contentType: "single",
+          text: finalText,
+          status: "draft",
+          quoteTweetId: viral.xTweetId,
+        })
+        .returning();
+
+      if (factResult.claims.length > 0 && inserted[0]) {
+        const claimRows = factResult.claims.slice(0, 20).map((c) => ({
+          postId: inserted[0]!.id,
+          claimText: c.text,
+          sourceId: c.sourceUrl ? sourceUrlToId.get(c.sourceUrl) ?? null : null,
+          verified: c.verdict === "supported",
+          notes: `${c.verdict}: ${c.reason}`,
+        }));
+        try {
+          await db.insert(claims).values(claimRows);
+        } catch {
+          // best-effort
+        }
       }
-    }
 
-    return Response.json(
-      {
+      emit("result", {
         generation: {
           id: generation.id,
           model: `${writerResult.model} + ${editorResult.model} + ${evalResult.model}`,
@@ -356,30 +369,27 @@ export async function POST(request: Request) {
           inventedCount: factResult.inventedCount,
         },
         posts: inserted,
-      },
-      { status: 201 },
-    );
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "unknown error";
-    await db
-      .update(generations)
-      .set({
-        status: "failed",
-        error: message,
-        completedAt: new Date(),
-      })
-      .where(eq(generations.id, generation.id));
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "unknown error";
+      await db
+        .update(generations)
+        .set({
+          status: "failed",
+          error: message,
+          completedAt: new Date(),
+        })
+        .where(eq(generations.id, generation.id));
 
-    await writeTrace({
-      generationId: generation.id,
-      agent: "qrt",
-      eventType: "error",
-      payload: { message },
-    });
+      await writeTrace({
+        generationId: generation.id,
+        agent: "qrt",
+        eventType: "error",
+        payload: { message },
+      });
 
-    return Response.json(
-      { error: "qrt generation failed", message, generationId: generation.id },
-      { status: 500 },
-    );
-  }
+      // Re-throw so sseStream emits the `error` SSE event.
+      throw err;
+    }
+  });
 }

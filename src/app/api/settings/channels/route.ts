@@ -15,6 +15,22 @@ const ChannelsRequest = z.object({
   ).max(50),
 });
 
+/** Return the caller's current tracked accounts. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: Request) {
+  const user = await requireUser();
+
+  const [profile] = await db
+    .select({ trackedAccounts: profiles.trackedAccounts })
+    .from(profiles)
+    .where(eq(profiles.id, user.id))
+    .limit(1);
+
+  return Response.json({
+    accounts: profile?.trackedAccounts ?? [],
+  });
+}
+
 export async function PUT(request: Request) {
   const user = await requireUser();
 
