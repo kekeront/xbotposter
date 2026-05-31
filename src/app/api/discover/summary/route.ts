@@ -42,7 +42,10 @@ export async function GET() {
 
   const result = await complete({
     tier: "cheap",
-    maxTokens: 600,
+    // gpt-5-nano is a reasoning model: reasoning tokens count against this
+    // budget, so a low ceiling (e.g. 600) gets fully consumed by reasoning and
+    // returns EMPTY visible text. Give it room for reasoning + the digest.
+    maxTokens: 3000,
     messages: [
       {
         role: "system",
