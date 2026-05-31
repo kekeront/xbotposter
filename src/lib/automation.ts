@@ -3,7 +3,7 @@ import { and, count, desc, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { generations, posts, traces } from "@/db/schema";
 
-export type CronJob = "discover" | "generate" | "post";
+export type CronJob = "discover" | "generate" | "post" | "wave";
 
 export type CronStatus = {
   job: CronJob;
@@ -20,12 +20,14 @@ const JOB_TO_AGENT: Record<CronJob, string> = {
   discover: "discover",
   generate: "cron-generate",
   post: "cron-post",
+  wave: "cron-wave",
 };
 
 const JOB_SCHEDULES: Record<CronJob, { cron: string; human: string }> = {
   discover: { cron: "0 */12 * * *", human: "every 12 hours" },
   generate: { cron: "0 */4 * * *", human: "every 4 hours" },
   post: { cron: "*/15 * * * *", human: "every 15 minutes" },
+  wave: { cron: "0 10 * * *", human: "daily" },
 };
 
 async function loadCronStatus(job: CronJob): Promise<CronStatus> {
@@ -89,6 +91,7 @@ export async function loadAllCronStatus(): Promise<CronStatus[]> {
     loadCronStatus("discover"),
     loadCronStatus("generate"),
     loadCronStatus("post"),
+    loadCronStatus("wave"),
   ]);
 }
 
