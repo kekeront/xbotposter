@@ -102,6 +102,10 @@ async function parsePdf(
       // PDF is slow/expensive and pointless here — uploaded sources are used as
       // a short research-context snippet downstream. Cap output (reasoning-safe).
       max_output_tokens: 2500,
+      // Summarizing a document needs no deliberation — minimal reasoning cuts
+      // latency a lot on large PDFs (~18s→~11s on a 50-page paper). The input
+      // floor is the doc itself: the model still reads every page.
+      reasoning: { effort: "minimal" },
       input: [
         {
           role: "user",
