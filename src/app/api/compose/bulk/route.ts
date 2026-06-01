@@ -175,7 +175,7 @@ export async function POST(request: Request) {
           }),
         );
 
-        const results: Array<{
+        type AngleResult = {
           angleIndex: number;
           hook: string;
           generationId: string;
@@ -192,25 +192,18 @@ export async function POST(request: Request) {
             text: string;
             threadPosition: number | null;
           }>;
-        }> = [];
+        };
 
-        // Run each angle sequentially to control spend.
-        for (let i = 0; i < anglesResult.angles.length; i++) {
-          const angle = anglesResult.angles[i]!;
-          const label = `angle ${i + 1}/${anglesResult.angles.length}`;
+        type AngleOutcome =
+          | { ok: true; result: AngleResult }
+          | { ok: false; angleIndex: number; hook: string; costUsd: number };
 
-          // Re-check spend cap before each angle.
-          const midVerdict = await checkSpendCap();
-          if (!midVerdict.allow) {
-            controller.enqueue(
-              sseEncode("spend_cap", {
-                message: midVerdict.reason,
-                completedAngles: results.length,
-                totalAngles: anglesResult.angles.length,
-              }),
-            );
-            break;
-          }
+        const processAngle = async (
+          i: number,
+          angle: { angle: string; hook: string },
+          totalAngles: number,
+        ): Promise<AngleOutcome> => {
+          const label = `angle ${i + 1}/${totalAngles}`;
 
           const [generation] = await db
             .insert(generations)
@@ -229,7 +222,9 @@ export async function POST(request: Request) {
             })
             .returning();
 
-          if (!generation) continue;
+          if (!generation) {
+            return { ok: false, angleIndex: i, hook: angle.hook, costUsd: 0 };
+          }
 
           await writeTrace({
             generationId: generation.id,
@@ -239,6 +234,9 @@ export async function POST(request: Request) {
           });
 
           let dbSucceeded = false;
+          // Accumulates real spend as each step completes, so a mid-pipeline
+          // failure still reports the cost already incurred (not 0).
+          let partialCost = 0;
 
           try {
             // Writer
@@ -252,6 +250,7 @@ export async function POST(request: Request) {
               researchBlock,
               preferences,
             });
+            partialCost += writerResult.costUsd;
             await writeTrace({
               generationId: generation.id,
               agent: "writer",
@@ -269,6 +268,7 @@ export async function POST(request: Request) {
               topic: angle.angle,
               drafts: writerResult.texts,
               contentType,
+              language: preferences?.language,
               referenceTweets: voice.referenceTweets,
               fingerprintBlock: voice.fingerprintBlock,
             });
@@ -287,6 +287,7 @@ export async function POST(request: Request) {
               tokensOut: editorResult.tokensOut,
               costUsd: editorResult.costUsd.toString(),
             });
+            partialCost += editorResult.costUsd;
 
             // Eval + fact-check in parallel
             emit("eval", label);
@@ -295,11 +296,13 @@ export async function POST(request: Request) {
                 seed: angle.angle,
                 draft: editorResult.texts,
                 contentType,
+                language: preferences?.language,
                 referenceTweets: voice.referenceTweets,
                 fingerprintBlock: voice.fingerprintBlock,
               }),
               check({ seed: angle.angle, draft: editorResult.texts, researchBlock }),
             ]);
+            partialCost += evalResult.costUsd + factResult.costUsd;
 
             await writeTrace({
               generationId: generation.id,
@@ -331,8 +334,6 @@ export async function POST(request: Request) {
               editorResult.tokensOut +
               evalResult.tokensOut +
               factResult.tokensOut;
-
-            totalCostUsd += angleCost;
 
             // Save
             emit("saving", label);
@@ -372,7 +373,7 @@ export async function POST(request: Request) {
               }
             }
 
-            const angleResult = {
+            const angleResult: AngleResult = {
               angleIndex: i,
               hook: angle.hook,
               generationId: generation.id,
@@ -390,11 +391,12 @@ export async function POST(request: Request) {
                 threadPosition: p.threadPosition,
               })),
             };
-            results.push(angleResult);
 
-            controller.enqueue(
-              sseEncode("angle_done", angleResult),
-            );
+            try {
+              controller.enqueue(sseEncode("angle_done", angleResult));
+            } catch {
+              // client disconnected
+            }
 
             await writeTrace({
               generationId: generation.id,
@@ -406,6 +408,8 @@ export async function POST(request: Request) {
                 postCount: createdPosts.length,
               },
             });
+
+            return { ok: true, result: angleResult };
           } catch (err) {
             const message =
               err instanceof Error ? err.message : "unknown error";
@@ -428,15 +432,69 @@ export async function POST(request: Request) {
               payload: { angleIndex: i, message },
             });
 
-            controller.enqueue(
-              sseEncode("angle_error", {
-                angleIndex: i,
-                hook: angle.hook,
-                message,
-              }),
-            );
+            try {
+              controller.enqueue(
+                sseEncode("angle_error", {
+                  angleIndex: i,
+                  hook: angle.hook,
+                  message,
+                }),
+              );
+            } catch {
+              // client disconnected
+            }
+
+            return {
+              ok: false,
+              angleIndex: i,
+              hook: angle.hook,
+              costUsd: partialCost,
+            };
           }
+        };
+
+        // Spend cap is gated once here, before launching the batch. Angles then
+        // run concurrently (like the variants path in compose/route.ts), so a
+        // per-angle check is omitted: with full parallelism every angle would
+        // read the cap before any of them has incurred cost, making it useless,
+        // and it would spam spend_cap events. Worst-case overshoot is therefore
+        // bounded to one parallel batch of angles (max 6, each a small generation).
+        const batchVerdict = await checkSpendCap();
+        if (!batchVerdict.allow) {
+          controller.enqueue(
+            sseEncode("spend_cap", {
+              message: batchVerdict.reason,
+              completedAngles: 0,
+              totalAngles: anglesResult.angles.length,
+            }),
+          );
+          controller.enqueue(
+            sseEncode("result", {
+              totalAngles: anglesResult.angles.length,
+              completedAngles: 0,
+              totalCostUsd,
+              results: [],
+            }),
+          );
+          return;
         }
+
+        // Run all angles concurrently; each emits its own SSE events as it finishes.
+        const outcomes = await Promise.all(
+          anglesResult.angles.map((angle, i) =>
+            processAngle(i, angle, anglesResult.angles.length),
+          ),
+        );
+
+        const results: AngleResult[] = outcomes
+          .filter((o): o is { ok: true; result: AngleResult } => o.ok)
+          .map((o) => o.result)
+          .sort((a, b) => a.angleIndex - b.angleIndex);
+
+        totalCostUsd += outcomes.reduce(
+          (sum, o) => sum + (o.ok ? o.result.costUsd : o.costUsd),
+          0,
+        );
 
         controller.enqueue(
           sseEncode("result", {

@@ -198,4 +198,31 @@ describe("evaluate()", () => {
     const userMsg = messages?.find((m) => m.content.includes("thread, 3 posts"));
     expect(userMsg).toBeDefined();
   });
+
+  it("system prompt scores language against ENGLISH when language is 'english'", async () => {
+    mockComplete.mockResolvedValue({
+      ...BASE_RESULT,
+      text: JSON.stringify(VALID_EVAL_RESPONSE),
+    });
+
+    await evaluate({ ...BASE_INPUT, language: "english" });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system");
+    expect(systemMsg?.content).toContain("Chosen output language: ENGLISH");
+    expect(systemMsg?.content).not.toContain("Russian-friendly seed got a pure-English answer, score low");
+  });
+
+  it("system prompt scores language against RUSSIAN by default", async () => {
+    mockComplete.mockResolvedValue({
+      ...BASE_RESULT,
+      text: JSON.stringify(VALID_EVAL_RESPONSE),
+    });
+
+    await evaluate(BASE_INPUT);
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system");
+    expect(systemMsg?.content).toContain("Chosen output language: RUSSIAN");
+  });
 });

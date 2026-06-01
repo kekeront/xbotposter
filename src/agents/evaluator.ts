@@ -10,6 +10,7 @@ export type EvalInput = {
   seed: string;
   draft: string[];
   contentType?: "single" | "thread" | "essay";
+  language?: string;
   referenceTweets?: string[];
   fingerprintBlock?: string;
   traceContext?: TraceContext;
@@ -34,7 +35,7 @@ export type EvalOutput = {
   costUsd: number;
 };
 
-const SYSTEM_PROMPT = `You are an evaluator scoring a tweet draft for an X (Twitter) writer. Output JSON only.
+const SYSTEM_PROMPT_BASE = `You are an evaluator scoring a tweet draft for an X (Twitter) writer. Output JSON only.
 
 RUBRIC — each criterion scored 0 to 100:
 
@@ -47,8 +48,8 @@ RUBRIC — each criterion scored 0 to 100:
   "А вы знали…"), closing tricolons. 100 = clean.
 - charFit: appropriate length. Single tweets 60-220 chars ideal; thread posts
   in same range each. Penalize overlong or trivially short.
-- language: matches the writer's default (Russian-first, light EN/KZ code-switch).
-  If a Russian-friendly seed got a pure-English answer, score low.
+- language: scored against the CHOSEN OUTPUT LANGUAGE defined in the LANGUAGE DIRECTIVE below.
+  Score 100 if the draft matches the chosen language. Score low if the draft is in the wrong language.
 - faithfulness: 100 if draft sticks to the seed. Penalize invented specifics
   (numbers, dollars, fake stories), topics borrowed from voice anchor that
   weren't in the seed, fabricated brands/people.
@@ -67,9 +68,33 @@ OUTPUT — return ONLY this JSON shape, no preamble, no code fences:
   "critique": "<one short sentence, plain prose, RU or EN>"
 }`;
 
+const LANGUAGE_DIRECTIVES: Record<string, string> = {
+  russian: `LANGUAGE DIRECTIVE
+Chosen output language: RUSSIAN. The draft should be Russian-primary with light EN/KZ code-switching for tech terms.
+Score the "language" criterion high for Russian-primary output; score low for pure-English output.`,
+
+  english: `LANGUAGE DIRECTIVE
+Chosen output language: ENGLISH. The draft should be English-primary.
+Score the "language" criterion high for English-primary output; score low if the draft is primarily in Russian or another language.`,
+
+  "mixed-ru-en": `LANGUAGE DIRECTIVE
+Chosen output language: MIXED RU/EN. Natural code-switching between Russian and English is the target.
+Score the "language" criterion high for fluid RU/EN mixing; score low for purely monolingual output.`,
+};
+
+function buildSystemPrompt(language?: string): string {
+  const directive =
+    language === "english"
+      ? LANGUAGE_DIRECTIVES.english!
+      : language === "mixed-ru-en"
+        ? LANGUAGE_DIRECTIVES["mixed-ru-en"]!
+        : LANGUAGE_DIRECTIVES.russian!;
+  return `${SYSTEM_PROMPT_BASE}\n\n${directive}`;
+}
+
 function buildMessages(input: EvalInput): CompletionMessage[] {
   const messages: CompletionMessage[] = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: buildSystemPrompt(input.language) },
   ];
 
   if (input.fingerprintBlock) {

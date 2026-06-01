@@ -229,4 +229,40 @@ describe("editor review()", () => {
     // After filter(Boolean) on trimmed, length won't match -> fallback
     expect(result.texts).toEqual(original);
   });
+
+  it("system prompt contains ENGLISH language directive when language is 'english'", async () => {
+    mockComplete.mockResolvedValue({
+      ...BASE_RESULT,
+      text: JSON.stringify({ issues: [], revised: ["ok"] }),
+    });
+
+    await review({
+      topic: "test",
+      drafts: ["draft"],
+      contentType: "single",
+      language: "english",
+    });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system");
+    expect(systemMsg?.content).toContain("The chosen output language is ENGLISH");
+    expect(systemMsg?.content).not.toContain("rewrite it in Russian colloquial internet-register");
+  });
+
+  it("system prompt contains RUSSIAN language directive by default", async () => {
+    mockComplete.mockResolvedValue({
+      ...BASE_RESULT,
+      text: JSON.stringify({ issues: [], revised: ["ok"] }),
+    });
+
+    await review({
+      topic: "test",
+      drafts: ["draft"],
+      contentType: "single",
+    });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system");
+    expect(systemMsg?.content).toContain("The chosen output language is RUSSIAN");
+  });
 });
