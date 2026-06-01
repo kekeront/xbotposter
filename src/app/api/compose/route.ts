@@ -122,6 +122,7 @@ async function runVariant(
     topic,
     drafts: writerResult.texts,
     contentType,
+    language: preferences?.language,
     referenceTweets: voice.referenceTweets,
     fingerprintBlock: voice.fingerprintBlock,
     traceContext: { generationId, agent: "editor" },
@@ -149,6 +150,7 @@ async function runVariant(
       seed: topic,
       draft: editorResult.texts,
       contentType,
+      language: preferences?.language,
       referenceTweets: voice.referenceTweets,
       fingerprintBlock: voice.fingerprintBlock,
       traceContext: { generationId, agent: "evaluator" },
@@ -287,6 +289,7 @@ async function draftAndScore(
     seed: topic,
     draft: writerResult.texts,
     contentType,
+    language: preferences?.language,
     referenceTweets: voice.referenceTweets,
     fingerprintBlock: voice.fingerprintBlock,
     traceContext: { generationId, agent: "evaluator" },
@@ -341,6 +344,7 @@ async function finalizeWinner(
   generationId: string,
   emit: ProgressEmitter,
   researchBlock?: string,
+  language?: string,
 ): Promise<VariantResult> {
   const tag = `winner (variant ${winner.index + 1})`;
 
@@ -349,6 +353,7 @@ async function finalizeWinner(
     topic,
     drafts: winner.texts,
     contentType,
+    language,
     referenceTweets: voice.referenceTweets,
     fingerprintBlock: voice.fingerprintBlock,
     traceContext: { generationId, agent: "editor" },
@@ -719,6 +724,7 @@ export async function POST(request: Request) {
             generation.id,
             emit,
             researchBlock,
+            preferences?.language,
           );
         }
 
@@ -838,6 +844,16 @@ export async function POST(request: Request) {
             factCheck: {
               claims: winner.factClaims,
               inventedCount: winner.factInventedCount,
+            },
+            // What the draft was grounded on (RAG/context transparency).
+            sources: {
+              web: searchResult?.sources ?? [],
+              uploaded: uploaded.map((u) => ({
+                id: u.id,
+                url: u.url,
+                title: u.title,
+                kind: u.type,
+              })),
             },
             variants: variantResults.map((v) => ({
               index: v.index,

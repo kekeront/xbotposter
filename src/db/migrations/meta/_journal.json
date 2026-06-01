@@ -36,6 +36,13 @@
       "when": 1780246532368,
       "tag": "0004_fat_jack_murdock",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780251541198,
+      "tag": "0005_warm_talisman",
+      "breakpoints": true
     }
   ]
 }

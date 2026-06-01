@@ -259,12 +259,17 @@ async function loadDiscoverData(userId: string) {
   }
 }
 
-async function loadAutomationData() {
+async function loadAutomationData(userId: string) {
   try {
-    const [jobs, stats, billing] = await Promise.all([
+    const [jobs, stats, billing, profile] = await Promise.all([
       loadAllCronStatus(),
       loadAutonomyStats(),
       loadBilling(),
+      db
+        .select({ waveAutonomous: profiles.waveAutonomous })
+        .from(profiles)
+        .where(eq(profiles.id, userId))
+        .limit(1),
     ]);
     const todaySpend = billing?.today.totalUsd ?? 0;
     const cap = env.MAX_DAILY_USD;
@@ -272,7 +277,13 @@ async function loadAutomationData() {
       ...j,
       lastRunAt: j.lastRunAt ? j.lastRunAt.toISOString() : null,
     }));
-    return { jobs: serializedJobs, stats, todaySpend, cap };
+    return {
+      jobs: serializedJobs,
+      stats,
+      todaySpend,
+      cap,
+      waveAutonomous: profile[0]?.waveAutonomous ?? false,
+    };
   } catch {
     return null;
   }
@@ -299,7 +310,7 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
   const [result, counts, automation, discover] = await Promise.all([
     loadPosts(filter, user.id),
     loadCounts(user.id),
-    loadAutomationData(),
+    loadAutomationData(user.id),
     loadDiscoverData(user.id),
   ]);
 
@@ -332,6 +343,7 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
           jobs={automation.jobs}
           todaySpend={automation.todaySpend}
           cap={automation.cap}
+          waveAutonomous={automation.waveAutonomous}
         />
       )}
 

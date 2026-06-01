@@ -45,6 +45,10 @@ async function loadTrackedAccounts(): Promise<Influencer[]> {
   return merged;
 }
 
+// Long-running autonomous job — pin the function budget so a slow run isn't
+// killed at the platform default (which would orphan in-flight work).
+export const maxDuration = 300;
+
 export async function GET(request: Request) {
   if (!authorizeCronRequest(request)) return unauthorized();
 

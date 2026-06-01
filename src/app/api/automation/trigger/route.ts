@@ -7,6 +7,7 @@ const TriggerRequest = z.object({
     "/api/cron/discover",
     "/api/cron/generate",
     "/api/cron/post",
+    "/api/cron/wave",
   ]),
 });
 

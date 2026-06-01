@@ -214,4 +214,67 @@ describe("writer draft()", () => {
     const result = await draft({ topic: "test" });
     expect(result.texts[0]).toBe("tweet with spaces");
   });
+
+  it("system prompt contains ENGLISH directive when language is 'english'", async () => {
+    mockComplete.mockResolvedValue({ ...BASE_RESULT, text: "tweet" });
+
+    await draft({ topic: "test", preferences: { language: "english" } });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system" && m.content.includes("OUTPUT LANGUAGE: ENGLISH"));
+    expect(systemMsg).toBeDefined();
+  });
+
+  it("system prompt does NOT contain 'NEVER write a pure-English tweet' when language is 'english'", async () => {
+    mockComplete.mockResolvedValue({ ...BASE_RESULT, text: "tweet" });
+
+    await draft({ topic: "test", preferences: { language: "english" } });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system");
+    expect(systemMsg?.content).not.toContain("NEVER write a pure-English tweet");
+  });
+
+  it("system prompt contains RUSSIAN directive by default (no language preference)", async () => {
+    mockComplete.mockResolvedValue({ ...BASE_RESULT, text: "tweet" });
+
+    await draft({ topic: "test" });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system" && m.content.includes("OUTPUT LANGUAGE: RUSSIAN"));
+    expect(systemMsg).toBeDefined();
+  });
+
+  it("system prompt contains RUSSIAN directive when language is 'russian'", async () => {
+    mockComplete.mockResolvedValue({ ...BASE_RESULT, text: "tweet" });
+
+    await draft({ topic: "test", preferences: { language: "russian" } });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system" && m.content.includes("OUTPUT LANGUAGE: RUSSIAN"));
+    expect(systemMsg).toBeDefined();
+  });
+
+  it("system prompt contains MIXED RU/EN directive when language is 'mixed-ru-en'", async () => {
+    mockComplete.mockResolvedValue({ ...BASE_RESULT, text: "tweet" });
+
+    await draft({ topic: "test", preferences: { language: "mixed-ru-en" } });
+
+    const callArgs = firstCompleteOptions();
+    const systemMsg = callArgs.messages?.find((m) => m.role === "system" && m.content.includes("OUTPUT LANGUAGE: MIXED RU/EN"));
+    expect(systemMsg).toBeDefined();
+  });
+
+  it("language preference is NOT duplicated as soft preference in user-preferences block", async () => {
+    mockComplete.mockResolvedValue({ ...BASE_RESULT, text: "tweet" });
+
+    await draft({ topic: "test", preferences: { language: "english", tone: "casual" } });
+
+    const callArgs = firstCompleteOptions();
+    const prefMsg = callArgs.messages?.find((m) => m.content.includes("USER PREFERENCES"));
+    // Language should not appear in the preferences block; it is baked into the system prompt.
+    expect(prefMsg?.content).not.toContain("OUTPUT LANGUAGE");
+    // But tone should still appear.
+    expect(prefMsg?.content).toContain("TONE: casual");
+  });
 });

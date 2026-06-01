@@ -614,6 +614,150 @@ account» вместо 500. `checkSpendCap()` возвращает 429 с JSON �
 
 ---
 
+## 2026-05-31 — Searcher: capнуть built-in web search вместо смены провайдера
+
+**Проблема.** OpenAI-кредиты выгорали быстро. Один searcher-вызов (`web_search`
+через Responses API) уходил в агентный цикл на 8+ поисков за прогон и стоил
+~$0.50. Хуже — per-call fee вообще не учитывался в `costUsd`, и spend cap
+недосчитывал расход на поиск ~30×.
+
+**Ход мыслей.** Возник соблазн сменить провайдера на Groq (дешевле токены). Но
+Groq не умеет ни embeddings, ни built-in web search — отвалятся и memory-слой, и
+searcher. Главный расход тут не токены (на gpt-5-mini это ~1.5¢), а сам цикл из
+8 платных поисков. Значит лечить надо цикл, а не провайдера.
+
+**Рассмотренные варианты.**
+1. Перейти на Groq (OpenAI-совместимый chat) — ломает embeddings + searcher.
+2. Заменить `web_search` на внешний search API (Brave/Tavily) — требует ключ +
+   привязку карты, лишний провайдер.
+3. Оставить OpenAI `web_search`, но ограничить: `search_context_size=low`,
+   `reasoning=low`, `max_tool_calls` ceiling, и записать fee в `costUsd`.
+
+**Причина выбора.** №3. `low reasoning` останавливает цепочку из 8 поисков (это
+он её разгонял), `low` context режет дозагрузку страниц в input. Fee в costUsd
+делает spend cap честным.
+
+**Результат.** Probe подтвердил: ~$0.50 → ~$0.015 за поиск, 1 поиск вместо 8+,
+10k токенов вместо 34k. `costFor()` теперь варнит на неизвестную модель —
+переименованная модель больше не зануляет cap молча.
+
+**Дальше.** Variant deferral в compose (edit+fact-check только на победителе при
+`variants>1`) — добито в этом же заходе.
+
+---
+
+## 2026-05-31 — Discovery как два движка: RAG-feed + virality summary
+
+**Проблема.** Discover показывал только X-твиты, фиксированные 10 инфлюенсеров,
+без фильтров — статично и «слишком просто». При этом HN/arXiv/Substack уже
+ингестились в `sources`, но в UI никогда не показывались (фронт читал только
+`viral_posts`). Плюс баг: feed фильтровал `userId = current`, а cron-items идут с
+`userId IS NULL` — глобальный контент был скрыт.
+
+**Ход мыслей.** Discovery — это два движка: (1) RAG-контекст для генерации, (2)
+дайджест «что происходит в bubble». Большая часть инфраструктуры была — задача
+соединить полузастроенное, а не строить заново.
+
+**Рассмотренные варианты.** Дедик-страница vs upgrade панели на месте; один
+unified loader vs отдельные запросы per source.
+
+**Причина выбора.** Unified `loadDiscoveryFeed()` (merge `viral_posts` + `sources`
+всех типов, включая `userId IS NULL`), upgrade панели на месте. Команда из
+агентов (foundation → B/C/E параллельно → frontend → QA) по непересекающимся
+файлам, т.к. всё сходилось на `discover-panel.tsx`.
+
+**Результат.** Multi-source feed (7 kinds + badges), kind-фильтры, recency/
+engagement sort, keyword search. `take`/`qrt` переведены на **SSE** с живым
+индикатором пайплайна. Upload PDF/image → парс через OpenAI vision/`input_file`
+→ source. Feed↔Summary toggle: «what's happening in the bubble» — один дешёвый
+LLM-дайджест ленты. QA-гейт нашёл реальный data-corruption баг (cross-user
+collision в upload `externalId`) — пофикшен до коммита.
+
+**Дальше.** Embedding-on-ingest + retriever для настоящего RAG: колонки
+`embedding` + HNSW уже есть на `sources`/`viral_posts`, но никогда не пишутся.
+
+---
+
+## 2026-05-31 — UI: вытащить core-принципы в compose (а не прятать данные)
+
+**Проблема.** Пайплайн считал eval-скоры, invented-claims и sources — но UI почти
+ничего из этого не показывал. Юзер видел финальный текст, не видя на чём он
+основан и где риск выдумки.
+
+**Причина выбора.** Минимальные additive-изменения в compose-form: (1) живой
+per-step индикатор `search→writer→editor→eval→fact-check`; (2) `FabricationWarning`
+— красный баннер при `inventedCount>0`; (3) eval с акцентом на insight+voice
+(дифференциаторы), hygiene-оси приглушены; (4) «grounded on N sources» disclosure
+(в result-payload добавлен `sources`).
+
+**Результат.** Display-only, без смены поведения пайплайна. `tsc`/eslint/110
+тестов зелёные.
+
+**Дальше.** Gate на `inventedCount` (статус needs_review), weighted winner-rubric
+— это уже меняет поведение, ушло в Phase 2.
+
+---
+
+## 2026-05-31 — Аудит agentic-flow: 5 ревью-агентов + verifier перед реформой
+
+**Проблема.** Подозрение, что в архитектуре agentic-flow есть неэффективности.
+Реформировать хотелось, но не вслепую — и не доверять выводам ревью-агентов
+на веру.
+
+**Ход мыслей.** Сначала аудит, потом реформа. Параллельные ревьюеры по разным
+измерениям, затем независимый verifier сверяет каждую находку с реальным кодом —
+fan-out всегда даёт правдоподобные-но-ложные пункты.
+
+**Рассмотренные варианты.** Один большой ревью vs N специализированных; доверять
+находкам vs adversarial-проверка.
+
+**Причина выбора.** 5 ревью-агентов (orchestration/duplication · prompt-tier ·
+memory-RAG · cost-reliability · agent-design) → синтез → verifier подтверждает
+каждый пункт по `file:line` → Phase 1 (безопасные фиксы, не меняют output) против
+Phase 2 (меняет поведение/крупное).
+
+**Результат.** Verifier подтвердил все находки, но сузил «безопасное»: реальный
+баг — нет `dbSucceeded` guard в take/qrt/cron (succeeded→failed inversion при
+ошибке после успешного апдейта); model-string дропает fact-checker в 3 роутах;
+нет `maxDuration` на cron (orphaned `running`); evaluator зануляется на parse-fail
+(но fails-safe в ранкинге). Из Phase 1 применены сразу: `costFor`-warn + `maxDuration`
+на cron-роутах. Остальное (shared `runPipeline`, ~900 строк дублирования; merge
+editor+evaluator в critic; weighted rubric; gate на inventedCount) — Phase 2.
+
+**Дальше.** Phase 2 реформа отдельным PR после явного подтверждения — меняет
+продуктовое поведение.
+
+---
+
+## 2026-05-31 — Viral Wave Shot: вторая автоматизация + full-autonomous toggle
+
+**Проблема.** Нужен отдельный флоу «recommended viral topic» с preview — «выстрел
+по виральной волне». Существующая autonomy (`cron/generate`) берёт ОДИН
+топ-engagement пост; хотелось рекомендовать ТОПИКИ из всей волны и показать
+превью-черновики.
+
+**Ход мыслей.** Строится поверх virality summary: тот же «читаем bubble», но на
+выходе — конкретные топики + writer-only превью, а не проза.
+
+**Рассмотренные варианты (preview depth).** writer-only превью (дёшево/быстро) vs
+полный пайплайн на каждый топик (×N дороже). И триггер: on-demand / cron / оба.
+
+**Причина выбора.** writer-only превью; полный пайплайн только при «queue this».
+Триггер — оба. Полная автономия (auto-generate **и** auto-post) за toggle, default
+OFF: это публикация в X без ревью, опт-ин обязателен.
+
+**Результат.** `agents/viral-topics.ts` (рекомендует N топиков {topic,hook,
+rationale}), `lib/wave.runWaveShot()` (recommend → writer-only превью);
+`/api/wave/{shot,queue}`, `/api/cron/wave` (gated на `profiles.waveAutonomous` →
+посты `approved` → post-cron шипит). Toggle в Automation-панели с красным
+варнингом. ~$0.006 за shot (2 топика), проверено probe'ом. `maxTokens=3000` —
+снова reasoning-бюджет (см. запись 2026-05-22 про JSON-агентов).
+
+**Дальше.** Telegram-пуш для autonomous-wave (сейчас черновики просто падают в
+queue). Embedding-RAG в рекомендатор топиков.
+
+---
+
 ## История слайсов
 
 ```
@@ -647,6 +791,11 @@ account» вместо 500. `checkSpendCap()` возвращает 429 с JSON �
 22 editable influencer channels per user (profiles.trackedAccounts)
 23 forgot-password / update-password flow
 24 security hardening (user-scoped resets, open redirect, auth checks, X callback errors)
+25 cost opt — capped web search (~$0.50→$0.015) + variant deferral (edit/fact on winner)
+26 discovery rebuild — multi-source feed, SSE take/qrt, PDF/image upload parse, Feed↔Summary digest
+27 content-gen UI — live pipeline steps, fabrication warning, insight-first eval, source grounding
+28 agentic-flow audit — 5 review agents + verifier; Phase-1 safe fixes (costFor warn, cron maxDuration)
+29 viral wave shot — recommended topics + writer-only previews + full-autonomous toggle (default off)
 ```
 
 Полный лог — `git log --oneline`. Cost-per-pipeline и live evidence — в

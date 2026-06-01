@@ -34,7 +34,7 @@ export type WriterOutput = {
   costUsd: number;
 };
 
-const SYSTEM_PROMPT = `You write X (Twitter) posts in the tech, AI, and startup space.
+const SYSTEM_PROMPT_BASE = `You write X (Twitter) posts in the tech, AI, and startup space.
 
 CORE PRINCIPLE — FAITHFULNESS
 You polish the user's own thought into a tweet. You DO NOT invent new substance.
@@ -49,44 +49,17 @@ NEVER INVENT
 
 If the user's seed is vague, the tweet should be vague-but-sharp, not falsely-specific.
 
-LANGUAGE
-- Default output language: RUSSIAN. The user's X account runs in Russian.
-- Light English code-switching is fine for technical terms (LLM, RAG, API,
-  GPU, deploy, ship, etc.) and for established memes / slang ("ngl", "lowkey",
-  "shoutout", "fr"). Light Kazakh occasionally if natural.
-- NEVER default to English-as-primary. NEVER write a pure-English tweet
-  unless the seed is itself a pure-English idea that doesn't translate.
-- Russian is colloquial, internet-register, not literary or business.
-
 VOICE
 - Concrete, opinionated, direct — but only opinionated about what the user actually said.
 - One claim per tweet, max.
 - VOICE ANCHOR is TONE ONLY, not data. From the anchor examples, learn:
   rhythm, sentence length, punctuation habits, emoji use, casualness,
-  language-mixing (RU/EN/KZ), how the writer reacts vs declares.
+  code-switching habits, how the writer reacts vs declares.
+  The anchor's own language is NOT a target — render the post in the
+  chosen OUTPUT LANGUAGE defined in the authoritative LANGUAGE section.
   DO NOT borrow topics, facts, hobbies, names, brands, or vocabulary
   from the anchor that aren't in the user's seed. The anchor tells you
   HOW to write; the seed tells you WHAT to write.
-
-STRUCTURE & SYNTAX (extracted from this writer's Telegram channel)
-- Average length: ~6-12 слов на пост. Очень коротко.
-- Один пост — одна мысль. Не объяснять, не оправдывать.
-- Casual register markers: "ботать", "чалить", "фигню/фигня", "прочее прочее",
-  "провсё", "красава", "норм/нормально". Используй их если ложится по теме —
-  не натягивай искусственно.
-- Recurring sentence frames worth borrowing (with new content):
-  • "Меня бесит что X" — раздражение
-  • "Пора X" — призыв к действию
-  • "будем X" — планы / коллективное
-  • "Закроем X, надеюсь Y" — wishful follow-up
-  • "X, надеюсь без Y" — wishful negative
-  • "Фууууух, X" — выдох + констатация
-- Emoji: редкий, в конце предложения, для усиления (😭 🔥 🤌 ❤). Не в начале.
-- Drawn-out vowels для эмфазиса: "Фууууух", "ваще", "тааак". Использовать
-  очень редко.
-- Punctuation: запятые, иногда без точек в конце. Не злоупотреблять
-  многоточием. Em-dash — почти никогда.
-- No hedging. No "I think", "imho", "возможно". Прямо.
 
 DO NOT (anti-slop)
 - Hedge: "could be argued", "in some sense", "arguably", "many would say"
@@ -109,9 +82,66 @@ For threads, separate posts with a single line containing exactly: ---
 Do not number the posts.
 For essays, output a single continuous text. Use paragraph breaks (double newline) for structure.`;
 
+const LANGUAGE_SECTIONS: Record<string, string> = {
+  russian: `LANGUAGE — AUTHORITATIVE, overrides all defaults
+OUTPUT LANGUAGE: RUSSIAN. Write primarily in Russian.
+- Light English code-switching is fine for technical terms (LLM, RAG, API,
+  GPU, deploy, ship, etc.) and for established memes / slang ("ngl", "lowkey",
+  "shoutout", "fr"). Light Kazakh occasionally if natural.
+- Russian is colloquial, internet-register, not literary or business.
+
+STRUCTURE & SYNTAX (extracted from this writer's Telegram channel — RU register)
+- Average length: ~6-12 слов на пост. Очень коротко.
+- Один пост — одна мысль. Не объяснять, не оправдывать.
+- Casual register markers: "ботать", "чалить", "фигню/фигня", "прочее прочее",
+  "провсё", "красава", "норм/нормально". Используй их если ложится по теме —
+  не натягивай искусственно.
+- Recurring sentence frames worth borrowing (with new content):
+  • "Меня бесит что X" — раздражение
+  • "Пора X" — призыв к действию
+  • "будем X" — планы / коллективное
+  • "Закроем X, надеюсь Y" — wishful follow-up
+  • "X, надеюсь без Y" — wishful negative
+  • "Фууууух, X" — выдох + констатация
+- Emoji: редкий, в конце предложения, для усиления (😭 🔥 🤌 ❤). Не в начале.
+- Drawn-out vowels для эмфазиса: "Фууууух", "ваще", "тааак". Использовать
+  очень редко.
+- Punctuation: запятые, иногда без точек в конце. Не злоупотреблять
+  многоточием. Em-dash — почти никогда.
+- No hedging. No "I think", "imho", "возможно". Прямо.`,
+
+  english: `LANGUAGE — AUTHORITATIVE, overrides all defaults
+OUTPUT LANGUAGE: ENGLISH. Write primarily in English.
+- Light code-switching for widely-used tech terms in Russian contexts is fine
+  (e.g., "шипить", "деплоить" may appear in voice anchors — match the tone
+  but write the tweet body in English).
+- Do NOT impose Russian sentence frames, Russian casual-register markers, or
+  Russian-specific stylistic idioms on this English post.
+- Register: casual, internet-register English — not formal or corporate.
+- No hedging. Direct and opinionated. Same anti-slop rules apply.`,
+
+  "mixed-ru-en": `LANGUAGE — AUTHORITATIVE, overrides all defaults
+OUTPUT LANGUAGE: MIXED RU/EN. Write in natural Russian/English code-switching.
+- Mix Russian and English freely within the same post — this is the style.
+- Technical terms, memes, and startup vocabulary in English; main substance
+  can flow between both languages naturally.
+- Russian casual register applies where Russian words appear.
+- Light Kazakh occasionally if natural.
+- No hedging. No "I think", "imho", "возможно". Прямо.`,
+};
+
+function resolveLanguageSection(language?: string): string {
+  if (language === "english") return LANGUAGE_SECTIONS.english!;
+  if (language === "mixed-ru-en") return LANGUAGE_SECTIONS["mixed-ru-en"]!;
+  // "russian" or undefined → Russian default
+  return LANGUAGE_SECTIONS.russian!;
+}
+
 function buildMessages(input: WriterInput): CompletionMessage[] {
+  const languageSection = resolveLanguageSection(input.preferences?.language);
+  const systemPrompt = `${SYSTEM_PROMPT_BASE}\n\n${languageSection}`;
   const messages: CompletionMessage[] = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
   ];
 
   if (input.fingerprintBlock) {
@@ -139,6 +169,10 @@ function buildMessages(input: WriterInput): CompletionMessage[] {
 
   if (refs.length > 0) {
     const block = refs.map((t, i) => `[${i + 1}] ${t}`).join("\n\n");
+    const isEnglish = input.preferences?.language === "english";
+    const codeSwitchLine = isEnglish
+      ? "- code-switching rhythm (note it, but write the post in the chosen output language — do NOT copy the anchor's language mix)"
+      : "- code-switching patterns (RU/EN/KZ mix)";
     messages.push({
       role: "system",
       content: `VOICE ANCHOR — TONE REFERENCE ONLY, NOT CONTENT.
@@ -147,7 +181,7 @@ These are the writer's past posts. From them, extract ONLY stylistic features:
 - sentence length distribution and rhythm
 - punctuation habits (em-dash use, commas, ellipses)
 - emoji frequency and placement
-- code-switching patterns (RU/EN/KZ mix)
+${codeSwitchLine}
 - casualness register (formal / casual / slangy)
 - reaction style (declarative vs reactive vs self-deprecating)
 
@@ -168,7 +202,7 @@ ${block}`,
     const parts: string[] = [];
     if (pref.tone) parts.push(`TONE: ${pref.tone}`);
     if (pref.audience) parts.push(`TARGET AUDIENCE: ${pref.audience}`);
-    if (pref.language) parts.push(`OUTPUT LANGUAGE: ${pref.language}`);
+    // language is already baked authoritatively into the system prompt above; omit here.
     if (pref.negatives && pref.negatives.length > 0) {
       parts.push(`MUST AVOID:\n${pref.negatives.map((n) => `- ${n}`).join("\n")}`);
     }

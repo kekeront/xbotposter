@@ -639,6 +639,52 @@ function UploadControl({ onSuccess }: { onSuccess: () => void }) {
 
 // ─── Main Panel ───────────────────────────────────────────────────────────────
 
+function SummaryView({
+  summary,
+  loading,
+  error,
+  onRefresh,
+}: {
+  summary: string | null;
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[10px] text-muted-foreground">
+          what&apos;s happening in your bubble
+        </span>
+        <button
+          onClick={onRefresh}
+          disabled={loading}
+          className="font-mono text-[10px] text-muted-foreground underline hover:text-foreground disabled:opacity-50"
+        >
+          {loading ? "…" : "refresh"}
+        </button>
+      </div>
+      {error ? (
+        <div className="rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3 font-mono text-xs text-destructive">
+          {error}
+        </div>
+      ) : loading && !summary ? (
+        <p className="py-4 text-center text-sm text-muted-foreground">
+          summarizing the feed…
+        </p>
+      ) : summary ? (
+        <div className="whitespace-pre-wrap rounded-md border bg-muted/20 p-3 text-sm leading-relaxed">
+          {summary}
+        </div>
+      ) : (
+        <p className="py-4 text-center text-sm text-muted-foreground">
+          No summary yet.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function DiscoverPanel({
   initialItems,
   initialTotal,
@@ -666,6 +712,12 @@ export function DiscoverPanel({
   const [kindFilter, setKindFilter] = useState<DiscoveryKind[]>([]);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"recency" | "engagement">("recency");
+
+  // Feed ↔ Summary view ("what's happening in the bubble").
+  const [view, setView] = useState<"feed" | "summary">("feed");
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
 
   // ── Fetch-fetch state (manual refresh) ────────────────────────────────────
   const [fetching, setFetching] = useState(false);
@@ -733,6 +785,25 @@ export function DiscoverPanel({
     },
     [kindFilter, query, sort],
   );
+
+  const loadSummary = useCallback(async () => {
+    setSummaryLoading(true);
+    setSummaryError(null);
+    try {
+      const res = await fetch("/api/discover/summary");
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setSummaryError(data.error ?? `HTTP ${res.status}`);
+        return;
+      }
+      const data = (await res.json()) as { summary: string };
+      setSummary(data.summary);
+    } catch (e) {
+      setSummaryError(e instanceof Error ? e.message : "failed to load summary");
+    } finally {
+      setSummaryLoading(false);
+    }
+  }, []);
 
   // Re-query when filters/sort change (but only once the panel is open to
   // avoid unnecessary network requests on mount).
@@ -939,6 +1010,40 @@ export function DiscoverPanel({
           {/* Upload control */}
           <UploadControl onSuccess={handleUploadSuccess} />
 
+          {/* Feed ↔ Summary view toggle */}
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono text-[10px] text-muted-foreground">
+              view:
+            </span>
+            {(["feed", "summary"] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => {
+                  setView(v);
+                  if (v === "summary" && summary === null && !summaryLoading) {
+                    loadSummary();
+                  }
+                }}
+                className={`rounded px-2 py-0.5 font-mono text-[10px] transition-colors ${
+                  view === v
+                    ? "bg-foreground text-background"
+                    : "bg-muted text-muted-foreground hover:bg-muted/70"
+                }`}
+              >
+                {v === "feed" ? "feed" : "what's happening"}
+              </button>
+            ))}
+          </div>
+
+          {view === "summary" ? (
+            <SummaryView
+              summary={summary}
+              loading={summaryLoading}
+              error={summaryError}
+              onRefresh={loadSummary}
+            />
+          ) : (
+            <>
           {/* Filters: kind chips + sort + search */}
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center gap-1.5">
@@ -1032,6 +1137,8 @@ export function DiscoverPanel({
                 </p>
               )}
             </div>
+          )}
+            </>
           )}
         </div>
       ) : null}
