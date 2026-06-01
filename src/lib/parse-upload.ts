@@ -98,6 +98,10 @@ async function parsePdf(
   const response = await client.responses.create(
     {
       model,
+      // Bounded digest, not a verbatim dump: a full transcription of a large
+      // PDF is slow/expensive and pointless here — uploaded sources are used as
+      // a short research-context snippet downstream. Cap output (reasoning-safe).
+      max_output_tokens: 2500,
       input: [
         {
           role: "user",
@@ -109,13 +113,13 @@ async function parsePdf(
             },
             {
               type: "input_text",
-              text: 'Extract all readable text from this PDF verbatim, preserving paragraph structure. Then on a new line starting with "TITLE:" write a concise 5-10 word descriptive title for the content. Format:\n\n<extracted text>\n\nTITLE: <short title>',
+              text: 'Summarize this PDF into a concise digest usable as a writing source: the main points, key facts, names, numbers, and conclusions — about 150-250 words, skimmable. Then on a new line starting with "TITLE:" write a concise 5-10 word descriptive title. Format:\n\n<digest>\n\nTITLE: <short title>',
             },
           ],
         },
       ],
     },
-    { timeout: 120_000 },
+    { timeout: 90_000 },
   );
 
   const raw = response.output_text ?? "";

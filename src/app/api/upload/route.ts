@@ -8,6 +8,10 @@ import {
   UPLOAD_ALLOWED_MIME_TYPES,
 } from "@/lib/parse-upload";
 
+// OpenAI file/vision parse can take a while — pin the budget so the platform
+// doesn't kill the request mid-parse (the default would stall the upload).
+export const maxDuration = 120;
+
 // ─── JSON text path (existing) ───────────────────────────────────────────────
 
 const JsonUploadRequest = z.object({
